@@ -169,7 +169,14 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 .rl{font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;}
 .rv{font-family:'Fredoka One',cursive;font-size:38px;color:#fff;}
 
-/* TOAST */
+/* ADMIN */
+.admin-tab{background:rgba(0,0,0,0.3);border:2px solid rgba(200,100,200,0.3);color:rgba(255,255,255,0.6);padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:900;transition:all 0.15s;}
+.admin-tab.active{background:rgba(150,50,150,0.5);border-color:#d9a0d9;color:#fff;}
+.admin-cat{font-family:'Fredoka One',cursive;font-size:16px;color:var(--r);margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid rgba(204,26,26,0.3);}
+.admin-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.admin-item-name{font-size:13px;font-weight:700;flex:1;}
+.admin-price-input{background:rgba(0,0,0,0.4);border:1.5px solid rgba(245,216,0,0.3);color:var(--g);padding:5px 8px;border-radius:6px;font-size:14px;font-weight:900;width:80px;text-align:right;font-family:'Fredoka One',cursive;}
+.admin-price-input:focus{outline:none;border-color:var(--g);}
 #toasts{position:fixed;top:78px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
 .toast{display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;font-size:14px;font-weight:900;min-width:270px;pointer-events:all;animation:tin 0.3s ease;}
 .toast.ok{background:linear-gradient(135deg,#1a5c1a,#27ae60);border:2px solid #2ecc71;color:#fff;}
@@ -203,6 +210,8 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
       <button class="nbtn active" onclick="switchView('new')">➕ Nuovo Ordine</button>
       <button class="nbtn" onclick="switchView('open')" id="btn-open">Ordini Aperti <span id="ocount"></span></button>
       <button class="nbtn" onclick="switchView('comp')" id="btn-comp">✅ Completati <span id="ccount"></span></button>
+      <button class="nbtn" onclick="switchView('stats')">📊 Statistiche</button>
+      <button class="nbtn" onclick="openAdmin()" style="background:rgba(150,50,150,0.3);border-color:rgba(200,100,200,0.5);color:#d9a0d9;">⚙️ Admin</button>
     </div>
     <div class="clock" id="clock">--:--</div>
   </div>
@@ -279,10 +288,82 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
     </div>
     <div class="ogrid" id="cgrid"></div>
   </div>
+
+  <!-- STATS VIEW -->
+  <div class="oview" id="sview" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g);">📊 Statistiche Serata</span>
+      <span style="color:rgba(255,255,255,0.4);font-size:12px;" id="stats-date"></span>
+    </div>
+    <div id="stats-content" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;"></div>
+  </div>
 </div>
 
 <!-- TOAST -->
 <div id="toasts"></div>
+
+<!-- MODAL ADMIN -->
+<div class="moverlay" id="madmin">
+  <div class="modal" style="width:600px;max-height:90vh;overflow-y:auto;">
+    <h3>⚙️ Pannello Admin</h3>
+
+    <!-- PASSWORD -->
+    <div id="admin-login" style="">
+      <div class="mnote" style="text-align:center;margin-bottom:12px;">Inserisci la password per accedere</div>
+      <input class="minput" type="password" id="admin-pwd" placeholder="Password admin" onkeydown="if(event.key==='Enter')checkAdminPwd()">
+      <div class="mbtns">
+        <button class="bcan" onclick="closeAdmin()">✕ Annulla</button>
+        <button class="bok" onclick="checkAdminPwd()">🔓 Accedi</button>
+      </div>
+    </div>
+
+    <!-- PANNELLO ADMIN (nascosto finché non si fa login) -->
+    <div id="admin-panel" style="display:none;">
+
+      <!-- TAB ADMIN -->
+      <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="admin-tab active" onclick="selAdminTab('prezzi',this)">💶 Prezzi Menu</button>
+        <button class="admin-tab" onclick="selAdminTab('consegna',this)">🛵 Consegna</button>
+        <button class="admin-tab" onclick="selAdminTab('pwd',this)">🔑 Password</button>
+      </div>
+
+      <!-- TAB PREZZI -->
+      <div id="atab-prezzi">
+        <div class="mnote" style="margin-bottom:10px;">Modifica prezzi del menu — clicca su un prezzo per cambiarlo</div>
+        <div id="admin-menu-list"></div>
+        <div class="mbtns" style="margin-top:16px;">
+          <button class="bcan" onclick="closeAdmin()">✕ Chiudi</button>
+          <button class="bok" onclick="saveAdminPrezzi()">💾 Salva tutto</button>
+        </div>
+      </div>
+
+      <!-- TAB CONSEGNA -->
+      <div id="atab-consegna" style="display:none;">
+        <div class="mnote" style="margin-bottom:10px;">Costo fisso consegna a domicilio</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <span style="font-size:16px;font-weight:700;">€</span>
+          <input class="minput" type="number" id="admin-delivery" step="0.50" min="0" style="font-size:22px;font-weight:900;width:120px;">
+        </div>
+        <div class="mbtns">
+          <button class="bcan" onclick="closeAdmin()">✕ Chiudi</button>
+          <button class="bok" onclick="saveDelivery()">💾 Salva</button>
+        </div>
+      </div>
+
+      <!-- TAB PASSWORD -->
+      <div id="atab-pwd" style="display:none;">
+        <div class="mnote" style="margin-bottom:10px;">Cambia password admin</div>
+        <input class="minput" type="password" id="admin-newpwd1" placeholder="Nuova password">
+        <input class="minput" type="password" id="admin-newpwd2" placeholder="Ripeti nuova password">
+        <div class="mbtns">
+          <button class="bcan" onclick="closeAdmin()">✕ Chiudi</button>
+          <button class="bok" onclick="saveAdminPwd()">💾 Salva</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- MODAL EXTRA -->
 <div class="moverlay" id="mex">
@@ -307,17 +388,40 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
     <h3>💰 Pagamento</h3>
     <div style="text-align:center;font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:4px;" id="pay-info"></div>
     <div class="paytot" id="pay-tot">€ 0,00</div>
-    <div class="payrow">
-      <label>Cliente dà:</label>
-      <input type="number" id="pay-in" placeholder="0.00" oninput="calcResto()" step="0.50" min="0">
+
+    <!-- SCELTA CONTANTI / CARTA -->
+    <div style="display:flex;gap:10px;margin-bottom:12px;" id="pay-method-row">
+      <button id="pay-cash-btn" onclick="setPayMethod('cash')" style="flex:1;padding:14px;border:2px solid rgba(245,216,0,0.3);background:rgba(0,0,0,0.3);color:rgba(255,255,255,0.6);border-radius:10px;cursor:pointer;font-size:16px;font-weight:900;transition:all 0.15s;">
+        💵 Contanti
+      </button>
+      <button id="pay-card-btn" onclick="setPayMethod('card')" style="flex:1;padding:14px;border:2px solid rgba(245,216,0,0.3);background:rgba(0,0,0,0.3);color:rgba(255,255,255,0.6);border-radius:10px;cursor:pointer;font-size:16px;font-weight:900;transition:all 0.15s;">
+        💳 Carta
+      </button>
     </div>
-    <div class="restobox">
-      <div class="rl">Resto da dare al cliente</div>
-      <div class="rv" id="resto-val">€ 0,00</div>
+
+    <!-- SEZIONE CONTANTI -->
+    <div id="pay-cash-section" style="display:none;">
+      <div class="payrow">
+        <label>Cliente dà:</label>
+        <input type="number" id="pay-in" placeholder="0.00" oninput="calcResto()" step="0.50" min="0">
+      </div>
+      <div class="restobox">
+        <div class="rl">Resto da dare al cliente</div>
+        <div class="rv" id="resto-val">€ 0,00</div>
+      </div>
     </div>
+
+    <!-- SEZIONE CARTA -->
+    <div id="pay-card-section" style="display:none;">
+      <div style="background:linear-gradient(135deg,#1a3a6a,#2980b9);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;">
+        <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:700;">Fai pagare il cliente col POS</div>
+        <div style="font-size:28px;font-weight:900;color:#fff;margin-top:4px;" id="card-amount">€ 0,00</div>
+      </div>
+    </div>
+
     <div class="mbtns">
       <button class="bcan" onclick="closePay()">✕ Annulla</button>
-      <button class="bok" onclick="completePay()">✅ Pagato</button>
+      <button class="bok" onclick="completePay()" id="pay-confirm-btn" style="opacity:0.4;pointer-events:none;">✅ Conferma</button>
     </div>
   </div>
 </div>
@@ -540,14 +644,12 @@ function renderItems(){
 function chgQ(i,d){order.items[i].qty+=d;if(order.items[i].qty<=0)order.items.splice(i,1);renderItems();}
 function delI(i){order.items.splice(i,1);renderItems();}
 
-function getTotal(){
-  let t=order.items.reduce((s,i)=>s+i.price*i.qty,0);
-  if(order.type==='domicilio')t+=3;
-  return +t.toFixed(2);
-}
 function updTotal(){
   document.getElementById('totval').textContent=fmt(getTotal());
   document.getElementById('delrow').style.display=order.type==='domicilio'?'flex':'none';
+  if(order.type==='domicilio'){
+    document.getElementById('delrow').innerHTML=`<span>🛵 Consegna</span><span style="color:var(--g)">${fmt(DELIVERY_COST)}</span>`;
+  }
 }
 
 // TYPE
@@ -670,11 +772,13 @@ function switchView(v){
   document.getElementById('opanel').style.display=v==='new'?'':'none';
   document.getElementById('oview').style.display=v==='open'?'block':'none';
   document.getElementById('cview').style.display=v==='comp'?'block':'none';
+  document.getElementById('sview').style.display=v==='stats'?'block':'none';
   document.querySelectorAll('.nbtn').forEach((b,i)=>{
-    b.classList.toggle('active',(i===0&&v==='new')||(i===1&&v==='open')||(i===2&&v==='comp'));
+    b.classList.toggle('active',(i===0&&v==='new')||(i===1&&v==='open')||(i===2&&v==='comp')||(i===3&&v==='stats'));
   });
   if(v==='open')renderOpen();
   if(v==='comp')renderCompleted();
+  if(v==='stats')renderStats();
 }
 
 function updCount(){
@@ -717,6 +821,50 @@ function resetCompleted(){
   renderCompleted();
   toast(`Serata azzerata! Totale incassato: ${fmt(tot)}`, 'ok', 5000);
 }
+
+function renderStats(){
+  const el=document.getElementById('stats-content');
+  document.getElementById('stats-date').textContent=new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
+  if(!completedOrders.length){
+    el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">📊</div><p>Nessun ordine completato stasera</p></div>';
+    return;
+  }
+  const tot=completedOrders.reduce((s,o)=>s+(o.total||0),0);
+  const cash=completedOrders.filter(o=>o.payMethod==='cash');
+  const card=completedOrders.filter(o=>o.payMethod==='card');
+  const asporto=completedOrders.filter(o=>o.type==='asporto');
+  const domicilio=completedOrders.filter(o=>o.type==='domicilio');
+  const totCash=cash.reduce((s,o)=>s+(o.total||0),0);
+  const totCard=card.reduce((s,o)=>s+(o.total||0),0);
+  const byHour={};
+  completedOrders.forEach(o=>{if(o.paidTime){const h=o.paidTime.split(':')[0];byHour[h]=(byHour[h]||0)+1;}});
+  const peakHour=Object.entries(byHour).sort((a,b)=>b[1]-a[1])[0];
+  const prodCount={};
+  completedOrders.forEach(o=>o.items.forEach(i=>{prodCount[i.name]=(prodCount[i.name]||0)+i.qty;}));
+  const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const sc=(v,label,sub,color='var(--g)')=>`
+    <div style="background:linear-gradient(145deg,rgba(45,90,27,0.6),rgba(26,58,26,0.8));border:2px solid ${color};border-radius:14px;padding:16px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">${label}</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:26px;color:${color};">${v}</div>
+      ${sub?`<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">${sub}</div>`:''}
+    </div>`;
+  el.innerHTML=`
+    ${sc(completedOrders.length,'🧾 Ordini totali','Completati stasera')}
+    ${sc(fmt(tot),'💰 Incasso totale','Tutti i pagamenti')}
+    ${sc(cash.length+' ord · '+fmt(totCash),'💵 Contanti','')}
+    ${sc(card.length+' ord · '+fmt(totCard),'💳 Carta','','#3498db')}
+    ${sc(asporto.length+' asporto / '+domicilio.length+' dom','🛵 Tipo ordini','')}
+    ${peakHour?sc(peakHour[0]+':00 — '+peakHour[1]+' ordini','⏰ Ora più affollata',''):''}
+    <div style="background:linear-gradient(145deg,rgba(45,90,27,0.6),rgba(26,58,26,0.8));border:2px solid var(--vc);border-radius:14px;padding:16px;grid-column:1/-1">
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);font-weight:700;text-transform:uppercase;margin-bottom:10px;">🍕 Prodotti più venduti stasera</div>
+      ${topProds.map((p,i)=>`
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
+          <span style="font-size:14px;font-weight:700;">${i+1}. ${p[0]}</span>
+          <span style="font-family:'Fredoka One',cursive;color:var(--g);font-size:18px;">${p[1]}x</span>
+        </div>`).join('')}
+    </div>`;
+}
+
 function renderOpen(){
   const grid=document.getElementById('ogrid');
   const tot=openOrders.reduce((s,o)=>s+(o.total||0),0);
@@ -777,23 +925,66 @@ function openPay(id){
     showPayModal(o.total,o.cognome);
   }
 }
+let payMethod=null;
+
 function showPayModal(tot,name){
   document.getElementById('pay-tot').textContent=fmt(tot);
   document.getElementById('pay-info').textContent='Cliente: '+name;
   document.getElementById('pay-in').value='';
   document.getElementById('resto-val').textContent='€ 0,00';
+  document.getElementById('card-amount').textContent=fmt(tot);
+  document.getElementById('pay-cash-section').style.display='none';
+  document.getElementById('pay-card-section').style.display='none';
+  document.getElementById('pay-confirm-btn').style.opacity='0.4';
+  document.getElementById('pay-confirm-btn').style.pointerEvents='none';
+  payMethod=null;
+  // Reset button styles
+  ['pay-cash-btn','pay-card-btn'].forEach(id=>{
+    const b=document.getElementById(id);
+    b.style.background='rgba(0,0,0,0.3)';
+    b.style.color='rgba(255,255,255,0.6)';
+    b.style.borderColor='rgba(245,216,0,0.3)';
+  });
   document.getElementById('mpay').classList.add('show');
 }
-function closePay(){document.getElementById('mpay').classList.remove('show');payId=null;}
+
+function setPayMethod(m){
+  payMethod=m;
+  const cashBtn=document.getElementById('pay-cash-btn');
+  const cardBtn=document.getElementById('pay-card-btn');
+  const confirmBtn=document.getElementById('pay-confirm-btn');
+  if(m==='cash'){
+    cashBtn.style.background='var(--g)';cashBtn.style.color='var(--vs)';cashBtn.style.borderColor='var(--g)';
+    cardBtn.style.background='rgba(0,0,0,0.3)';cardBtn.style.color='rgba(255,255,255,0.6)';cardBtn.style.borderColor='rgba(245,216,0,0.3)';
+    document.getElementById('pay-cash-section').style.display='block';
+    document.getElementById('pay-card-section').style.display='none';
+    confirmBtn.style.opacity='0.4';confirmBtn.style.pointerEvents='none';
+  } else {
+    cardBtn.style.background='#2980b9';cardBtn.style.color='#fff';cardBtn.style.borderColor='#3498db';
+    cashBtn.style.background='rgba(0,0,0,0.3)';cashBtn.style.color='rgba(255,255,255,0.6)';cashBtn.style.borderColor='rgba(245,216,0,0.3)';
+    document.getElementById('pay-cash-section').style.display='none';
+    document.getElementById('pay-card-section').style.display='block';
+    confirmBtn.style.opacity='1';confirmBtn.style.pointerEvents='auto';
+  }
+}
+
 function calcResto(){
   const tot=payId?openOrders.find(o=>o.id===payId)?.total:getTotal();
   const dato=parseFloat(document.getElementById('pay-in').value)||0;
-  document.getElementById('resto-val').textContent=fmt(Math.max(0,dato-tot));
+  const resto=Math.max(0,dato-tot);
+  document.getElementById('resto-val').textContent=fmt(resto);
+  const confirmBtn=document.getElementById('pay-confirm-btn');
+  if(dato>=tot){confirmBtn.style.opacity='1';confirmBtn.style.pointerEvents='auto';}
+  else{confirmBtn.style.opacity='0.4';confirmBtn.style.pointerEvents='none';}
 }
+function closePay(){document.getElementById('mpay').classList.remove('show');payId=null;payMethod=null;}
 function completePay(){
+  if(!payMethod){toast('Seleziona contanti o carta!','err');return;}
   const tot=payId?openOrders.find(o=>o.id===payId)?.total:getTotal();
-  const dato=parseFloat(document.getElementById('pay-in').value)||0;
-  if(dato<tot){toast('Il cliente non ha dato abbastanza!','err');return;}
+  if(payMethod==='cash'){
+    const dato=parseFloat(document.getElementById('pay-in').value)||0;
+    if(dato<tot){toast('Il cliente non ha dato abbastanza!','err');return;}
+  }
   let paidOrder=null;
   if(payId){
     paidOrder=openOrders.find(o=>o.id===payId);
@@ -809,13 +1000,16 @@ function completePay(){
   if(paidOrder){
     paidOrder.paidTime=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
     paidOrder.paidDate=new Date().toLocaleDateString('it-IT');
+    paidOrder.payMethod=payMethod;
     completedOrders.push(paidOrder);
     localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
   }
   saveOrders();updCount();closePay();
   if(view==='open')renderOpen();
   if(view==='comp')renderCompleted();
-  toast('Pagamento completato!','ok',4000);
+  if(view==='stats')renderStats();
+  const methodLabel=payMethod==='cash'?'💵 Contanti':'💳 Carta';
+  toast(`Pagamento ${methodLabel} completato!`,'ok',4000);
 }
 
 // EXTRA MODAL
@@ -886,6 +1080,101 @@ function printComanda(o){
   const d=fr.contentDocument||fr.contentWindow.document;
   d.open();d.write(html);d.close();
   setTimeout(()=>{fr.contentWindow.focus();fr.contentWindow.print();},350);
+}
+
+// ADMIN
+let DELIVERY_COST=parseFloat(localStorage.getItem('bb_delivery')||'3');
+let ADMIN_PWD=localStorage.getItem('bb_adminpwd')||'1234';
+
+function getTotal(){
+  let t=order.items.reduce((s,i)=>s+i.price*i.qty,0);
+  if(order.type==='domicilio')t+=DELIVERY_COST;
+  return +t.toFixed(2);
+}
+
+function openAdmin(){
+  document.getElementById('admin-login').style.display='block';
+  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('admin-pwd').value='';
+  document.getElementById('madmin').classList.add('show');
+}
+function closeAdmin(){document.getElementById('madmin').classList.remove('show');}
+
+function checkAdminPwd(){
+  const pwd=document.getElementById('admin-pwd').value;
+  if(pwd===ADMIN_PWD){
+    document.getElementById('admin-login').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    renderAdminMenu();
+    document.getElementById('admin-delivery').value=DELIVERY_COST;
+  } else {
+    toast('Password errata!','err');
+    document.getElementById('admin-pwd').value='';
+  }
+}
+
+function selAdminTab(tab,btn){
+  ['prezzi','consegna','pwd'].forEach(t=>{
+    document.getElementById('atab-'+t).style.display=t===tab?'block':'none';
+  });
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function renderAdminMenu(){
+  const el=document.getElementById('admin-menu-list');
+  let html='';
+  Object.entries(MENU).forEach(([cat,items])=>{
+    html+=`<div class="admin-cat">${cat}</div>`;
+    items.forEach((item,idx)=>{
+      html+=`<div class="admin-item">
+        <span class="admin-item-name">${item.n}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:12px;color:rgba(255,255,255,0.4);">€</span>
+          <input class="admin-price-input" type="number" step="0.50" min="0"
+            value="${item.p}" data-cat="${cat}" data-idx="${idx}">
+        </div>
+      </div>`;
+    });
+  });
+  el.innerHTML=html;
+}
+
+function saveAdminPrezzi(){
+  document.querySelectorAll('.admin-price-input').forEach(input=>{
+    const cat=input.dataset.cat;
+    const idx=parseInt(input.dataset.idx);
+    const newPrice=parseFloat(input.value);
+    if(!isNaN(newPrice)&&newPrice>=0){
+      MENU[cat][idx].p=newPrice;
+    }
+  });
+  // Salva nel localStorage
+  localStorage.setItem('bb_menu',JSON.stringify(MENU));
+  toast('Prezzi aggiornati!','ok');
+  renderCats();
+  closeAdmin();
+}
+
+function saveDelivery(){
+  const v=parseFloat(document.getElementById('admin-delivery').value);
+  if(isNaN(v)||v<0){toast('Valore non valido!','err');return;}
+  DELIVERY_COST=v;
+  localStorage.setItem('bb_delivery',v.toString());
+  toast('Costo consegna aggiornato a '+fmt(v)+'!','ok');
+  closeAdmin();
+  updTotal();
+}
+
+function saveAdminPwd(){
+  const p1=document.getElementById('admin-newpwd1').value;
+  const p2=document.getElementById('admin-newpwd2').value;
+  if(!p1){toast('Inserisci la nuova password!','err');return;}
+  if(p1!==p2){toast('Le password non coincidono!','err');return;}
+  ADMIN_PWD=p1;
+  localStorage.setItem('bb_adminpwd',p1);
+  toast('Password cambiata!','ok');
+  closeAdmin();
 }
 
 // INIT
