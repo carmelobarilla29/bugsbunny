@@ -2,7 +2,9 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Pizzeria Bugs Bunny - Gestionale</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
@@ -13,24 +15,35 @@
   --r:#cc1a1a;--rs:#8b0000;
   --mar:#3d2b0a;
 }
-body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;height:100vh;overflow:hidden;}
-.app{display:grid;grid-template-columns:1fr 440px;grid-template-rows:68px 1fr;height:100vh;}
+body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;height:100vh;height:100dvh;overflow:hidden;}
+.app{display:grid;grid-template-columns:1fr 400px;grid-template-rows:60px 1fr;height:100vh;height:100dvh;}
+
+/* TABLET/IPAD RESPONSIVE */
+@media (max-width:900px){
+  .app{grid-template-columns:1fr 340px;}
+}
+@media (max-width:768px){
+  .app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr;}
+  .menu-panel{display:none;}
+  .opanel{grid-column:1;border-left:none;}
+}
 
 /* HEADER */
 .header{
   grid-column:1/-1;
   background:linear-gradient(135deg,var(--vs) 0%,var(--vm) 50%,var(--vs) 100%);
   border-bottom:4px solid var(--g);
-  display:flex;align-items:center;justify-content:space-between;padding:0 16px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;
+  flex-shrink:0;
 }
-.hbrand{display:flex;align-items:center;gap:10px;}
-.hlogo{font-size:34px;}
-.htitle{font-family:'Fredoka One',cursive;font-size:24px;color:var(--g);text-shadow:2px 2px 0 var(--rs),-1px -1px 0 var(--mar);letter-spacing:1px;}
-.hsub{font-size:10px;color:rgba(245,216,0,0.65);letter-spacing:2px;text-transform:uppercase;}
-.hnav{display:flex;gap:8px;}
-.nbtn{background:rgba(0,0,0,0.3);border:2px solid var(--gs);color:var(--g);padding:8px 18px;border-radius:25px;cursor:pointer;font-size:13px;font-weight:900;transition:all 0.2s;}
+.hbrand{display:flex;align-items:center;gap:8px;}
+.hlogo{font-size:28px;}
+.htitle{font-family:'Fredoka One',cursive;font-size:20px;color:var(--g);text-shadow:2px 2px 0 var(--rs),-1px -1px 0 var(--mar);letter-spacing:1px;}
+.hsub{font-size:9px;color:rgba(245,216,0,0.65);letter-spacing:1px;text-transform:uppercase;}
+.hnav{display:flex;gap:6px;}
+.nbtn{background:rgba(0,0,0,0.3);border:2px solid var(--gs);color:var(--g);padding:7px 14px;border-radius:25px;cursor:pointer;font-size:12px;font-weight:900;transition:all 0.2s;white-space:nowrap;}
 .nbtn.active,.nbtn:hover{background:var(--g);color:var(--vs);border-color:var(--g);}
-.clock{font-family:'Fredoka One',cursive;font-size:22px;color:var(--g);}
+.clock{font-family:'Fredoka One',cursive;font-size:20px;color:var(--g);}
 
 /* MENU */
 .menu-panel{background:var(--vs);overflow-y:auto;padding:12px;}
@@ -53,18 +66,18 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 .tbtn.active{background:var(--g);color:var(--rs);border-color:var(--g);}
 
 /* CUSTOMER INFO */
-.cinfo{padding:10px 14px;border-bottom:1px solid rgba(245,216,0,0.12);flex-shrink:0;}
-.finput{width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(245,216,0,0.25);color:#fff;padding:8px 10px;border-radius:8px;font-size:13px;margin-bottom:7px;font-family:'Nunito',sans-serif;transition:border-color 0.15s;}
+.cinfo{padding:8px 14px;border-bottom:1px solid rgba(245,216,0,0.12);flex-shrink:0;}
+.finput{width:100%;background:rgba(0,0,0,0.4);border:1.5px solid rgba(245,216,0,0.25);color:#fff;padding:10px 10px;border-radius:8px;font-size:15px;margin-bottom:6px;font-family:'Nunito',sans-serif;transition:border-color 0.15s;}
 .finput:focus{outline:none;border-color:var(--g);}
 .finput::placeholder{color:rgba(255,255,255,0.3);}
 
 /* ORARIO BUTTONS */
-.orario-row{display:flex;gap:8px;margin-bottom:7px;}
+.orario-row{display:flex;gap:8px;margin-bottom:6px;}
 .orbtn{
-  flex:1;padding:11px 8px;border:2px solid rgba(245,216,0,0.3);
+  flex:1;padding:14px 8px;border:2px solid rgba(245,216,0,0.3);
   background:rgba(0,0,0,0.35);color:rgba(255,255,255,0.6);
-  border-radius:10px;cursor:pointer;font-size:14px;font-weight:900;
-  transition:all 0.15s;line-height:1.2;text-align:center;
+  border-radius:10px;cursor:pointer;font-size:15px;font-weight:900;
+  transition:all 0.15s;line-height:1.2;text-align:center;min-height:54px;
 }
 .orbtn.active{background:var(--g);color:var(--vs);border-color:var(--g);}
 .orbtn:hover:not(.active){border-color:var(--gs);color:var(--g);}
@@ -91,18 +104,18 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 .idel:hover{color:#ff4444;}
 
 /* FOOTER */
-.ofooter{padding:12px 14px;border-top:3px solid var(--g);background:rgba(0,0,0,0.28);flex-shrink:0;}
+.ofooter{padding:10px 14px;border-top:3px solid var(--g);background:rgba(0,0,0,0.28);flex-shrink:0;}
 .delrow{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:4px;}
-.totbox{display:flex;justify-content:space-between;align-items:center;background:rgba(245,216,0,0.1);border:2px solid var(--g);border-radius:10px;padding:10px 14px;margin-bottom:10px;}
+.totbox{display:flex;justify-content:space-between;align-items:center;background:rgba(245,216,0,0.1);border:2px solid var(--g);border-radius:10px;padding:8px 14px;margin-bottom:8px;}
 .totlbl{font-size:16px;font-weight:900;color:var(--g);}
-.totval{font-size:26px;font-weight:900;color:var(--g);font-family:'Fredoka One',cursive;}
-.fbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
-.bconf{background:linear-gradient(135deg,#1a7a1a,#27ae60);border:2px solid #2ecc71;color:#fff;padding:13px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:900;transition:all 0.15s;}
+.totval{font-size:24px;font-weight:900;color:var(--g);font-family:'Fredoka One',cursive;}
+.fbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;}
+.bconf{background:linear-gradient(135deg,#1a7a1a,#27ae60);border:2px solid #2ecc71;color:#fff;padding:16px;border-radius:10px;cursor:pointer;font-size:15px;font-weight:900;transition:all 0.15s;min-height:54px;}
 .bconf:hover{transform:scale(1.02);}
-.bpay{background:linear-gradient(135deg,#b8860b,#f39c12);border:2px solid var(--g);color:#000;padding:13px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:900;transition:all 0.15s;}
+.bpay{background:linear-gradient(135deg,#b8860b,#f39c12);border:2px solid var(--g);color:#000;padding:16px;border-radius:10px;cursor:pointer;font-size:15px;font-weight:900;transition:all 0.15s;min-height:54px;}
 .bpay:hover{transform:scale(1.02);}
-.bclr{background:rgba(100,100,100,0.25);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);padding:9px;border-radius:8px;cursor:pointer;font-size:12px;width:100%;transition:all 0.15s;}
-.bclr:hover{background:rgba(150,50,50,0.35);color:#fff;}
+.bclr{background:rgba(150,50,50,0.35);border:1px solid rgba(255,100,100,0.3);color:rgba(255,255,255,0.7);padding:12px;border-radius:8px;cursor:pointer;font-size:13px;width:100%;transition:all 0.15s;min-height:44px;}
+.bclr:hover{background:rgba(200,50,50,0.5);color:#fff;}
 
 /* OPEN ORDERS */
 .oview{grid-column:1;overflow-y:auto;padding:14px;}
@@ -275,7 +288,7 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 <div class="moverlay" id="mex">
   <div class="modal">
     <h3 id="mex-title">🍕 Personalizza</h3>
-    <div class="mnote">➕ Ingredienti extra (+€1,00 cad.)</div>
+    <div class="mnote" id="mex-note-label">➕ Ingredienti extra (+€1,00 cad.)</div>
     <div class="elist" id="mex-extras"></div>
     <div class="mnote">➖ Ingredienti da togliere</div>
     <div class="rlist" id="mex-removes"></div>
@@ -337,10 +350,12 @@ const MENU={
     {n:"Baby",p:7,ing:"pomodoro, mozzarella, würstel, patatine"}
   ],
   "Pizze Max":[
-    {n:"Max Margherita (8pz)",p:12,ing:"pomodoro, mozzarella"},
-    {n:"Max Farcita (8pz)",p:15,ing:"ingredienti vari"},
-    {n:"Max Taglio Margherita",p:16,ing:"pomodoro, mozzarella"},
-    {n:"Max Taglio Farcita",p:20,ing:"ingredienti vari"}
+    {n:"Max Margherita (8pz)",p:12,ing:"pomodoro, mozzarella",extraMax:true},
+    {n:"Max Farcita (8pz)",p:15,ing:"ingredienti vari",extraMax:true},
+    {n:"Teglia Margherita (8pz)",p:16,ing:"pomodoro, mozzarella",extraMax:true},
+    {n:"Teglia Farcita (8pz)",p:20,ing:"ingredienti vari",extraMax:true},
+    {n:"Mezzo Metro Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true},
+    {n:"Mezzo Metro Farcita",p:15,ing:"ingredienti vari",extraMax:true}
   ],
   "Rosticceria":[
     {n:"Arancino al Ragù",p:2.5,ing:"riso, mozzarella, sugo alla bolognese"},
@@ -408,7 +423,23 @@ const EXTRAS=[
   {n:"Gorgonzola",p:1},{n:"Scamorza",p:1},{n:"Edamer",p:1},{n:"Tonno",p:1},
   {n:"Fiori di zucca",p:1},{n:"Mortadella",p:1},{n:"Porchetta",p:2},
   {n:"Salsiccia",p:2},{n:"Crema di pistacchio",p:2},{n:"Granella di pistacchio",p:2},
-  {n:"Basilico",p:0}
+  {n:"Basilico",p:0},{n:"Origano",p:0}
+];
+
+// Extra speciali per Pizze Max — tutto 2€ tranne bufala e bresaola 4€, basilico e origano gratis
+const EXTRAS_MAX=[
+  {n:"Mozzarella extra",p:2},{n:"Pomodorini",p:2},{n:"Funghi",p:2},
+  {n:"Cotto",p:2},{n:"Crudo",p:2},
+  {n:"Salame piccante",p:2},{n:"Salame dolce",p:2},
+  {n:"Würstel",p:2},{n:"Speck",p:2},{n:"Pancetta",p:2},
+  {n:"Rucola",p:2},{n:"Scaglie di grana",p:2},{n:"Bresaola",p:4},
+  {n:"Mozzarella di bufala",p:4},{n:"Olive",p:2},{n:"Peperoni",p:2},
+  {n:"Peperoni arrosto",p:2},{n:"Melanzane arrosto",p:2},{n:"Zucchine arrosto",p:2},
+  {n:"Cipolla",p:2},{n:"Acciughe",p:2},{n:"Capperi",p:2},
+  {n:"Gorgonzola",p:2},{n:"Scamorza",p:2},{n:"Edamer",p:2},{n:"Tonno",p:2},
+  {n:"Fiori di zucca",p:2},{n:"Mortadella",p:2},{n:"Porchetta",p:2},
+  {n:"Salsiccia",p:2},{n:"Crema di pistacchio",p:2},{n:"Granella di pistacchio",p:2},
+  {n:"Basilico",p:0},{n:"Origano",p:0}
 ];
 
 let order={type:'asporto',items:[]};
@@ -463,15 +494,17 @@ function addProd(cat,name,price){
   const isPizza=cat==='Pizze Tonde'||cat==='Pizze Max';
   if(isPizza){
     const prod=MENU[cat].find(p=>p.n===name);
-    pendProd={name,price,ing:prod?prod.ing:''};
-    openEx(name,prod?prod.ing:'');
+    const isMax=prod&&prod.extraMax;
+    pendProd={name,price,ing:prod?prod.ing:'',isMax};
+    openEx(name,prod?prod.ing:'',isMax);
   } else {
     pushItem(name,price,[],[]);
   }
 }
 
-function pushItem(name,price,extras,removes,note=''){
-  const ep=extras.reduce((s,e)=>{const ex=EXTRAS.find(x=>x.n===e);return s+(ex?ex.p:1);},0);
+function pushItem(name,price,extras,removes,note='',isMax=false){
+  const list=isMax?EXTRAS_MAX:EXTRAS;
+  const ep=extras.reduce((s,e)=>{const ex=list.find(x=>x.n===e);return s+(ex?ex.p:isMax?2:1);},0);
   const fp=+(price+ep).toFixed(2);
   const ex=order.items.find(i=>i.name===name&&JSON.stringify(i.extras)===JSON.stringify(extras)&&JSON.stringify(i.removes)===JSON.stringify(removes)&&i.note===note);
   if(ex){ex.qty++;}else{order.items.push({name,price:fp,extras,removes,note,qty:1});}
@@ -786,11 +819,14 @@ function completePay(){
 }
 
 // EXTRA MODAL
-function openEx(name,ing){
+function openEx(name,ing,isMax=false){
   selEx=[];selRm=[];
+  const extrasList=isMax?EXTRAS_MAX:EXTRAS;
+  const noteLabel=isMax?'➕ Extra (+€2,00 | bufala/bresaola +€4,00 | basilico/origano gratis)':'➕ Ingredienti extra (+€1,00 cad.)';
   document.getElementById('mex-title').textContent='🍕 '+name;
   document.getElementById('mex-note').value='';
-  document.getElementById('mex-extras').innerHTML=EXTRAS.map(e=>`<button class="ebtn" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')">${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
+  document.getElementById('mex-note-label').textContent=noteLabel;
+  document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')">${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
   const ings=ing.split(',').map(s=>s.trim()).filter(Boolean);
   document.getElementById('mex-removes').innerHTML=ings.length?ings.map(e=>`<button class="rbtn" onclick="togRm(this,'${e.replace(/'/g,"\\'")}')">${e}</button>`).join(''):'<span style="color:rgba(255,255,255,0.3);font-size:12px;">Nessun ingrediente base</span>';
   document.getElementById('mex').classList.add('show');
@@ -800,7 +836,7 @@ function togRm(btn,n){selRm.includes(n)?(selRm=selRm.filter(e=>e!==n),btn.classL
 function closeEx(){document.getElementById('mex').classList.remove('show');pendProd=null;}
 function confirmEx(){
   if(!pendProd)return;
-  pushItem(pendProd.name,pendProd.price,[...selEx],[...selRm],document.getElementById('mex-note').value.trim());
+  pushItem(pendProd.name,pendProd.price,[...selEx],[...selRm],document.getElementById('mex-note').value.trim(),pendProd.isMax);
   closeEx();
 }
 
