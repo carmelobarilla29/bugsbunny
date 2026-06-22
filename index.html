@@ -365,6 +365,23 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
   </div>
 </div>
 
+<!-- MODAL MODIFICA ORDINE -->
+<div class="moverlay" id="medit">
+  <div class="modal" style="width:500px;max-height:85vh;display:flex;flex-direction:column;">
+    <h3 id="medit-title">✏️ Modifica Ordine</h3>
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:10px;">Modifica quantità o rimuovi prodotti. Per aggiungere nuovi prodotti chiudi e usali dal menu.</div>
+    <div id="medit-items" style="flex:1;overflow-y:auto;margin-bottom:10px;"></div>
+    <div style="background:rgba(245,216,0,0.1);border:2px solid var(--g);border-radius:8px;padding:8px 14px;display:flex;justify-content:space-between;margin-bottom:10px;">
+      <span style="font-size:14px;font-weight:900;color:var(--g);">TOTALE</span>
+      <span style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--g);" id="medit-total">€ 0,00</span>
+    </div>
+    <div class="mbtns">
+      <button class="bcan" onclick="closeEditModal()">✕ Chiudi</button>
+      <button onclick="editPrintComanda()" style="flex:1;padding:12px;background:linear-gradient(135deg,#6a1a8a,#9b59b6);border:none;color:#fff;border-radius:10px;cursor:pointer;font-size:14px;font-weight:900;">🖨️ Ristampa</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL EXTRA -->
 <div class="moverlay" id="mex">
   <div class="modal">
@@ -429,122 +446,132 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 <script>
 const MENU={
   "Pizze Tonde":[
-    {n:"Regina",p:5,ing:"pomodoro, pomodorini, mozzarella, basilico"},
-    {n:"Marinara",p:4,ing:"pomodoro, olio, aglio, origano"},
-    {n:"Margherita",p:5,ing:"pomodoro, mozzarella, basilico"},
-    {n:"Bugs Bunny",p:7,ing:"pomodorini pachino, mozzarella, capperi, acciughe"},
-    {n:"Biancaneve",p:4.5,ing:"mozzarella, origano"},
-    {n:"Napoli",p:7,ing:"pomodoro, mozzarella, capperi, acciughe"},
-    {n:"Quattro Stagioni",p:8,ing:"pomodoro, mozzarella, carciofini, funghi, olive, prosciutto cotto"},
-    {n:"Capricciosa",p:8,ing:"pomodoro, mozzarella, würstel, carciofini, funghi"},
-    {n:"Diavola",p:7,ing:"pomodoro, mozzarella, salame, olive"},
-    {n:"Bestemmia",p:8,ing:"pomodoro, mozzarella, salame, funghi"},
-    {n:"Bolognese",p:8,ing:"mortadella, mozzarella, pesto e granella di pistacchio"},
-    {n:"Bolognese Burrata",p:12,ing:"mortadella, mozzarella, burrata, pesto e granella di pistacchio"},
-    {n:"Fantasy",p:8,ing:"pomodoro, mozzarella, salame, lattuga, olive"},
-    {n:"Calabrese",p:8,ing:"pomodoro, mozzarella, peperoni, melanzane fritte, olive, peperoncino"},
-    {n:"Ortolana",p:8,ing:"pomodoro, mozzarella, peperoni arrosto, melanzane fritte, zucchine fritte"},
-    {n:"Vegetariana",p:7,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola"},
-    {n:"Quattro Formaggi",p:8,ing:"mozzarella, scamorza, edamer, gorgonzola"},
-    {n:"Caprese",p:7,ing:"mozzarella di bufala, pomodorini, basilico"},
-    {n:"Tonnara",p:7,ing:"pomodoro, mozzarella, tonno"},
-    {n:"Gustosa",p:8,ing:"pomodorini pachino, mozzarella, prosciutto crudo, rucola, scaglie di grana"},
-    {n:"Suprema",p:9,ing:"pomodorini pachino, mozzarella, bresaola, rucola, scaglie di grana"},
-    {n:"Boscaiola",p:8,ing:"pomodoro, mozzarella, speck, funghi, scamorza"},
-    {n:"Baby",p:7,ing:"pomodoro, mozzarella, würstel, patatine"},
-    {n:"🌾 No Glutine",p:8,ing:"pomodoro, mozzarella"}
+    {n:"Margherita",p:5,ing:"pomodoro, mozzarella, basilico",cat:"pizza"},
+    {n:"Biancaneve",p:4.5,ing:"mozzarella, origano",cat:"pizza"},
+    {n:"Baby",p:7,ing:"pomodoro, mozzarella, würstel, patatine",cat:"pizza"},
+    {n:"Bestemmia",p:8,ing:"pomodoro, mozzarella, salame, funghi",cat:"pizza"},
+    {n:"Bolognese",p:8,ing:"mortadella, mozzarella, pesto e granella di pistacchio",cat:"pizza"},
+    {n:"Bolognese Burrata",p:12,ing:"mortadella, mozzarella, burrata, pesto e granella di pistacchio",cat:"pizza"},
+    {n:"Boscaiola",p:8,ing:"pomodoro, mozzarella, speck, funghi, scamorza",cat:"pizza"},
+    {n:"Bugs Bunny",p:7,ing:"pomodorini pachino, mozzarella, capperi, acciughe",cat:"pizza"},
+    {n:"Calabrese",p:8,ing:"pomodoro, mozzarella, peperoni, melanzane fritte, olive, peperoncino",cat:"pizza"},
+    {n:"Caprese",p:7,ing:"mozzarella di bufala, pomodorini, basilico",cat:"pizza"},
+    {n:"Capricciosa",p:8,ing:"pomodoro, mozzarella, würstel, carciofini, funghi",cat:"pizza"},
+    {n:"Diavola",p:7,ing:"pomodoro, mozzarella, salame, olive",cat:"pizza"},
+    {n:"Fantasy",p:8,ing:"pomodoro, mozzarella, salame, lattuga, olive",cat:"pizza"},
+    {n:"Gustosa",p:8,ing:"pomodorini pachino, mozzarella, prosciutto crudo, rucola, scaglie di grana",cat:"pizza"},
+    {n:"Marinara",p:4,ing:"pomodoro, olio, aglio, origano",cat:"pizza"},
+    {n:"Napoli",p:7,ing:"pomodoro, mozzarella, capperi, acciughe",cat:"pizza"},
+    {n:"🌾 No Glutine",p:8,ing:"pomodoro, mozzarella",cat:"pizza"},
+    {n:"Ortolana",p:8,ing:"pomodoro, mozzarella, peperoni arrosto, melanzane fritte, zucchine fritte",cat:"pizza"},
+    {n:"Quattro Formaggi",p:8,ing:"mozzarella, scamorza, edamer, gorgonzola",cat:"pizza"},
+    {n:"Quattro Stagioni",p:8,ing:"pomodoro, mozzarella, carciofini, funghi, olive, prosciutto cotto",cat:"pizza"},
+    {n:"Regina",p:5,ing:"pomodoro, pomodorini, mozzarella, basilico",cat:"pizza"},
+    {n:"Suprema",p:9,ing:"pomodorini pachino, mozzarella, bresaola, rucola, scaglie di grana",cat:"pizza"},
+    {n:"Tonnara",p:7,ing:"pomodoro, mozzarella, tonno",cat:"pizza"},
+    {n:"Vegetariana",p:7,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",cat:"pizza"}
   ],
   "Pizze Max":[
-    {n:"Max Margherita (8pz)",p:12,ing:"pomodoro, mozzarella",extraMax:true},
-    {n:"Max Farcita (8pz)",p:15,ing:"ingredienti vari",extraMax:true},
-    {n:"Teglia Margherita (8pz)",p:16,ing:"pomodoro, mozzarella",extraMax:true},
-    {n:"Teglia Farcita (8pz)",p:20,ing:"ingredienti vari",extraMax:true},
-    {n:"Mezzo Metro Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true},
-    {n:"Mezzo Metro Farcita",p:15,ing:"ingredienti vari",extraMax:true}
+    {n:"Max Margherita (8pz)",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza"},
+    {n:"Max Farcita (8pz)",p:15,ing:"ingredienti vari",extraMax:true,cat:"pizza"},
+    {n:"Mezzo Metro Farcita",p:15,ing:"ingredienti vari",extraMax:true,cat:"pizza"},
+    {n:"Mezzo Metro Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza"},
+    {n:"Teglia Farcita (8pz)",p:20,ing:"ingredienti vari",extraMax:true,cat:"pizza"},
+    {n:"Teglia Margherita (8pz)",p:16,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza"}
   ],
   "Rosticceria":[
-    {n:"Arancino al Ragù",p:2.5,ing:"riso, mozzarella, sugo alla bolognese"},
-    {n:"Arancino Salsiccia",p:2.5,ing:"riso, sugo con salsiccia"},
-    {n:"Calzone Fritto",p:2,ing:"pomodoro, mozzarella, prosciutto cotto"},
-    {n:"Calzone Fritto Impanato",p:2.5,ing:"pomodoro, mozzarella, prosciutto cotto"},
-    {n:"Calzone al Forno",p:2,ing:"pomodoro, mozzarella, prosciutto cotto"},
-    {n:"Calzone Baby",p:2.5,ing:"pomodoro, würstel, patatine"},
-    {n:"Würstel in Camicia",p:2,ing:""},
-    {n:"Crocchetta di Patate",p:1.5,ing:""},
-    {n:"Medaglione",p:1.5,ing:"crocchette, scamorza, salame piccante"},
-    {n:"Crostone al Cotto",p:3,ing:"besciamella, mozzarella, prosciutto cotto"},
-    {n:"Crostone Speck e Funghi",p:3,ing:"mozzarella, besciamella, speck, funghi"},
-    {n:"Crostone Salame Piccante",p:3,ing:"mozzarella, besciamella, salame piccante"},
-    {n:"Crostone con Pancetta",p:3,ing:"mozzarella, besciamella, pancetta"},
-    {n:"Crostone con Spinaci",p:3,ing:"mozzarella, besciamella, spinaci"},
-    {n:"Mozzarella in Carrozza",p:2,ing:"mozzarella, besciamella"},
-    {n:"Tramezzino Tonno",p:3,ing:"pomodoro, maionese, prosciutto cotto, lattuga, tonno"},
-    {n:"Tramezzino Pancetta",p:3,ing:"pomodoro, pancetta, formaggio, lattuga, maionese"}
+    {n:"Arancino al Ragù",p:2.5,ing:"riso, mozzarella, sugo alla bolognese",cat:"rosticceria"},
+    {n:"Arancino Salsiccia",p:2.5,ing:"riso, sugo con salsiccia",cat:"rosticceria"},
+    {n:"Calzone al Forno",p:2,ing:"pomodoro, mozzarella, prosciutto cotto",cat:"rosticceria"},
+    {n:"Calzone Baby",p:2.5,ing:"pomodoro, würstel, patatine",cat:"rosticceria"},
+    {n:"Calzone Fritto",p:2,ing:"pomodoro, mozzarella, prosciutto cotto",cat:"rosticceria"},
+    {n:"Calzone Fritto Impanato",p:2.5,ing:"pomodoro, mozzarella, prosciutto cotto",cat:"rosticceria"},
+    {n:"Crocchetta di Patate",p:1.5,ing:"",cat:"rosticceria"},
+    {n:"Crostone al Cotto",p:3,ing:"besciamella, mozzarella, prosciutto cotto",cat:"rosticceria"},
+    {n:"Crostone con Pancetta",p:3,ing:"mozzarella, besciamella, pancetta",cat:"rosticceria"},
+    {n:"Crostone con Spinaci",p:3,ing:"mozzarella, besciamella, spinaci",cat:"rosticceria"},
+    {n:"Crostone Salame Piccante",p:3,ing:"mozzarella, besciamella, salame piccante",cat:"rosticceria"},
+    {n:"Crostone Speck e Funghi",p:3,ing:"mozzarella, besciamella, speck, funghi",cat:"rosticceria"},
+    {n:"Medaglione",p:1.5,ing:"crocchette, scamorza, salame piccante",cat:"rosticceria"},
+    {n:"Mozzarella in Carrozza",p:2,ing:"mozzarella, besciamella",cat:"rosticceria"},
+    {n:"Tramezzino Pancetta",p:3,ing:"pomodoro, pancetta, formaggio, lattuga, maionese",cat:"rosticceria"},
+    {n:"Tramezzino Tonno",p:3,ing:"pomodoro, maionese, prosciutto cotto, lattuga, tonno",cat:"rosticceria"},
+    {n:"Würstel in Camicia",p:2,ing:"",cat:"rosticceria"}
   ],
   "Stuzzicheria":[
-    {n:"Patatine",p:2.5,ing:""},
-    {n:"Patatine e Würstel",p:3,ing:""},
-    {n:"Mozzarelline (8pz)",p:3.5,ing:""},
-    {n:"Olive Ascolane (8pz)",p:3.5,ing:""},
-    {n:"Noisette",p:3.5,ing:""},
-    {n:"Misto Bugs Bunny",p:5,ing:"patate, noisette, olive ascolane, mozzarelline, würstel"}
+    {n:"Misto Bugs Bunny",p:5,ing:"patate, noisette, olive ascolane, mozzarelline, würstel",cat:"rosticceria"},
+    {n:"Mozzarelline (8pz)",p:3.5,ing:"",cat:"rosticceria"},
+    {n:"Noisette",p:3.5,ing:"",cat:"rosticceria"},
+    {n:"Olive Ascolane (8pz)",p:3.5,ing:"",cat:"rosticceria"},
+    {n:"Patatine",p:2.5,ing:"",cat:"rosticceria"},
+    {n:"Patatine e Würstel",p:3,ing:"",cat:"rosticceria"}
   ],
   "Bibite":[
-    {n:"Acqua piccola",p:1,ing:""},
-    {n:"Coca Cola 1L",p:3,ing:""},
-    {n:"Coca Cola vetro",p:3,ing:""},
-    {n:"Fanta vetro",p:3,ing:""},
-    {n:"Chinotto",p:2.5,ing:""},
-    {n:"Sprite vetro",p:3,ing:""},
-    {n:"Coca Cola plastica",p:3,ing:""},
-    {n:"Fanta plastica",p:3,ing:""},
-    {n:"Thè Pesca/Limone",p:1.5,ing:""},
-    {n:"Coca Cola lattina",p:2,ing:""},
-    {n:"Sprite lattina",p:2,ing:""},
-    {n:"Fanta lattina",p:2,ing:""}
+    {n:"Acqua piccola",p:1,ing:"",cat:"bibita"},
+    {n:"Björne",p:3,ing:"",cat:"birra"},
+    {n:"Chinotto",p:2.5,ing:"",cat:"bibita"},
+    {n:"Coca Cola 1L",p:3,ing:"",cat:"bibita"},
+    {n:"Coca Cola lattina",p:2,ing:"",cat:"bibita"},
+    {n:"Coca Cola plastica",p:3,ing:"",cat:"bibita"},
+    {n:"Coca Cola vetro",p:3,ing:"",cat:"bibita"},
+    {n:"Corona",p:4,ing:"",cat:"birra"},
+    {n:"Fanta lattina",p:2,ing:"",cat:"bibita"},
+    {n:"Fanta plastica",p:3,ing:"",cat:"bibita"},
+    {n:"Fanta vetro",p:3,ing:"",cat:"bibita"},
+    {n:"Nastro Azzurro 33cl",p:2,ing:"",cat:"birra"},
+    {n:"Nastro Azzurro 66cl",p:4,ing:"",cat:"birra"},
+    {n:"Peroni 33cl",p:1.5,ing:"",cat:"birra"},
+    {n:"Peroni 66cl",p:3,ing:"",cat:"birra"},
+    {n:"Raffo grande",p:3,ing:"",cat:"birra"},
+    {n:"Raffo piccola",p:2.5,ing:"",cat:"birra"},
+    {n:"Sprite lattina",p:2,ing:"",cat:"bibita"},
+    {n:"Sprite vetro",p:3,ing:"",cat:"bibita"},
+    {n:"Tennent's",p:3,ing:"",cat:"birra"},
+    {n:"Thè Pesca/Limone",p:1.5,ing:"",cat:"bibita"}
   ],
   "Birre":[
-    {n:"Tennent's",p:3,ing:""},
-    {n:"Björne",p:3,ing:""},
-    {n:"Corona",p:4,ing:""},
-    {n:"Nastro Azzurro 66cl",p:4,ing:""},
-    {n:"Peroni 66cl",p:3,ing:""},
-    {n:"Raffo grande",p:3,ing:""},
-    {n:"Nastro Azzurro 33cl",p:2,ing:""},
-    {n:"Raffo piccola",p:2.5,ing:""},
-    {n:"Peroni 33cl",p:1.5,ing:""}
+    {n:"Björne",p:3,ing:"",cat:"birra"},
+    {n:"Corona",p:4,ing:"",cat:"birra"},
+    {n:"Nastro Azzurro 33cl",p:2,ing:"",cat:"birra"},
+    {n:"Nastro Azzurro 66cl",p:4,ing:"",cat:"birra"},
+    {n:"Peroni 33cl",p:1.5,ing:"",cat:"birra"},
+    {n:"Peroni 66cl",p:3,ing:"",cat:"birra"},
+    {n:"Raffo grande",p:3,ing:"",cat:"birra"},
+    {n:"Raffo piccola",p:2.5,ing:"",cat:"birra"},
+    {n:"Tennent's",p:3,ing:"",cat:"birra"}
   ]
 };
 
 const EXTRAS=[
-  {n:"Mozzarella extra",p:1},{n:"Pomodorini",p:1},{n:"Funghi",p:1},
-  {n:"Cotto",p:1},{n:"Crudo",p:1},
-  {n:"Salame piccante",p:1},{n:"Salame dolce",p:1},
-  {n:"Würstel",p:1},{n:"Speck",p:1},{n:"Pancetta",p:1},
-  {n:"Rucola",p:1},{n:"Scaglie di grana",p:1},{n:"Bresaola",p:1},
-  {n:"Mozzarella di bufala",p:2},{n:"Olive",p:1},{n:"Peperoni",p:1},
-  {n:"Peperoni arrosto",p:1},{n:"Melanzane arrosto",p:1},{n:"Zucchine arrosto",p:1},
-  {n:"Cipolla",p:1},{n:"Acciughe",p:1},{n:"Capperi",p:1},
-  {n:"Gorgonzola",p:1},{n:"Scamorza",p:1},{n:"Edamer",p:1},{n:"Tonno",p:1},
-  {n:"Fiori di zucca",p:1},{n:"Mortadella",p:1},{n:"Porchetta",p:2},
-  {n:"Salsiccia",p:2},{n:"Crema di pistacchio",p:2},{n:"Granella di pistacchio",p:2},
-  {n:"Basilico",p:0},{n:"Origano",p:0}
+  {n:"Würstel",p:1},{n:"Patate",p:1},
+  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:1},
+  {n:"Capperi",p:1},{n:"Cipolla",p:1},{n:"Cotto",p:1},{n:"Crudo",p:1},
+  {n:"Crema di pistacchio",p:2},{n:"Edamer",p:1},{n:"Fiori di zucca",p:1},
+  {n:"Funghi",p:1},{n:"Gorgonzola",p:1},{n:"Granella di pistacchio",p:2},
+  {n:"Melanzane arrosto",p:1},{n:"Melanzane fritte",p:1},
+  {n:"Mortadella",p:1},{n:"Mozzarella di bufala",p:2},{n:"Mozzarella extra",p:1},
+  {n:"Olive",p:1},{n:"Origano",p:0},{n:"Pancetta",p:1},
+  {n:"Peperoni",p:1},{n:"Peperoni arrosto",p:1},{n:"Pomodorini",p:1},
+  {n:"Porchetta",p:2},{n:"Porcini",p:1},{n:"Rucola",p:1},
+  {n:"Salame dolce",p:1},{n:"Salame piccante",p:1},{n:"Salsiccia",p:2},
+  {n:"Scaglie di grana",p:1},{n:"Scamorza",p:1},{n:"Speck",p:1},
+  {n:"Tonno",p:1},{n:"Zucchine arrosto",p:1},{n:"Zucchine fritte",p:1}
 ];
 
-// Extra speciali per Pizze Max — tutto 2€ tranne bufala e bresaola 4€, basilico e origano gratis
 const EXTRAS_MAX=[
-  {n:"Mozzarella extra",p:2},{n:"Pomodorini",p:2},{n:"Funghi",p:2},
-  {n:"Cotto",p:2},{n:"Crudo",p:2},
-  {n:"Salame piccante",p:2},{n:"Salame dolce",p:2},
-  {n:"Würstel",p:2},{n:"Speck",p:2},{n:"Pancetta",p:2},
-  {n:"Rucola",p:2},{n:"Scaglie di grana",p:2},{n:"Bresaola",p:4},
-  {n:"Mozzarella di bufala",p:4},{n:"Olive",p:2},{n:"Peperoni",p:2},
-  {n:"Peperoni arrosto",p:2},{n:"Melanzane arrosto",p:2},{n:"Zucchine arrosto",p:2},
-  {n:"Cipolla",p:2},{n:"Acciughe",p:2},{n:"Capperi",p:2},
-  {n:"Gorgonzola",p:2},{n:"Scamorza",p:2},{n:"Edamer",p:2},{n:"Tonno",p:2},
-  {n:"Fiori di zucca",p:2},{n:"Mortadella",p:2},{n:"Porchetta",p:2},
-  {n:"Salsiccia",p:2},{n:"Crema di pistacchio",p:2},{n:"Granella di pistacchio",p:2},
-  {n:"Basilico",p:0},{n:"Origano",p:0}
+  {n:"Würstel",p:2},{n:"Patate",p:2},
+  {n:"Acciughe",p:2},{n:"Basilico",p:0},{n:"Bresaola",p:4},
+  {n:"Capperi",p:2},{n:"Cipolla",p:2},{n:"Cotto",p:2},{n:"Crudo",p:2},
+  {n:"Crema di pistacchio",p:2},{n:"Edamer",p:2},{n:"Fiori di zucca",p:2},
+  {n:"Funghi",p:2},{n:"Gorgonzola",p:2},{n:"Granella di pistacchio",p:2},
+  {n:"Melanzane arrosto",p:2},{n:"Melanzane fritte",p:2},
+  {n:"Mortadella",p:2},{n:"Mozzarella di bufala",p:4},{n:"Mozzarella extra",p:2},
+  {n:"Olive",p:2},{n:"Origano",p:0},{n:"Pancetta",p:2},
+  {n:"Peperoni",p:2},{n:"Peperoni arrosto",p:2},{n:"Pomodorini",p:2},
+  {n:"Porchetta",p:2},{n:"Porcini",p:2},{n:"Rucola",p:2},
+  {n:"Salame dolce",p:2},{n:"Salame piccante",p:2},{n:"Salsiccia",p:2},
+  {n:"Scaglie di grana",p:2},{n:"Scamorza",p:2},{n:"Speck",p:2},
+  {n:"Tonno",p:2},{n:"Zucchine arrosto",p:2},{n:"Zucchine fritte",p:2}
 ];
 
 let order={type:'asporto',items:[]};
@@ -906,20 +933,63 @@ function renderOpen(){
 function editOrder(id){
   const o=openOrders.find(x=>x.id===id);
   if(!o)return;
-  order=JSON.parse(JSON.stringify(o));
-  editId=id;
-  setType(o.type);
-  document.getElementById('cognome').value=o.cognome;
-  if(o.type==='domicilio'){
-    document.getElementById('telefono').value=o.telefono||'';
-    document.getElementById('indirizzo').value=o.indirizzo||'';
-  }
-  if(o.orario==='Appena possibile')setOr('ap');
-  else if(o.orario){setOr('ora');document.getElementById('orario-input').value=o.orario;}
-  openOrders=openOrders.filter(x=>x.id!==id);
+  // Apre modal di modifica senza toccare il carrello corrente
+  document.getElementById('medit-title').textContent='✏️ Modifica — '+o.cognome;
+  document.getElementById('medit-items').innerHTML=o.items.map((it,i)=>`
+    <div style="display:flex;align-items:center;background:rgba(45,90,27,0.25);border:1px solid rgba(74,124,47,0.35);border-radius:8px;padding:7px 10px;margin-bottom:5px;gap:8px;">
+      <div style="flex:1;font-size:13px;font-weight:700;">${it.name}
+        ${it.extras.length?`<div style="font-size:11px;color:var(--g);">+ ${it.extras.join(', ')}</div>`:''}
+        ${it.removes.length?`<div style="font-size:11px;color:#ff7070;">- ${it.removes.join(', ')}</div>`:''}
+        ${it.note?`<div style="font-size:11px;color:rgba(255,255,255,0.45);">📝 ${it.note}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <button onclick="editChgQty(${id},${i},-1)" style="background:var(--r);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:bold;">−</button>
+        <span style="font-weight:900;min-width:20px;text-align:center;">${it.qty}</span>
+        <button onclick="editChgQty(${id},${i},1)" style="background:var(--r);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:bold;">+</button>
+      </div>
+      <span style="font-weight:900;color:var(--g);min-width:48px;text-align:right;font-family:'Fredoka One',cursive;">${fmt(it.price*it.qty)}</span>
+      <button onclick="editDelItem(${id},${i})" style="background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:16px;">✕</button>
+    </div>`).join('');
+  document.getElementById('medit-total').textContent=fmt(o.total);
+  document.getElementById('medit').classList.add('show');
+  window._editId=id;
+}
+
+function editChgQty(orderId,itemIdx,d){
+  const o=openOrders.find(x=>x.id===orderId);
+  if(!o)return;
+  o.items[itemIdx].qty+=d;
+  if(o.items[itemIdx].qty<=0)o.items.splice(itemIdx,1);
+  o.total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
+  if(o.type==='domicilio')o.total+=DELIVERY_COST;
+  o.total=+o.total.toFixed(2);
   saveOrders();
-  renderItems();
-  switchView('new');
+  editOrder(orderId);
+}
+
+function editDelItem(orderId,itemIdx){
+  const o=openOrders.find(x=>x.id===orderId);
+  if(!o)return;
+  o.items.splice(itemIdx,1);
+  o.total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
+  if(o.type==='domicilio')o.total+=DELIVERY_COST;
+  o.total=+o.total.toFixed(2);
+  saveOrders();
+  if(!o.items.length){
+    document.getElementById('medit').classList.remove('show');
+    openOrders=openOrders.filter(x=>x.id!==orderId);
+    saveOrders();updCount();renderOpen();
+    toast('Ordine svuotato e rimosso','ok');
+    return;
+  }
+  editOrder(orderId);
+}
+
+function closeEditModal(){document.getElementById('medit').classList.remove('show');renderOpen();}
+
+function editPrintComanda(){
+  const o=openOrders.find(x=>x.id===window._editId);
+  if(o)printComanda(o);
 }
 
 // PAY
@@ -1054,10 +1124,24 @@ function printComanda(o){
 
   const tipoSub=o.type==='domicilio'
     ?`<div style="font-size:20px;font-weight:bold;text-align:center;margin-top:6px;">${o.indirizzo||'Indirizzo non specificato'}</div>
-       <div style="font-size:17px;text-align:center;">Tel: ${o.telefono||'-'}</div>`
-    :'';
+       <div style="font-size:17px;text-align:center;">Tel: ${o.telefono||'-'}</div>`:'';
 
-  const items=o.items.map(i=>`
+  // Cerca categoria di ogni prodotto nel menu
+  function getCat(name){
+    for(const [cat,items] of Object.entries(MENU)){
+      const found=items.find(i=>i.n===name);
+      if(found)return found.cat||'altro';
+    }
+    return 'altro';
+  }
+
+  // Dividi items per categoria
+  const pizze=o.items.filter(i=>getCat(i.name)==='pizza');
+  const rosticceria=o.items.filter(i=>getCat(i.name)==='rosticceria');
+  const bibite=o.items.filter(i=>['bibita','birra'].includes(getCat(i.name)));
+  const altro=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getCat(i.name)));
+
+  const renderItems=items=>items.map(i=>`
     <div style="display:flex;gap:6px;align-items:baseline;margin:10px 0 4px;">
       <span style="font-size:34px;font-weight:900;min-width:36px;line-height:1;">${i.qty}x</span>
       <span style="font-size:26px;font-weight:900;line-height:1.2;">${i.name}</span>
@@ -1065,6 +1149,10 @@ function printComanda(o){
     ${i.extras.length?`<div style="font-size:20px;font-weight:bold;margin:3px 0 3px 42px;">+ ${i.extras.join(', ')}</div>`:''}
     ${i.removes.length?`<div style="font-size:20px;font-weight:bold;margin:3px 0 3px 42px;text-decoration:underline;">- ${i.removes.join(', ')}</div>`:''}
     ${i.note?`<div style="font-size:19px;font-weight:bold;margin:3px 0 3px 42px;font-style:italic;">⚠️ ${i.note}</div>`:''}`).join('');
+
+  const renderSection=(title,items)=>items.length?`
+    <div style="font-size:14px;font-weight:900;text-align:center;letter-spacing:2px;margin:6px 0 4px;border-bottom:2px solid #000;padding-bottom:3px;">${title}</div>
+    ${renderItems(items)}`:'' ;
 
   const html=`<!DOCTYPE html><html><head><style>
     *{margin:0;padding:0;box-sizing:border-box;}
@@ -1080,7 +1168,11 @@ function printComanda(o){
     </div>
     ${tipoSub}
     <hr class="sep">
-    ${items}
+    ${renderSection('— PIZZE —',pizze)}
+    ${rosticceria.length&&pizze.length?'<hr class="sep">':''}
+    ${renderSection('— ROSTICCERIA —',rosticceria)}
+    ${bibite.length&&(pizze.length||rosticceria.length)?'<hr class="sep">':''}
+    ${renderSection('— BIBITE —',[...bibite,...altro])}
     <hr class="sep">
     <div style="text-align:center;font-size:38px;font-weight:900;margin:6px 0;">${o.cognome.toUpperCase()}</div>
     <div style="text-align:center;font-size:28px;font-weight:900;margin-bottom:6px;">⏰ ${o.orario||'-'}</div>
