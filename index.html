@@ -367,11 +367,26 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 
 <!-- MODAL MODIFICA ORDINE -->
 <div class="moverlay" id="medit">
-  <div class="modal" style="width:500px;max-height:85vh;display:flex;flex-direction:column;">
+  <div class="modal" style="width:520px;max-height:90vh;display:flex;flex-direction:column;">
     <h3 id="medit-title">✏️ Modifica Ordine</h3>
-    <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:10px;">Modifica quantità o rimuovi prodotti. Per aggiungere nuovi prodotti chiudi e usali dal menu.</div>
-    <div id="medit-items" style="flex:1;overflow-y:auto;margin-bottom:10px;"></div>
-    <div style="background:rgba(245,216,0,0.1);border:2px solid var(--g);border-radius:8px;padding:8px 14px;display:flex;justify-content:space-between;margin-bottom:10px;">
+    <!-- TAB modifica/aggiungi -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <button onclick="selEditTab('items',this)" id="etab-items" style="flex:1;padding:8px;background:var(--g);color:var(--vs);border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">📋 Prodotti ordine</button>
+      <button onclick="selEditTab('add',this)" id="etab-add" style="flex:1;padding:8px;background:rgba(0,0,0,0.3);color:rgba(255,255,255,0.6);border:2px solid rgba(255,255,255,0.2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">➕ Aggiungi prodotto</button>
+    </div>
+
+    <!-- TAB PRODOTTI ORDINE -->
+    <div id="etab-items-panel" style="flex:1;overflow-y:auto;margin-bottom:10px;">
+      <div id="medit-items"></div>
+    </div>
+
+    <!-- TAB AGGIUNGI -->
+    <div id="etab-add-panel" style="display:none;flex:1;overflow-y:auto;margin-bottom:10px;">
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;" id="edit-cat-tabs"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;" id="edit-prod-grid"></div>
+    </div>
+
+    <div style="background:rgba(245,216,0,0.1);border:2px solid var(--g);border-radius:8px;padding:8px 14px;display:flex;justify-content:space-between;margin-bottom:8px;">
       <span style="font-size:14px;font-weight:900;color:var(--g);">TOTALE</span>
       <span style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--g);" id="medit-total">€ 0,00</span>
     </div>
@@ -418,6 +433,11 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 
     <!-- SEZIONE CONTANTI -->
     <div id="pay-cash-section" style="display:none;">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;background:rgba(200,50,50,0.15);border:1.5px solid rgba(200,50,50,0.3);border-radius:8px;padding:8px 12px;">
+        <span style="font-size:13px;color:rgba(255,255,255,0.7);font-weight:700;white-space:nowrap;">🏷️ Sconto €</span>
+        <input type="number" id="pay-sconto" placeholder="0.00" oninput="calcResto()" step="0.50" min="0"
+          style="flex:1;background:transparent;border:none;color:#ff9999;padding:4px;border-radius:6px;font-size:16px;font-weight:900;width:80px;text-align:right;">
+      </div>
       <div class="payrow">
         <label>Cliente dà:</label>
         <input type="number" id="pay-in" placeholder="0.00" oninput="calcResto()" step="0.50" min="0">
@@ -430,6 +450,11 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 
     <!-- SEZIONE CARTA -->
     <div id="pay-card-section" style="display:none;">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;background:rgba(200,50,50,0.15);border:1.5px solid rgba(200,50,50,0.3);border-radius:8px;padding:8px 12px;">
+        <span style="font-size:13px;color:rgba(255,255,255,0.7);font-weight:700;white-space:nowrap;">🏷️ Sconto €</span>
+        <input type="number" id="pay-sconto-card" placeholder="0.00" oninput="updateCardTotal()" step="0.50" min="0"
+          style="flex:1;background:transparent;border:none;color:#ff9999;padding:4px;font-size:16px;font-weight:900;width:80px;text-align:right;">
+      </div>
       <div style="background:linear-gradient(135deg,#1a3a6a,#2980b9);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;">
         <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:700;">Fai pagare il cliente col POS</div>
         <div style="font-size:28px;font-weight:900;color:#fff;margin-top:4px;" id="card-amount">€ 0,00</div>
@@ -508,25 +533,16 @@ const MENU={
   ],
   "Bibite":[
     {n:"Acqua piccola",p:1,ing:"",cat:"bibita"},
-    {n:"Björne",p:3,ing:"",cat:"birra"},
     {n:"Chinotto",p:2.5,ing:"",cat:"bibita"},
     {n:"Coca Cola 1L",p:3,ing:"",cat:"bibita"},
     {n:"Coca Cola lattina",p:2,ing:"",cat:"bibita"},
     {n:"Coca Cola plastica",p:3,ing:"",cat:"bibita"},
     {n:"Coca Cola vetro",p:3,ing:"",cat:"bibita"},
-    {n:"Corona",p:4,ing:"",cat:"birra"},
     {n:"Fanta lattina",p:2,ing:"",cat:"bibita"},
     {n:"Fanta plastica",p:3,ing:"",cat:"bibita"},
     {n:"Fanta vetro",p:3,ing:"",cat:"bibita"},
-    {n:"Nastro Azzurro 33cl",p:2,ing:"",cat:"birra"},
-    {n:"Nastro Azzurro 66cl",p:4,ing:"",cat:"birra"},
-    {n:"Peroni 33cl",p:1.5,ing:"",cat:"birra"},
-    {n:"Peroni 66cl",p:3,ing:"",cat:"birra"},
-    {n:"Raffo grande",p:3,ing:"",cat:"birra"},
-    {n:"Raffo piccola",p:2.5,ing:"",cat:"birra"},
     {n:"Sprite lattina",p:2,ing:"",cat:"bibita"},
     {n:"Sprite vetro",p:3,ing:"",cat:"bibita"},
-    {n:"Tennent's",p:3,ing:"",cat:"birra"},
     {n:"Thè Pesca/Limone",p:1.5,ing:"",cat:"bibita"}
   ],
   "Birre":[
@@ -864,6 +880,9 @@ function renderStats(){
   const domicilio=completedOrders.filter(o=>o.type==='domicilio');
   const totCash=cash.reduce((s,o)=>s+(o.total||0),0);
   const totCard=card.reduce((s,o)=>s+(o.total||0),0);
+  const totSconti=completedOrders.reduce((s,o)=>s+(o.sconto||0),0);
+  const nSconti=completedOrders.filter(o=>o.sconto>0).length;
+  const incassoReale=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
   const byHour={};
   completedOrders.forEach(o=>{if(o.paidTime){const h=o.paidTime.split(':')[0];byHour[h]=(byHour[h]||0)+1;}});
   const peakHour=Object.entries(byHour).sort((a,b)=>b[1]-a[1])[0];
@@ -878,7 +897,9 @@ function renderStats(){
     </div>`;
   el.innerHTML=`
     ${sc(completedOrders.length,'🧾 Ordini totali','Completati stasera')}
-    ${sc(fmt(tot),'💰 Incasso totale','Tutti i pagamenti')}
+    ${sc(fmt(tot),'💰 Incasso lordo','Prima degli sconti')}
+    ${sc(fmt(incassoReale),'💵 Incasso reale','Dopo sconti')}
+    ${nSconti>0?sc(nSconti+' sconti · '+fmt(totSconti),'🏷️ Sconti applicati','Totale perso','#e74c3c'):''}
     ${sc(cash.length+' ord · '+fmt(totCash),'💵 Contanti','')}
     ${sc(card.length+' ord · '+fmt(totCard),'💳 Carta','','#3498db')}
     ${sc(asporto.length+' asporto / '+domicilio.length+' dom','🛵 Tipo ordini','')}
@@ -927,14 +948,57 @@ function renderOpen(){
         <button class="ocbtn print" onclick="printComanda(openOrders.find(x=>x.id===${o.id}))">🖨️ Stampa</button>
         <button class="ocbtn pay" onclick="openPay(${o.id})">💰 Paga</button>
       </div>
+      <button onclick="if(confirm('Annullare ordine di ${o.cognome}?'))deleteOrder(${o.id})"
+        style="width:100%;margin-top:6px;padding:7px;background:rgba(100,20,20,0.5);border:1px solid rgba(200,50,50,0.4);color:rgba(255,150,150,0.8);border-radius:8px;cursor:pointer;font-size:12px;font-weight:900;">
+        🗑️ Annulla ordine
+      </button>
     </div>`).join('');
 }
 
-function editOrder(id){
-  const o=openOrders.find(x=>x.id===id);
+function selEditTab(tab,btn){
+  document.getElementById('etab-items-panel').style.display=tab==='items'?'block':'none';
+  document.getElementById('etab-add-panel').style.display=tab==='add'?'block':'none';
+  document.getElementById('etab-items').style.background=tab==='items'?'var(--g)':'rgba(0,0,0,0.3)';
+  document.getElementById('etab-items').style.color=tab==='items'?'var(--vs)':'rgba(255,255,255,0.6)';
+  document.getElementById('etab-add').style.background=tab==='add'?'var(--g)':'rgba(0,0,0,0.3)';
+  document.getElementById('etab-add').style.color=tab==='add'?'var(--vs)':'rgba(255,255,255,0.6)';
+  if(tab==='add')renderEditCats();
+}
+
+function renderEditCats(){
+  const cats=Object.keys(MENU);
+  document.getElementById('edit-cat-tabs').innerHTML=cats.map((c,i)=>`
+    <button onclick="renderEditProds('${c}',this)"
+      style="padding:6px 12px;border-radius:16px;border:2px solid var(--vc);background:${i===0?'var(--r)':'rgba(0,0,0,0.4)'};color:${i===0?'var(--g)':'#ccc'};cursor:pointer;font-size:11px;font-weight:900;">${c}</button>`).join('');
+  renderEditProds(cats[0],document.getElementById('edit-cat-tabs').firstChild);
+}
+
+function renderEditProds(cat,btn){
+  document.querySelectorAll('#edit-cat-tabs button').forEach(b=>{b.style.background='rgba(0,0,0,0.4)';b.style.color='#ccc';b.style.borderColor='var(--vc)';});
+  if(btn){btn.style.background='var(--r)';btn.style.color='var(--g)';btn.style.borderColor='var(--g)';}
+  document.getElementById('edit-prod-grid').innerHTML=MENU[cat].map(p=>`
+    <button onclick="editAddProduct('${p.n.replace(/'/g,"\\'")}',${p.p})"
+      style="background:linear-gradient(145deg,rgba(45,90,27,0.8),rgba(26,58,26,0.9));border:2px solid var(--vc);color:#fff;padding:10px 8px;border-radius:10px;cursor:pointer;text-align:center;">
+      <div style="font-size:12px;font-weight:900;">${p.n}</div>
+      <div style="font-size:14px;color:var(--g);font-weight:900;margin-top:4px;">${fmt(p.p)}</div>
+    </button>`).join('');
+}
+
+function editAddProduct(name,price){
+  const o=openOrders.find(x=>x.id===window._editId);
   if(!o)return;
-  // Apre modal di modifica senza toccare il carrello corrente
-  document.getElementById('medit-title').textContent='✏️ Modifica — '+o.cognome;
+  const ex=o.items.find(i=>i.name===name&&!i.extras.length&&!i.removes.length&&!i.note);
+  if(ex){ex.qty++;}
+  else{o.items.push({name,price,extras:[],removes:[],note:'',qty:1});}
+  o.total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
+  if(o.type==='domicilio')o.total+=DELIVERY_COST;
+  o.total=+o.total.toFixed(2);
+  saveOrders();
+  renderEditItems(o);
+  toast(name+' aggiunto!','ok',2000);
+}
+
+function renderEditItems(o){
   document.getElementById('medit-items').innerHTML=o.items.map((it,i)=>`
     <div style="display:flex;align-items:center;background:rgba(45,90,27,0.25);border:1px solid rgba(74,124,47,0.35);border-radius:8px;padding:7px 10px;margin-bottom:5px;gap:8px;">
       <div style="flex:1;font-size:13px;font-weight:700;">${it.name}
@@ -943,14 +1007,22 @@ function editOrder(id){
         ${it.note?`<div style="font-size:11px;color:rgba(255,255,255,0.45);">📝 ${it.note}</div>`:''}
       </div>
       <div style="display:flex;align-items:center;gap:5px;">
-        <button onclick="editChgQty(${id},${i},-1)" style="background:var(--r);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:bold;">−</button>
+        <button onclick="editChgQty(${o.id},${i},-1)" style="background:var(--r);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:bold;">−</button>
         <span style="font-weight:900;min-width:20px;text-align:center;">${it.qty}</span>
-        <button onclick="editChgQty(${id},${i},1)" style="background:var(--r);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:bold;">+</button>
+        <button onclick="editChgQty(${o.id},${i},1)" style="background:var(--r);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:bold;">+</button>
       </div>
       <span style="font-weight:900;color:var(--g);min-width:48px;text-align:right;font-family:'Fredoka One',cursive;">${fmt(it.price*it.qty)}</span>
-      <button onclick="editDelItem(${id},${i})" style="background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:16px;">✕</button>
+      <button onclick="editDelItem(${o.id},${i})" style="background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:16px;">✕</button>
     </div>`).join('');
   document.getElementById('medit-total').textContent=fmt(o.total);
+}
+
+function editOrder(id){
+  const o=openOrders.find(x=>x.id===id);
+  if(!o)return;
+  document.getElementById('medit-title').textContent='✏️ Modifica — '+o.cognome;
+  renderEditItems(o);
+  selEditTab('items',null);
   document.getElementById('medit').classList.add('show');
   window._editId=id;
 }
@@ -964,32 +1036,29 @@ function editChgQty(orderId,itemIdx,d){
   if(o.type==='domicilio')o.total+=DELIVERY_COST;
   o.total=+o.total.toFixed(2);
   saveOrders();
-  editOrder(orderId);
-}
-
-function editDelItem(orderId,itemIdx){
-  const o=openOrders.find(x=>x.id===orderId);
-  if(!o)return;
-  o.items.splice(itemIdx,1);
-  o.total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
-  if(o.type==='domicilio')o.total+=DELIVERY_COST;
-  o.total=+o.total.toFixed(2);
-  saveOrders();
   if(!o.items.length){
     document.getElementById('medit').classList.remove('show');
     openOrders=openOrders.filter(x=>x.id!==orderId);
     saveOrders();updCount();renderOpen();
-    toast('Ordine svuotato e rimosso','ok');
-    return;
+    toast('Ordine svuotato e rimosso','ok');return;
   }
-  editOrder(orderId);
+  renderEditItems(o);
+}
+
+function editDelItem(orderId,itemIdx){
+  editChgQty(orderId,itemIdx,-99);
 }
 
 function closeEditModal(){document.getElementById('medit').classList.remove('show');renderOpen();}
-
 function editPrintComanda(){
   const o=openOrders.find(x=>x.id===window._editId);
   if(o)printComanda(o);
+}
+
+function deleteOrder(id){
+  openOrders=openOrders.filter(o=>o.id!==id);
+  saveOrders();updCount();renderOpen();
+  toast('Ordine annullato','ok',3000);
 }
 
 // PAY
@@ -1013,6 +1082,8 @@ function showPayModal(tot,name){
   document.getElementById('pay-tot').textContent=fmt(tot);
   document.getElementById('pay-info').textContent='Cliente: '+name;
   document.getElementById('pay-in').value='';
+  document.getElementById('pay-sconto').value='';
+  document.getElementById('pay-sconto-card').value='';
   document.getElementById('resto-val').textContent='€ 0,00';
   document.getElementById('card-amount').textContent=fmt(tot);
   document.getElementById('pay-cash-section').style.display='none';
@@ -1020,7 +1091,6 @@ function showPayModal(tot,name){
   document.getElementById('pay-confirm-btn').style.opacity='0.4';
   document.getElementById('pay-confirm-btn').style.pointerEvents='none';
   payMethod=null;
-  // Reset button styles
   ['pay-cash-btn','pay-card-btn'].forEach(id=>{
     const b=document.getElementById(id);
     b.style.background='rgba(0,0,0,0.3)';
@@ -1028,6 +1098,13 @@ function showPayModal(tot,name){
     b.style.borderColor='rgba(245,216,0,0.3)';
   });
   document.getElementById('mpay').classList.add('show');
+}
+
+function updateCardTotal(){
+  const tot=payId?openOrders.find(o=>o.id===payId)?.total:getTotal();
+  const sconto=parseFloat(document.getElementById('pay-sconto-card').value)||0;
+  const finale=Math.max(0,tot-sconto);
+  document.getElementById('card-amount').textContent=fmt(finale);
 }
 
 function setPayMethod(m){
@@ -1052,20 +1129,26 @@ function setPayMethod(m){
 
 function calcResto(){
   const tot=payId?openOrders.find(o=>o.id===payId)?.total:getTotal();
+  const sconto=parseFloat(document.getElementById('pay-sconto').value)||0;
+  const totale_finale=Math.max(0,tot-sconto);
   const dato=parseFloat(document.getElementById('pay-in').value)||0;
-  const resto=Math.max(0,dato-tot);
+  const resto=Math.max(0,dato-totale_finale);
   document.getElementById('resto-val').textContent=fmt(resto);
   const confirmBtn=document.getElementById('pay-confirm-btn');
-  if(dato>=tot){confirmBtn.style.opacity='1';confirmBtn.style.pointerEvents='auto';}
+  if(dato>=totale_finale){confirmBtn.style.opacity='1';confirmBtn.style.pointerEvents='auto';}
   else{confirmBtn.style.opacity='0.4';confirmBtn.style.pointerEvents='none';}
 }
 function closePay(){document.getElementById('mpay').classList.remove('show');payId=null;payMethod=null;}
 function completePay(){
   if(!payMethod){toast('Seleziona contanti o carta!','err');return;}
   const tot=payId?openOrders.find(o=>o.id===payId)?.total:getTotal();
+  const sconto=payMethod==='cash'
+    ?(parseFloat(document.getElementById('pay-sconto').value)||0)
+    :(parseFloat(document.getElementById('pay-sconto-card').value)||0);
+  const totalefinale=Math.max(0,tot-sconto);
   if(payMethod==='cash'){
     const dato=parseFloat(document.getElementById('pay-in').value)||0;
-    if(dato<tot){toast('Il cliente non ha dato abbastanza!','err');return;}
+    if(dato<totalefinale){toast('Il cliente non ha dato abbastanza!','err');return;}
   }
   let paidOrder=null;
   if(payId){
@@ -1083,6 +1166,8 @@ function completePay(){
     paidOrder.paidTime=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
     paidOrder.paidDate=new Date().toLocaleDateString('it-IT');
     paidOrder.payMethod=payMethod;
+    paidOrder.sconto=sconto;
+    paidOrder.totalePagato=totalefinale;
     completedOrders.push(paidOrder);
     localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
   }
@@ -1090,8 +1175,9 @@ function completePay(){
   if(view==='open')renderOpen();
   if(view==='comp')renderCompleted();
   if(view==='stats')renderStats();
+  const scontoTxt=sconto>0?` (sconto ${fmt(sconto)})`:'';
   const methodLabel=payMethod==='cash'?'💵 Contanti':'💳 Carta';
-  toast(`Pagamento ${methodLabel} completato!`,'ok',4000);
+  toast(`Pagamento ${methodLabel} completato${scontoTxt}!`,'ok',4000);
 }
 
 // EXTRA MODAL
