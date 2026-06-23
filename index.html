@@ -118,25 +118,33 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 .bclr:hover{background:rgba(200,50,50,0.5);color:#fff;}
 
 /* OPEN ORDERS */
-.oview{grid-column:1;overflow-y:auto;padding:14px;}
-.ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-top:12px;}
-.ocard{background:linear-gradient(145deg,rgba(45,90,27,0.6),rgba(26,58,26,0.8));border-radius:14px;padding:14px;border:2px solid var(--vc);transition:all 0.15s;}
-.ocard.domicilio{border-color:var(--r);}
+.oview{grid-column:1/-1;overflow-y:auto;padding:12px 16px;}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px;margin-top:8px;}
+.ocard{background:linear-gradient(145deg,rgba(45,90,27,0.6),rgba(26,58,26,0.8));border-radius:12px;padding:12px;border:2px solid var(--vc);transition:all 0.15s;}
+.ocard.domicilio{border-color:var(--r);background:linear-gradient(145deg,rgba(80,20,20,0.5),rgba(50,10,10,0.7));}
 .ocard.asporto{border-color:var(--gs);}
-.ocard:hover{transform:translateY(-2px);}
-.ocname{font-size:17px;font-weight:900;color:var(--g);}
+.ocard:hover{transform:translateY(-1px);}
+.ocname{font-size:18px;font-weight:900;color:var(--g);}
 .octype{font-size:11px;padding:3px 9px;border-radius:12px;font-weight:900;}
 .octype.domicilio{background:var(--r);color:var(--g);}
 .octype.asporto{background:var(--g);color:var(--vs);}
-.ocitems{font-size:12px;color:rgba(255,255,255,0.65);margin:8px 0;line-height:1.8;}
-.octot{font-size:20px;font-weight:900;color:var(--g);font-family:'Fredoka One',cursive;}
+.ocitems{font-size:12px;color:rgba(255,255,255,0.7);margin:6px 0;line-height:1.7;}
+.octot{font-size:22px;font-weight:900;color:var(--g);font-family:'Fredoka One',cursive;}
 .octime{font-size:11px;color:rgba(255,255,255,0.35);}
-.ocacts{display:flex;gap:6px;margin-top:10px;}
-.ocbtn{flex:1;padding:8px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:900;transition:all 0.15s;}
-.ocbtn:hover{transform:scale(1.03);}
-.ocbtn.edit{background:rgba(15,52,96,0.9);color:#fff;border:1px solid #3498db;}
-.ocbtn.print{background:rgba(90,27,90,0.9);color:#fff;border:1px solid #9b59b6;}
-.ocbtn.pay{background:var(--g);color:var(--vs);}
+/* Nuovi tasti ordini */
+.ocacts{display:flex;gap:6px;margin-top:8px;align-items:center;}
+.ocico{width:36px;height:36px;border:none;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
+.ocico:hover{transform:scale(1.1);}
+.ocico.edit{background:rgba(15,52,96,0.9);border:2px solid #3498db;}
+.ocico.print{background:rgba(90,27,90,0.9);border:2px solid #9b59b6;}
+.ocico.cancel{background:rgba(80,20,20,0.7);border:1px solid rgba(200,50,50,0.4);}
+.ocbtn-pay{flex:1;padding:10px;background:linear-gradient(135deg,#b8860b,#f39c12);border:2px solid var(--g);color:#000;border-radius:8px;cursor:pointer;font-size:14px;font-weight:900;transition:all 0.15s;}
+.ocbtn-pay:hover{transform:scale(1.02);}
+
+/* Sezioni asporto/domicilio */
+.osection-title{font-family:'Fredoka One',cursive;font-size:18px;padding:6px 12px;border-radius:8px;margin-bottom:6px;display:inline-block;}
+.osection-title.asporto{background:rgba(200,168,0,0.2);color:var(--g);border:1px solid var(--gs);}
+.osection-title.domicilio{background:rgba(150,20,20,0.3);color:#ff9999;border:1px solid var(--r);}
 
 /* MODALS */
 .moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;align-items:center;justify-content:center;}
@@ -270,15 +278,24 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 
   <!-- OPEN ORDERS VIEW -->
   <div class="oview" id="oview" style="display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
       <span style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g);">📋 Ordini Aperti</span>
       <span id="oinfo" style="color:rgba(255,255,255,0.45);font-size:13px;font-weight:700;"></span>
     </div>
-    <div class="ogrid" id="ogrid"></div>
+    <!-- ASPORTO -->
+    <div id="osection-asporto" style="margin-bottom:16px;">
+      <div class="osection-title asporto">🥡 Asporto <span id="ocount-asp" style="font-size:14px;"></span></div>
+      <div class="ogrid" id="ogrid-asp"></div>
+    </div>
+    <!-- DOMICILIO -->
+    <div id="osection-domicilio">
+      <div class="osection-title domicilio">🛵 Domicilio <span id="ocount-dom" style="font-size:14px;"></span></div>
+      <div class="ogrid" id="ogrid-dom"></div>
+    </div>
   </div>
 
   <!-- COMPLETED ORDERS VIEW -->
-  <div class="oview" id="cview" style="display:none;">
+  <div style="grid-column:1/-1;overflow-y:auto;padding:12px 16px;display:none;" id="cview">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <span style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g);">✅ Ordini Completati</span>
       <div style="display:flex;gap:8px;align-items:center;">
@@ -290,7 +307,7 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
   </div>
 
   <!-- STATS VIEW -->
-  <div class="oview" id="sview" style="display:none;">
+  <div style="grid-column:1/-1;overflow-y:auto;padding:12px 16px;display:none;" id="sview">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <span style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g);">📊 Statistiche Serata</span>
       <span style="color:rgba(255,255,255,0.4);font-size:12px;" id="stats-date"></span>
@@ -835,8 +852,8 @@ function updCount(){
 // COMPLETED ORDERS
 function renderCompleted(){
   const grid=document.getElementById('cgrid');
-  const tot=completedOrders.reduce((s,o)=>s+(o.total||0),0);
-  document.getElementById('cinfo').textContent=`${completedOrders.length} ordini · Incasso: ${fmt(tot)}`;
+  const totNetto=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
+  document.getElementById('cinfo').textContent=`${completedOrders.length} ordini · Incasso netto: ${fmt(totNetto)}`;
   if(!completedOrders.length){
     grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">✅</div><p>Nessun ordine completato stasera</p></div>';
     return;
@@ -858,12 +875,12 @@ function renderCompleted(){
 
 function resetCompleted(){
   if(!completedOrders.length){toast('Nessun ordine da azzerare','err');return;}
-  const tot=completedOrders.reduce((s,o)=>s+(o.total||0),0);
+  const totNetto=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
   completedOrders=[];
   localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
   updCount();
   renderCompleted();
-  toast(`Serata azzerata! Totale incassato: ${fmt(tot)}`, 'ok', 5000);
+  toast(`Serata azzerata! Incasso netto: ${fmt(totNetto)}`,'ok',5000);
 }
 
 function renderStats(){
@@ -915,12 +932,9 @@ function renderStats(){
 }
 
 function renderOpen(){
-  const grid=document.getElementById('ogrid');
   const tot=openOrders.reduce((s,o)=>s+(o.total||0),0);
   document.getElementById('oinfo').textContent=`${openOrders.length} ordini · Totale: ${fmt(tot)}`;
-  if(!openOrders.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">📋</div><p>Nessun ordine aperto</p></div>';return;}
 
-  // Ordina per orario cronologico — "Appena possibile" prima, poi per orario HH:MM
   const sorted=[...openOrders].sort((a,b)=>{
     const getMin=o=>{
       if(!o.orario||o.orario==='Appena possibile')return 0;
@@ -930,29 +944,46 @@ function renderOpen(){
     return getMin(a)-getMin(b);
   });
 
-  grid.innerHTML=sorted.map(o=>`
+  const asporto=sorted.filter(o=>o.type==='asporto');
+  const domicilio=sorted.filter(o=>o.type==='domicilio');
+
+  document.getElementById('ocount-asp').textContent=asporto.length?`(${asporto.length})`:'';
+  document.getElementById('ocount-dom').textContent=domicilio.length?`(${domicilio.length})`:'';
+
+  const cardHtml=o=>`
     <div class="ocard ${o.type}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;">
         <div class="ocname">${o.cognome}</div>
-        <span class="octype ${o.type}">${o.type==='domicilio'?'🛵 Dom':'🥡 Asp'}</span>
+        ${o.orario?`<div style="font-size:16px;font-weight:900;color:var(--g);">⏰ ${o.orario}</div>`:''}
       </div>
-      ${o.orario?`<div style="font-size:18px;font-weight:900;color:var(--g);margin-bottom:4px;">⏰ ${o.orario}</div>`:''}
-      ${o.indirizzo?`<div style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.8);margin-bottom:4px;">📍 ${o.indirizzo}</div>`:''}
+      ${o.indirizzo?`<div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.85);margin-bottom:4px;">📍 ${o.indirizzo}</div>`:''}
       <div class="ocitems">${o.items.map(i=>`${i.qty}x ${i.name}${i.extras.length?' [+'+i.extras.join(',')+']':''}${i.removes.length?' [-'+i.removes.join(',')+']':''}`).join('<br>')}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 8px;">
         <span class="octot">${fmt(o.total)}</span>
         <span class="octime">Preso: ${o.time}</span>
       </div>
-      <div class="ocacts">
-        <button class="ocbtn edit" onclick="editOrder(${o.id})">✏️ Modifica</button>
-        <button class="ocbtn print" onclick="printComanda(openOrders.find(x=>x.id===${o.id}))">🖨️ Stampa</button>
-        <button class="ocbtn pay" onclick="openPay(${o.id})">💰 Paga</button>
+      <button class="ocbtn-pay" onclick="openPay(${o.id})">💰 Paga</button>
+      <div class="ocacts" style="margin-top:6px;">
+        <button class="ocico edit" onclick="editOrder(${o.id})" title="Modifica">✏️</button>
+        <button class="ocico print" onclick="printComanda(openOrders.find(x=>x.id===${o.id}))" title="Stampa">🖨️</button>
+        <button class="ocico cancel" onclick="if(confirm('Annullare ordine di ${o.cognome}?'))deleteOrder(${o.id})" title="Annulla ordine">🗑️</button>
       </div>
-      <button onclick="if(confirm('Annullare ordine di ${o.cognome}?'))deleteOrder(${o.id})"
-        style="width:100%;margin-top:6px;padding:7px;background:rgba(100,20,20,0.5);border:1px solid rgba(200,50,50,0.4);color:rgba(255,150,150,0.8);border-radius:8px;cursor:pointer;font-size:12px;font-weight:900;">
-        🗑️ Annulla ordine
-      </button>
-    </div>`).join('');
+    </div>`;
+
+  const aspGrid=document.getElementById('ogrid-asp');
+  const domGrid=document.getElementById('ogrid-dom');
+
+  aspGrid.innerHTML=asporto.length
+    ?asporto.map(cardHtml).join('')
+    :'<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:10px;">Nessun ordine asporto</div>';
+
+  domGrid.innerHTML=domicilio.length
+    ?domicilio.map(cardHtml).join('')
+    :'<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:10px;">Nessun ordine domicilio</div>';
+
+  // Nascondi sezione se vuota del tutto
+  document.getElementById('osection-asporto').style.display=asporto.length||!domicilio.length?'block':'block';
+  document.getElementById('osection-domicilio').style.display='block';
 }
 
 function selEditTab(tab,btn){
