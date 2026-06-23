@@ -237,6 +237,7 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
       <div class="typrow">
         <button class="tbtn active" onclick="setType('asporto')" id="ta">🥡 Asporto</button>
         <button class="tbtn" onclick="setType('domicilio')" id="td">🛵 Domicilio</button>
+        <button onclick="addCoperto()" style="background:rgba(52,152,219,0.25);border:2px solid #3498db;color:#74b9ff;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:900;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.background='rgba(52,152,219,0.5)'" onmouseout="this.style.background='rgba(52,152,219,0.25)'">🪑 Coperto<br><span style="font-size:11px;">+€2,00</span></button>
       </div>
     </div>
 
@@ -711,6 +712,14 @@ function updTotal(){
   if(order.type==='domicilio'){
     document.getElementById('delrow').innerHTML=`<span>🛵 Consegna</span><span style="color:var(--g)">${fmt(DELIVERY_COST)}</span>`;
   }
+}
+
+function addCoperto(){
+  const ex=order.items.find(i=>i.name==='Coperto');
+  if(ex){ex.qty++;}
+  else{order.items.push({name:'Coperto',price:2,extras:[],removes:[],note:'',qty:1});}
+  renderItems();
+  toast('Coperto aggiunto','ok',1500);
 }
 
 // TYPE
