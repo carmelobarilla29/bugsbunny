@@ -222,6 +222,10 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
       <button class="nbtn" onclick="openAdmin()" style="background:rgba(150,50,150,0.3);border-color:rgba(200,100,200,0.5);color:#d9a0d9;">⚙️ Admin</button>
     </div>
     <div class="clock" id="clock">--:--</div>
+    <button onclick="connectBluetooth()" id="bt-status"
+      style="background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:900;white-space:nowrap;">
+      🖨️ Non connessa
+    </button>
   </div>
 
   <!-- MENU PANEL -->
@@ -1242,17 +1246,92 @@ function confirmEx(){
   closeEx();
 }
 
-// PRINT
-function printComanda(o){
-  if(!o)return;
+// BLUETOOTH PRINTER
+let btDevice=null;
+let btChar=null;
+
+async function connectBluetooth(){
+  try {
+    toast('Ricerca stampante Bluetooth...','ok',3000);
+    btDevice=await navigator.bluetooth.requestDevice({
+      filters:[{name:'Jolimark TP510'},{namePrefix:'TP510'},{namePrefix:'Jolimark'}],
+      optionalServices:['000018f0-0000-1000-8000-00805f9b34fb','e7810a71-73ae-499d-8c15-faa9aef0c3f2','49535343-fe7d-4ae5-8fa9-9fafd205e455']
+    });
+    const server=await btDevice.gatt.connect();
+    // Prova diversi UUID di servizio comuni per stampanti ESC/POS
+    let service=null;
+    const serviceUUIDs=['000018f0-0000-1000-8000-00805f9b34fb','e7810a71-73ae-499d-8c15-faa9aef0c3f2','49535343-fe7d-4ae5-8fa9-9fafd205e455'];
+    for(const uuid of serviceUUIDs){
+      try{service=await server.getPrimaryService(uuid);break;}catch(e){}
+    }
+    if(!service){
+      // Prova a prendere il primo servizio disponibile
+      const services=await server.getPrimaryServices();
+      service=services[0];
+    }
+    const characteristics=await service.getCharacteristics();
+    btChar=characteristics.find(c=>c.properties.write||c.properties.writeWithoutResponse)||characteristics[0];
+    localStorage.setItem('bb_bt_connected','1');
+    document.getElementById('bt-status').textContent='🖨️ TP510 ✅';
+    document.getElementById('bt-status').style.color='#2ecc71';
+    toast('Stampante connessa!','ok',3000);
+  } catch(e){
+    toast('Connessione fallita: '+e.message,'err',5000);
+    btChar=null;btDevice=null;
+  }
+}
+
+async function btPrint(bytes){
+  if(!btChar){toast('Stampante non connessa! Tocca 🖨️ per connettere.','err',4000);return false;}
+  try{
+    const chunkSize=20;
+    for(let i=0;i<bytes.length;i+=chunkSize){
+      const chunk=bytes.slice(i,i+chunkSize);
+      if(btChar.properties.writeWithoutResponse){await btChar.writeValueWithoutResponse(chunk);}
+      else{await btChar.writeValue(chunk);}
+      await new Promise(r=>setTimeout(r,20));
+    }
+    return true;
+  }catch(e){
+    toast('Errore stampa: '+e.message,'err',4000);
+    btChar=null;
+    document.getElementById('bt-status').textContent='🖨️ Non connessa';
+    document.getElementById('bt-status').style.color='rgba(255,255,255,0.5)';
+    return false;
+  }
+}
+
+function escPos(o){
+  const enc=new TextEncoder();
+  const lines=[];
+  const ESC=0x1B,GS=0x1D,LF=0x0A;
+
+  // Init
+  lines.push([ESC,0x40]); // Reset
+  lines.push([ESC,0x61,0x01]); // Center
+  lines.push([ESC,0x21,0x10]); // Double height
+  lines.push(...enc.encode('BUGS BUNNY\n'));
+  lines.push([ESC,0x21,0x00]); // Normal
   const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   const data=o.date||new Date().toLocaleDateString('it-IT');
+  lines.push(...enc.encode(data+' - '+ora+'\n'));
+  lines.push(...enc.encode('--------------------------------\n'));
 
-  const tipoSub=o.type==='domicilio'
-    ?`<div style="font-size:20px;font-weight:bold;text-align:center;margin-top:6px;">${o.indirizzo||'Indirizzo non specificato'}</div>
-       <div style="font-size:17px;text-align:center;">Tel: ${o.telefono||'-'}</div>`:'';
+  // Tipo ordine
+  lines.push([ESC,0x61,0x01]); // Center
+  lines.push([ESC,0x21,0x30]); // Double width+height
+  lines.push(...enc.encode((o.type==='domicilio'?'DOMICILIO':'ASPORTO')+'\n'));
+  lines.push([ESC,0x21,0x00]); // Normal
 
-  // Cerca categoria di ogni prodotto nel menu
+  if(o.type==='domicilio'){
+    lines.push([ESC,0x21,0x10]);
+    lines.push(...enc.encode((o.indirizzo||'N/D')+'\n'));
+    lines.push([ESC,0x21,0x00]);
+    lines.push(...enc.encode('Tel: '+(o.telefono||'-')+'\n'));
+  }
+  lines.push(...enc.encode('--------------------------------\n'));
+
+  // Prodotti divisi per categoria
   function getCat(name){
     for(const [cat,items] of Object.entries(MENU)){
       const found=items.find(i=>i.n===name);
@@ -1260,51 +1339,101 @@ function printComanda(o){
     }
     return 'altro';
   }
-
-  // Dividi items per categoria
   const pizze=o.items.filter(i=>getCat(i.name)==='pizza');
   const rosticceria=o.items.filter(i=>getCat(i.name)==='rosticceria');
   const bibite=o.items.filter(i=>['bibita','birra'].includes(getCat(i.name)));
   const altro=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getCat(i.name)));
 
-  const renderItems=items=>items.map(i=>`
-    <div style="display:flex;gap:6px;align-items:baseline;margin:10px 0 4px;">
-      <span style="font-size:34px;font-weight:900;min-width:36px;line-height:1;">${i.qty}x</span>
-      <span style="font-size:26px;font-weight:900;line-height:1.2;">${i.name}</span>
-    </div>
-    ${i.extras.length?`<div style="font-size:20px;font-weight:bold;margin:3px 0 3px 42px;">+ ${i.extras.join(', ')}</div>`:''}
-    ${i.removes.length?`<div style="font-size:20px;font-weight:bold;margin:3px 0 3px 42px;text-decoration:underline;">- ${i.removes.join(', ')}</div>`:''}
-    ${i.note?`<div style="font-size:19px;font-weight:bold;margin:3px 0 3px 42px;font-style:italic;">⚠️ ${i.note}</div>`:''}`).join('');
+  function addSection(title,items){
+    if(!items.length)return;
+    lines.push([ESC,0x61,0x01]);
+    lines.push(...enc.encode('-- '+title+' --\n'));
+    lines.push([ESC,0x61,0x00]);
+    items.forEach(i=>{
+      lines.push([ESC,0x21,0x20]); // Double width
+      const nome=i.name.length>18?i.name.substring(0,18):i.name;
+      lines.push(...enc.encode(i.qty+'x '+nome+'\n'));
+      lines.push([ESC,0x21,0x00]);
+      if(i.extras.length)lines.push(...enc.encode('  +'+i.extras.join(', ')+'\n'));
+      if(i.removes.length)lines.push(...enc.encode('  -'+i.removes.join(', ')+'\n'));
+      if(i.note)lines.push(...enc.encode('  NOTE: '+i.note+'\n'));
+    });
+  }
 
-  const renderSection=(title,items)=>items.length?`
-    <div style="font-size:14px;font-weight:900;text-align:center;letter-spacing:2px;margin:6px 0 4px;border-bottom:2px solid #000;padding-bottom:3px;">${title}</div>
-    ${renderItems(items)}`:'' ;
+  addSection('PIZZE',pizze);
+  if(rosticceria.length)lines.push(...enc.encode('--------------------------------\n'));
+  addSection('ROSTICCERIA',rosticceria);
+  if(bibite.length||altro.length)lines.push(...enc.encode('--------------------------------\n'));
+  addSection('BIBITE',[...bibite,...altro]);
 
-  const html=`<!DOCTYPE html><html><head><style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    @page{margin:2mm;size:80mm auto;}
-    body{font-family:Arial,sans-serif;width:76mm;padding:2mm;}
-    .sep{border:none;border-top:2px dashed #000;margin:8px 0;}
-  </style></head><body>
-    <div style="text-align:center;font-size:16px;font-weight:900;">BUGS BUNNY</div>
-    <div style="text-align:center;font-size:13px;">${data} — ${ora}</div>
-    <hr class="sep">
-    <div style="background:${o.type==='domicilio'?'#000':'#fff'};color:${o.type==='domicilio'?'#fff':'#000'};padding:10px;text-align:center;font-size:30px;font-weight:900;border:3px solid #000;">
-      ${o.type==='domicilio'?'DOMICILIO':'ASPORTO'}
+  lines.push(...enc.encode('--------------------------------\n'));
+
+  // Cognome e orario grandi in fondo
+  lines.push([ESC,0x61,0x01]);
+  lines.push([ESC,0x21,0x30]);
+  lines.push(...enc.encode(o.cognome.toUpperCase()+'\n'));
+  lines.push([ESC,0x21,0x10]);
+  lines.push(...enc.encode('ORA: '+(o.orario||'-')+'\n'));
+  lines.push([ESC,0x21,0x00]);
+  lines.push(...enc.encode('--------------------------------\n'));
+  lines.push([LF,LF,LF]);
+  // Cut paper
+  lines.push([GS,0x56,0x41,0x03]);
+
+  // Flatten
+  const total=lines.reduce((s,l)=>s+(Array.isArray(l)?l.length:l.length),0);
+  const buf=new Uint8Array(total);
+  let pos=0;
+  lines.forEach(l=>{
+    if(Array.isArray(l)){buf.set(l,pos);pos+=l.length;}
+    else{buf.set(l,pos);pos+=l.length;}
+  });
+  return buf;
+}
+
+// PRINT
+async function printComanda(o){
+  if(!o)return;
+
+  // Se Bluetooth disponibile e connesso — usa Bluetooth
+  if(navigator.bluetooth&&btChar){
+    const bytes=escPos(o);
+    const ok=await btPrint(bytes);
+    if(ok){toast('Comanda stampata! 🖨️','ok',2000);return;}
+  }
+
+  // Fallback — stampa browser classica
+  const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const data=o.date||new Date().toLocaleDateString('it-IT');
+  const tipoSub=o.type==='domicilio'
+    ?`<div style="font-size:20px;font-weight:bold;text-align:center;margin-top:6px;">${o.indirizzo||'Indirizzo non specificato'}</div>
+       <div style="font-size:17px;text-align:center;">Tel: ${o.telefono||'-'}</div>`:'';
+  function getCat(name){for(const [cat,items] of Object.entries(MENU)){const found=items.find(i=>i.n===name);if(found)return found.cat||'altro';}return 'altro';}
+  const pizze=o.items.filter(i=>getCat(i.name)==='pizza');
+  const rosticceria=o.items.filter(i=>getCat(i.name)==='rosticceria');
+  const bibite=o.items.filter(i=>['bibita','birra'].includes(getCat(i.name)));
+  const altro=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getCat(i.name)));
+  const rI=items=>items.map(i=>`
+    <div style="display:flex;gap:4px;align-items:baseline;margin:6px 0 2px;">
+      <span style="font-size:20px;font-weight:900;min-width:24px;line-height:1;">${i.qty}x</span>
+      <span style="font-size:16px;font-weight:900;line-height:1.2;">${i.name}</span>
     </div>
-    ${tipoSub}
+    ${i.extras.length?`<div style="font-size:13px;font-weight:bold;margin:2px 0 2px 28px;">+ ${i.extras.join(', ')}</div>`:''}
+    ${i.removes.length?`<div style="font-size:13px;font-weight:bold;margin:2px 0 2px 28px;text-decoration:underline;">- ${i.removes.join(', ')}</div>`:''}
+    ${i.note?`<div style="font-size:12px;font-weight:bold;margin:2px 0 2px 28px;font-style:italic;">⚠️ ${i.note}</div>`:''}`).join('');
+  const rS=(title,items)=>items.length?`<div style="font-size:11px;font-weight:900;text-align:center;letter-spacing:1px;margin:4px 0 3px;border-bottom:1px solid #000;padding-bottom:2px;">${title}</div>${rI(items)}`:'';
+  const html=`<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box;}@page{margin:1mm;size:58mm auto;}body{font-family:Arial,sans-serif;width:54mm;padding:1mm;}.sep{border:none;border-top:1px dashed #000;margin:4px 0;}</style></head><body>
+    <div style="text-align:center;font-size:13px;font-weight:900;">BUGS BUNNY</div>
+    <div style="text-align:center;font-size:10px;">${data} — ${ora}</div>
     <hr class="sep">
-    ${renderSection('— PIZZE —',pizze)}
-    ${rosticceria.length&&pizze.length?'<hr class="sep">':''}
-    ${renderSection('— ROSTICCERIA —',rosticceria)}
-    ${bibite.length&&(pizze.length||rosticceria.length)?'<hr class="sep">':''}
-    ${renderSection('— BIBITE —',[...bibite,...altro])}
+    <div style="background:${o.type==='domicilio'?'#000':'#fff'};color:${o.type==='domicilio'?'#fff':'#000'};padding:6px;text-align:center;font-size:18px;font-weight:900;border:2px solid #000;">${o.type==='domicilio'?'DOMICILIO':'ASPORTO'}</div>
+    ${tipoSub}<hr class="sep">
+    ${rS('— PIZZE —',pizze)}${rosticceria.length&&pizze.length?'<hr class="sep">':''}${rS('— ROSTICCERIA —',rosticceria)}${(bibite.length||altro.length)&&(pizze.length||rosticceria.length)?'<hr class="sep">':''}${rS('— BIBITE —',[...bibite,...altro])}
     <hr class="sep">
-    <div style="text-align:center;font-size:38px;font-weight:900;margin:6px 0;">${o.cognome.toUpperCase()}</div>
-    <div style="text-align:center;font-size:28px;font-weight:900;margin-bottom:6px;">⏰ ${o.orario||'-'}</div>
+    <div style="text-align:center;font-size:22px;font-weight:900;margin:4px 0;">${o.cognome.toUpperCase()}</div>
+    <div style="text-align:center;font-size:16px;font-weight:900;margin-bottom:4px;">⏰ ${o.orario||'-'}</div>
     <hr class="sep">
   </body></html>`;
-
   let fr=document.getElementById('pfr');
   if(!fr){fr=document.createElement('iframe');fr.id='pfr';fr.style.cssText='position:fixed;top:-9999px;left:-9999px;width:80mm;height:1px;border:none;';document.body.appendChild(fr);}
   const d=fr.contentDocument||fr.contentWindow.document;
