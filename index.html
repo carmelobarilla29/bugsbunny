@@ -1361,7 +1361,12 @@ function printBrowser(o){
 }
 
 function connectBluetooth(){
-  toast('Usa il tasto 🖨️ direttamente quando stampi — RawBT gestisce tutto!','ok',3000);
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  if(isIOS){
+    toast('Su iPad la stampa si apre automaticamente quando confermi','ok',3000);
+    return;
+  }
+  toast('RawBT gestisce la connessione automaticamente!','ok',3000);
   document.getElementById('bt-status').textContent='🖨️ RawBT ✅';
   document.getElementById('bt-status').style.color='#2ecc71';
 }
@@ -1369,7 +1374,12 @@ function connectBluetooth(){
 // PRINT
 async function printComanda(o){
   if(!o)return;
-  printViaRawBT(o);
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  if(isIOS){
+    printBrowser(o);
+  } else {
+    printViaRawBT(o);
+  }
 }
 
 // ADMIN
@@ -1468,14 +1478,11 @@ function saveAdminPwd(){
 }
 
 // INIT
-// Reset dati di prova — rimuovi queste righe dopo il primo utilizzo reale
-localStorage.removeItem('bb_ord');
-localStorage.removeItem('bb_comp');
-localStorage.removeItem('bb_cli');
-openOrders=[];
-completedOrders=[];
-clienti=[];
-// FINE RESET
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+if(isIOS){
+  const btn=document.getElementById('bt-status');
+  if(btn)btn.style.display='none';
+}
 
 renderCats();
 updCount();
