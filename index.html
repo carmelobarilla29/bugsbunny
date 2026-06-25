@@ -1299,12 +1299,65 @@ function buildEscPosText(o){
 }
 
 function printViaRawBT(o){
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  if(isIOS){
+    // Su iOS stampa browser classica
+    printBrowser(o);
+    return;
+  }
+  // Su Android usa RawBT
   const testo=buildEscPosText(o);
-  // Codifica in base64 e apre RawBT via intent Android
   const b64=btoa(unescape(encodeURIComponent(testo)));
   const url='rawbt://base64/'+b64;
-  window.location.href=url;
+  // Usa iframe per non navigare via dalla pagina
+  let fr=document.getElementById('rawbt-fr');
+  if(!fr){
+    fr=document.createElement('iframe');
+    fr.id='rawbt-fr';
+    fr.style.cssText='display:none;';
+    document.body.appendChild(fr);
+  }
+  fr.src=url;
   toast('Stampa inviata a RawBT! 🖨️','ok',2000);
+}
+
+function printBrowser(o){
+  const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const data=o.date||new Date().toLocaleDateString('it-IT');
+  const tipoSub=o.type==='domicilio'
+    ?`<div style="font-size:14px;font-weight:bold;text-align:center;margin-top:4px;">${o.indirizzo||'N/D'}</div>
+       <div style="font-size:12px;text-align:center;">Tel: ${o.telefono||'-'}</div>`:'';
+  function getC(name){for(const [,items] of Object.entries(MENU)){const f=items.find(i=>i.n===name);if(f)return f.cat||'altro';}return 'altro';}
+  const pizze=o.items.filter(i=>getC(i.name)==='pizza');
+  const rost=o.items.filter(i=>getC(i.name)==='rosticceria');
+  const bib=o.items.filter(i=>['bibita','birra'].includes(getC(i.name)));
+  const alt=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getC(i.name)));
+  const rI=items=>items.map(i=>`
+    <div style="display:flex;gap:4px;margin:5px 0 2px;">
+      <span style="font-size:18px;font-weight:900;min-width:22px;">${i.qty}x</span>
+      <span style="font-size:14px;font-weight:900;">${i.name}</span>
+    </div>
+    ${i.extras.length?`<div style="font-size:11px;font-weight:bold;margin-left:26px;">+ ${i.extras.join(', ')}</div>`:''}
+    ${i.removes.length?`<div style="font-size:11px;font-weight:bold;margin-left:26px;text-decoration:underline;">- ${i.removes.join(', ')}</div>`:''}
+    ${i.note?`<div style="font-size:11px;font-style:italic;margin-left:26px;">⚠️ ${i.note}</div>`:''}`).join('');
+  const rS=(t,items)=>items.length?`<div style="font-size:10px;font-weight:900;text-align:center;border-bottom:1px solid #000;padding-bottom:2px;margin:4px 0 3px;">${t}</div>${rI(items)}`:'';
+  const html=`<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box;}@page{margin:1mm;size:58mm auto;}body{font-family:Arial,sans-serif;width:54mm;padding:1mm;}.sep{border:none;border-top:1px dashed #000;margin:4px 0;}</style></head><body>
+    <div style="text-align:center;font-size:13px;font-weight:900;">BUGS BUNNY</div>
+    <div style="text-align:center;font-size:10px;">${data} — ${ora}</div>
+    <hr class="sep">
+    <div style="background:${o.type==='domicilio'?'#000':'#fff'};color:${o.type==='domicilio'?'#fff':'#000'};padding:5px;text-align:center;font-size:16px;font-weight:900;border:2px solid #000;">${o.type==='domicilio'?'DOMICILIO':'ASPORTO'}</div>
+    ${tipoSub}<hr class="sep">
+    ${rS('— PIZZE —',pizze)}${rost.length&&pizze.length?'<hr class="sep">':''}${rS('— ROSTICCERIA —',rost)}${(bib.length||alt.length)&&(pizze.length||rost.length)?'<hr class="sep">':''}${rS('— BIBITE —',[...bib,...alt])}
+    <hr class="sep">
+    <div style="text-align:center;font-size:20px;font-weight:900;margin:3px 0;">${o.cognome.toUpperCase()}</div>
+    <div style="text-align:center;font-size:14px;font-weight:900;margin-bottom:3px;">⏰ ${o.orario||'-'}</div>
+    <hr class="sep">
+  </body></html>`;
+  let fr=document.getElementById('pfr');
+  if(!fr){fr=document.createElement('iframe');fr.id='pfr';fr.style.cssText='position:fixed;top:-9999px;left:-9999px;width:58mm;height:1px;border:none;';document.body.appendChild(fr);}
+  const d=fr.contentDocument||fr.contentWindow.document;
+  d.open();d.write(html);d.close();
+  setTimeout(()=>{fr.contentWindow.focus();fr.contentWindow.print();},400);
 }
 
 function connectBluetooth(){
