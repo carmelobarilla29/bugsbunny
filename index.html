@@ -1341,23 +1341,33 @@ function printBrowser(o){
     ${i.removes.length?`<div style="font-size:11px;font-weight:bold;margin-left:26px;text-decoration:underline;">- ${i.removes.join(', ')}</div>`:''}
     ${i.note?`<div style="font-size:11px;font-style:italic;margin-left:26px;">⚠️ ${i.note}</div>`:''}`).join('');
   const rS=(t,items)=>items.length?`<div style="font-size:10px;font-weight:900;text-align:center;border-bottom:1px solid #000;padding-bottom:2px;margin:4px 0 3px;">${t}</div>${rI(items)}`:'';
-  const html=`<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box;}@page{margin:1mm;size:58mm auto;}body{font-family:Arial,sans-serif;width:54mm;padding:1mm;}.sep{border:none;border-top:1px dashed #000;margin:4px 0;}</style></head><body>
-    <div style="text-align:center;font-size:13px;font-weight:900;">BUGS BUNNY</div>
-    <div style="text-align:center;font-size:10px;">${data} — ${ora}</div>
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    @page{margin:2mm;size:80mm auto;}
+    body{font-family:Arial,sans-serif;width:76mm;padding:2mm;}
+    .sep{border:none;border-top:1px dashed #000;margin:4px 0;}
+  </style></head><body>
+    <div style="text-align:center;font-size:14px;font-weight:900;">BUGS BUNNY</div>
+    <div style="text-align:center;font-size:11px;">${data} — ${ora}</div>
     <hr class="sep">
-    <div style="background:${o.type==='domicilio'?'#000':'#fff'};color:${o.type==='domicilio'?'#fff':'#000'};padding:5px;text-align:center;font-size:16px;font-weight:900;border:2px solid #000;">${o.type==='domicilio'?'DOMICILIO':'ASPORTO'}</div>
+    <div style="background:${o.type==='domicilio'?'#000':'#fff'};color:${o.type==='domicilio'?'#fff':'#000'};padding:5px;text-align:center;font-size:18px;font-weight:900;border:2px solid #000;">${o.type==='domicilio'?'DOMICILIO':'ASPORTO'}</div>
     ${tipoSub}<hr class="sep">
     ${rS('— PIZZE —',pizze)}${rost.length&&pizze.length?'<hr class="sep">':''}${rS('— ROSTICCERIA —',rost)}${(bib.length||alt.length)&&(pizze.length||rost.length)?'<hr class="sep">':''}${rS('— BIBITE —',[...bib,...alt])}
     <hr class="sep">
-    <div style="text-align:center;font-size:20px;font-weight:900;margin:3px 0;">${o.cognome.toUpperCase()}</div>
-    <div style="text-align:center;font-size:14px;font-weight:900;margin-bottom:3px;">⏰ ${o.orario||'-'}</div>
+    <div style="text-align:center;font-size:22px;font-weight:900;margin:3px 0;">${o.cognome.toUpperCase()}</div>
+    <div style="text-align:center;font-size:16px;font-weight:900;margin-bottom:3px;">⏰ ${o.orario||'-'}</div>
     <hr class="sep">
   </body></html>`;
-  let fr=document.getElementById('pfr');
-  if(!fr){fr=document.createElement('iframe');fr.id='pfr';fr.style.cssText='position:fixed;top:-9999px;left:-9999px;width:58mm;height:1px;border:none;';document.body.appendChild(fr);}
-  const d=fr.contentDocument||fr.contentWindow.document;
-  d.open();d.write(html);d.close();
-  setTimeout(()=>{fr.contentWindow.focus();fr.contentWindow.print();},400);
+
+  // Apre una nuova finestra e stampa — funziona su Safari iPad
+  const w=window.open('','_blank','width=400,height=600');
+  if(w){
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    w.onload=function(){w.focus();w.print();};
+    setTimeout(()=>{w.focus();w.print();},500);
+  }
 }
 
 function connectBluetooth(){
@@ -1478,10 +1488,18 @@ function saveAdminPwd(){
 }
 
 // INIT
-const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-if(isIOS){
-  const btn=document.getElementById('bt-status');
-  if(btn)btn.style.display='none';
+// Detect iOS/iPadOS (iPad in Safari ha userAgent desktop da iOS 13+)
+const isIOS=(/iPad|iPhone|iPod/.test(navigator.userAgent))||
+            (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+
+const btBtn=document.getElementById('bt-status');
+if(btBtn){
+  if(isIOS){
+    btBtn.style.display='none';
+  } else {
+    btBtn.textContent='🖨️ RawBT';
+    btBtn.style.color='rgba(255,255,255,0.6)';
+  }
 }
 
 renderCats();
