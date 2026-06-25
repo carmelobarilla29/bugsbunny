@@ -1246,59 +1246,71 @@ function confirmEx(){
   closeEx();
 }
 
-// BLUETOOTH PRINTER
-let btDevice=null;
-let btChar=null;
+// RAWBT PRINTING
+function buildEscPosText(o){
+  const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const data=o.date||new Date().toLocaleDateString('it-IT');
 
-async function connectBluetooth(){
-  try {
-    toast('Ricerca stampante Bluetooth...','ok',3000);
-    btDevice=await navigator.bluetooth.requestDevice({
-      filters:[{name:'Jolimark TP510'},{namePrefix:'TP510'},{namePrefix:'Jolimark'}],
-      optionalServices:['000018f0-0000-1000-8000-00805f9b34fb','e7810a71-73ae-499d-8c15-faa9aef0c3f2','49535343-fe7d-4ae5-8fa9-9fafd205e455']
-    });
-    const server=await btDevice.gatt.connect();
-    // Prova diversi UUID di servizio comuni per stampanti ESC/POS
-    let service=null;
-    const serviceUUIDs=['000018f0-0000-1000-8000-00805f9b34fb','e7810a71-73ae-499d-8c15-faa9aef0c3f2','49535343-fe7d-4ae5-8fa9-9fafd205e455'];
-    for(const uuid of serviceUUIDs){
-      try{service=await server.getPrimaryService(uuid);break;}catch(e){}
+  function getCat(name){
+    for(const [cat,items] of Object.entries(MENU)){
+      const found=items.find(i=>i.n===name);
+      if(found)return found.cat||'altro';
     }
-    if(!service){
-      // Prova a prendere il primo servizio disponibile
-      const services=await server.getPrimaryServices();
-      service=services[0];
-    }
-    const characteristics=await service.getCharacteristics();
-    btChar=characteristics.find(c=>c.properties.write||c.properties.writeWithoutResponse)||characteristics[0];
-    localStorage.setItem('bb_bt_connected','1');
-    document.getElementById('bt-status').textContent='🖨️ TP510 ✅';
-    document.getElementById('bt-status').style.color='#2ecc71';
-    toast('Stampante connessa!','ok',3000);
-  } catch(e){
-    toast('Connessione fallita: '+e.message,'err',5000);
-    btChar=null;btDevice=null;
+    return 'altro';
   }
+  const pizze=o.items.filter(i=>getCat(i.name)==='pizza');
+  const rosticceria=o.items.filter(i=>getCat(i.name)==='rosticceria');
+  const bibite=o.items.filter(i=>['bibita','birra'].includes(getCat(i.name)));
+  const altro=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getCat(i.name)));
+
+  let txt='';
+  txt+='================================\n';
+  txt+='         BUGS BUNNY\n';
+  txt+='================================\n';
+  txt+=data+' - '+ora+'\n';
+  txt+='--------------------------------\n';
+  txt+=(o.type==='domicilio'?'*** DOMICILIO ***':'*** ASPORTO ***')+'\n';
+  if(o.type==='domicilio'){
+    txt+=(o.indirizzo||'N/D')+'\n';
+    txt+='Tel: '+(o.telefono||'-')+'\n';
+  }
+  txt+='--------------------------------\n';
+
+  function addSection(title,items){
+    if(!items.length)return;
+    txt+='-- '+title+' --\n';
+    items.forEach(i=>{
+      txt+=i.qty+'x '+i.name+'\n';
+      if(i.extras.length)txt+='  + '+i.extras.join(', ')+'\n';
+      if(i.removes.length)txt+='  - '+i.removes.join(', ')+'\n';
+      if(i.note)txt+='  NOTE: '+i.note+'\n';
+    });
+  }
+
+  addSection('PIZZE',pizze);
+  if(rosticceria.length){txt+='--------------------------------\n';addSection('ROSTICCERIA',rosticceria);}
+  if(bibite.length||altro.length){txt+='--------------------------------\n';addSection('BIBITE',[...bibite,...altro]);}
+  txt+='================================\n';
+  txt+=o.cognome.toUpperCase()+'\n';
+  txt+='ORA: '+(o.orario||'-')+'\n';
+  txt+='================================\n';
+  txt+='\n\n\n';
+  return txt;
 }
 
-async function btPrint(bytes){
-  if(!btChar){toast('Stampante non connessa! Tocca 🖨️ per connettere.','err',4000);return false;}
-  try{
-    const chunkSize=20;
-    for(let i=0;i<bytes.length;i+=chunkSize){
-      const chunk=bytes.slice(i,i+chunkSize);
-      if(btChar.properties.writeWithoutResponse){await btChar.writeValueWithoutResponse(chunk);}
-      else{await btChar.writeValue(chunk);}
-      await new Promise(r=>setTimeout(r,20));
-    }
-    return true;
-  }catch(e){
-    toast('Errore stampa: '+e.message,'err',4000);
-    btChar=null;
-    document.getElementById('bt-status').textContent='🖨️ Non connessa';
-    document.getElementById('bt-status').style.color='rgba(255,255,255,0.5)';
-    return false;
-  }
+function printViaRawBT(o){
+  const testo=buildEscPosText(o);
+  // Codifica in base64 e apre RawBT via intent Android
+  const b64=btoa(unescape(encodeURIComponent(testo)));
+  const url='rawbt://base64/'+b64;
+  window.location.href=url;
+  toast('Stampa inviata a RawBT! 🖨️','ok',2000);
+}
+
+function connectBluetooth(){
+  toast('Usa il tasto 🖨️ direttamente quando stampi — RawBT gestisce tutto!','ok',3000);
+  document.getElementById('bt-status').textContent='🖨️ RawBT ✅';
+  document.getElementById('bt-status').style.color='#2ecc71';
 }
 
 function escPos(o){
@@ -1394,15 +1406,9 @@ function escPos(o){
 // PRINT
 async function printComanda(o){
   if(!o)return;
-
-  // Se Bluetooth disponibile e connesso — usa Bluetooth
-  if(navigator.bluetooth&&btChar){
-    const bytes=escPos(o);
-    const ok=await btPrint(bytes);
-    if(ok){toast('Comanda stampata! 🖨️','ok',2000);return;}
-  }
-
-  // Fallback — stampa browser classica
+  // Usa sempre RawBT su Android
+  printViaRawBT(o);
+}
   const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   const data=o.date||new Date().toLocaleDateString('it-IT');
   const tipoSub=o.type==='domicilio'
