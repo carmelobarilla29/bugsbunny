@@ -1313,10 +1313,11 @@ function printViaRawBT(o){
     return;
   }
   const testo=buildEscPosText(o);
-  // Metodo 1: rawbt con testo plain
-  const url='rawbt:'+encodeURIComponent(testo);
+  // Base64 encoding per RawBT — formato corretto
+  const b64=btoa(unescape(encodeURIComponent(testo)));
+  const url='rawbt://base64/'+b64;
   window.location.href=url;
-  toast('Stampa inviata! 🖨️','ok',2000);
+  setTimeout(()=>{toast('Stampa inviata! 🖨️','ok',2000);},300);
 }
 
 function printBrowser(o){
