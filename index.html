@@ -251,15 +251,17 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 
       <!-- ORARIO -->
       <div class="orario-row">
-        <button class="orbtn" id="orbtn-ap" onclick="setOr('ap')">⚡ Appena<br>possibile</button>
-        <button class="orbtn" id="orbtn-ora" onclick="setOr('ora')">🕐 Inserisci<br>orario</button>
+        <button class="orbtn" id="orbtn-ap" onclick="setOr('ap')">⚡ Appena possibile</button>
+        <button class="orbtn" id="orbtn-ora" onclick="setOr('ora')">🕐 Inserisci orario</button>
       </div>
-      <input class="finput" type="text" id="orario-input" placeholder="Es: 20:30" style="display:none;margin-bottom:7px;">
+      <input class="finput" type="text" id="orario-input" placeholder="Es: 20:30" style="display:none;margin-bottom:5px;">
 
       <!-- DOMICILIO FIELDS -->
       <div id="domfields" style="display:none;">
-        <input class="finput" type="text" id="telefono" placeholder="📞 Telefono *">
-        <input class="finput" type="text" id="indirizzo" placeholder="📍 Indirizzo consegna">
+        <div style="display:flex;gap:5px;">
+          <input class="finput" type="text" id="telefono" placeholder="📞 Telefono *" style="flex:1;margin-bottom:0;">
+          <input class="finput" type="text" id="indirizzo" placeholder="📍 Indirizzo" style="flex:2;margin-bottom:0;">
+        </div>
       </div>
     </div>
 
@@ -1265,34 +1267,40 @@ function buildEscPosText(o){
 
   let txt='';
   txt+='================================\n';
-  txt+='         BUGS BUNNY\n';
+  txt+='        BUGS BUNNY\n';
   txt+='================================\n';
-  txt+=data+' - '+ora+'\n';
-  txt+='--------------------------------\n';
-  txt+=(o.type==='domicilio'?'*** DOMICILIO ***':'*** ASPORTO ***')+'\n';
+  txt+='  '+data+'   '+ora+'\n';
+  txt+='================================\n';
+
   if(o.type==='domicilio'){
-    txt+=(o.indirizzo||'N/D')+'\n';
-    txt+='Tel: '+(o.telefono||'-')+'\n';
+    txt+='  >>> DOMICILIO <<<\n';
+    txt+='--------------------------------\n';
+    txt+='  '+( o.indirizzo||'N/D')+'\n';
+    txt+='  Tel: '+(o.telefono||'-')+'\n';
+  } else {
+    txt+='   >>> ASPORTO <<<\n';
   }
-  txt+='--------------------------------\n';
+  txt+='================================\n';
 
   function addSection(title,items){
     if(!items.length)return;
-    txt+='-- '+title+' --\n';
+    txt+='\n  *** '+title+' ***\n';
+    txt+='--------------------------------\n';
     items.forEach(i=>{
-      txt+=i.qty+'x '+i.name+'\n';
-      if(i.extras.length)txt+='  + '+i.extras.join(', ')+'\n';
-      if(i.removes.length)txt+='  - '+i.removes.join(', ')+'\n';
-      if(i.note)txt+='  NOTE: '+i.note+'\n';
+      txt+='  '+i.qty+'x  '+i.name+'\n';
+      if(i.extras.length)txt+='       + '+i.extras.join('\n       + ')+'\n';
+      if(i.removes.length)txt+='       - '+i.removes.join('\n       - ')+'\n';
+      if(i.note)txt+='       ! '+i.note+'\n';
     });
   }
 
   addSection('PIZZE',pizze);
-  if(rosticceria.length){txt+='--------------------------------\n';addSection('ROSTICCERIA',rosticceria);}
-  if(bibite.length||altro.length){txt+='--------------------------------\n';addSection('BIBITE',[...bibite,...altro]);}
-  txt+='================================\n';
-  txt+=o.cognome.toUpperCase()+'\n';
-  txt+='ORA: '+(o.orario||'-')+'\n';
+  if(rosticceria.length)addSection('ROSTICCERIA',rosticceria);
+  if(bibite.length||altro.length)addSection('BIBITE',[...bibite,...altro]);
+
+  txt+='\n================================\n';
+  txt+='  '+o.cognome.toUpperCase()+'\n';
+  txt+='  ORA: '+(o.orario||'-')+'\n';
   txt+='================================\n';
   txt+='\n\n\n';
   return txt;
@@ -1305,11 +1313,10 @@ function printViaRawBT(o){
     return;
   }
   const testo=buildEscPosText(o);
-  // RawBT accetta testo diretto via intent Android
-  const encoded=encodeURIComponent(testo);
-  const url='intent://'+encoded+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end';
+  // Metodo 1: rawbt con testo plain
+  const url='rawbt:'+encodeURIComponent(testo);
   window.location.href=url;
-  setTimeout(()=>{toast('Stampa inviata! 🖨️','ok',2000);},300);
+  toast('Stampa inviata! 🖨️','ok',2000);
 }
 
 function printBrowser(o){
