@@ -258,9 +258,14 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 
       <!-- DOMICILIO FIELDS -->
       <div id="domfields" style="display:none;">
-        <div style="display:flex;gap:5px;">
+        <div style="display:flex;gap:5px;margin-bottom:5px;">
           <input class="finput" type="text" id="telefono" placeholder="📞 Telefono *" style="flex:1;margin-bottom:0;">
           <input class="finput" type="text" id="indirizzo" placeholder="📍 Indirizzo" style="flex:2;margin-bottom:0;">
+        </div>
+        <div style="display:flex;gap:6px;margin-top:4px;">
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:700;align-self:center;">🛵 Consegna:</div>
+          <button id="del-3" onclick="setDelivery(3)" style="flex:1;padding:7px;background:var(--g);border:2px solid var(--g);color:#000;border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">€ 3,00</button>
+          <button id="del-5" onclick="setDelivery(5)" style="flex:1;padding:7px;background:rgba(0,0,0,0.3);border:2px solid rgba(245,216,0,0.3);color:rgba(255,255,255,0.6);border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">€ 5,00</button>
         </div>
       </div>
     </div>
@@ -637,6 +642,7 @@ const MENU={
     {n:"Crostone Speck e Funghi",p:3,ing:"mozzarella, besciamella, speck, funghi",cat:"rosticceria"},
     {n:"Medaglione",p:1.5,ing:"crocchette, scamorza, salame piccante",cat:"rosticceria"},
     {n:"Mozzarella in Carrozza",p:2,ing:"mozzarella, besciamella",cat:"rosticceria"},
+    {n:"Tramezzino Integrale",p:4,ing:"",cat:"rosticceria"},
     {n:"Tramezzino Pancetta",p:3,ing:"pomodoro, pancetta, formaggio, lattuga, maionese",cat:"rosticceria"},
     {n:"Tramezzino Tonno",p:3,ing:"pomodoro, maionese, prosciutto cotto, lattuga, tonno",cat:"rosticceria"},
     {n:"Würstel in Camicia",p:2,ing:"",cat:"rosticceria"}
@@ -669,8 +675,7 @@ const MENU={
     {n:"Nastro Azzurro 66cl",p:4,ing:"",cat:"birra"},
     {n:"Peroni 33cl",p:1.5,ing:"",cat:"birra"},
     {n:"Peroni 66cl",p:3,ing:"",cat:"birra"},
-    {n:"Raffo grande",p:3,ing:"",cat:"birra"},
-    {n:"Raffo piccola",p:2.5,ing:"",cat:"birra"},
+    {n:"Raffo",p:2.5,ing:"",cat:"birra"},
     {n:"Tennent's",p:3,ing:"",cat:"birra"}
   ]
 };
@@ -681,14 +686,15 @@ const EXTRAS=[
   {n:"Capperi",p:1},{n:"Cipolla",p:1},{n:"Cotto",p:1},{n:"Crudo",p:1},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:1},{n:"Fiori di zucca",p:1},
   {n:"Funghi",p:1},{n:"Gorgonzola",p:1},{n:"Granella di pistacchio",p:2},
-  {n:"Melanzane arrosto",p:1},{n:"Melanzane fritte",p:1},
+  {n:"Mais",p:1},{n:"Melanzane arrosto",p:1},{n:"Melanzane fritte",p:1},
   {n:"Mortadella",p:1},{n:"Mozzarella di bufala",p:2},{n:"Mozzarella extra",p:1},
   {n:"Nduja",p:1},{n:"Olive",p:1},{n:"Origano",p:0},{n:"Pancetta",p:1},
-  {n:"Peperoni",p:1},{n:"Peperoni arrosto",p:1},{n:"Pomodorini",p:1},
-  {n:"Porchetta",p:2},{n:"Porcini",p:1},{n:"Rucola",p:1},
+  {n:"Patate al forno",p:1},{n:"Peperoncino",p:1},{n:"Peperoni",p:1},{n:"Peperoni arrosto",p:1},
+  {n:"Pomodorini",p:1},{n:"Porchetta",p:2},{n:"Porcini",p:1},{n:"Rucola",p:1},
   {n:"Salame dolce",p:1},{n:"Salame piccante",p:1},{n:"Salsiccia",p:2},
   {n:"Scaglie di grana",p:1},{n:"Scamorza",p:1},{n:"Speck",p:1},
-  {n:"Tonno",p:1},{n:"Zucchine arrosto",p:1},{n:"Zucchine fritte",p:1}
+  {n:"Tonno",p:1},{n:"Uovo Sodo",p:2},{n:"Zucchine arrosto",p:1},{n:"Zucchine fritte",p:1},
+  {n:"No Lattosio",p:0,special:true}
 ];
 
 const EXTRAS_MAX=[
@@ -697,14 +703,15 @@ const EXTRAS_MAX=[
   {n:"Capperi",p:2},{n:"Cipolla",p:2},{n:"Cotto",p:2},{n:"Crudo",p:2},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:2},{n:"Fiori di zucca",p:2},
   {n:"Funghi",p:2},{n:"Gorgonzola",p:2},{n:"Granella di pistacchio",p:2},
-  {n:"Melanzane arrosto",p:2},{n:"Melanzane fritte",p:2},
+  {n:"Mais",p:2},{n:"Melanzane arrosto",p:2},{n:"Melanzane fritte",p:2},
   {n:"Mortadella",p:2},{n:"Mozzarella di bufala",p:4},{n:"Mozzarella extra",p:2},
   {n:"Nduja",p:2},{n:"Olive",p:2},{n:"Origano",p:0},{n:"Pancetta",p:2},
-  {n:"Peperoni",p:2},{n:"Peperoni arrosto",p:2},{n:"Pomodorini",p:2},
-  {n:"Porchetta",p:2},{n:"Porcini",p:2},{n:"Rucola",p:2},
+  {n:"Patate al forno",p:2},{n:"Peperoncino",p:2},{n:"Peperoni",p:2},{n:"Peperoni arrosto",p:2},
+  {n:"Pomodorini",p:2},{n:"Porchetta",p:2},{n:"Porcini",p:2},{n:"Rucola",p:2},
   {n:"Salame dolce",p:2},{n:"Salame piccante",p:2},{n:"Salsiccia",p:2},
   {n:"Scaglie di grana",p:2},{n:"Scamorza",p:2},{n:"Speck",p:2},
-  {n:"Tonno",p:2},{n:"Zucchine arrosto",p:2},{n:"Zucchine fritte",p:2}
+  {n:"Tonno",p:2},{n:"Uovo Sodo",p:2},{n:"Zucchine arrosto",p:2},{n:"Zucchine fritte",p:2},
+  {n:"No Lattosio",p:0,special:true}
 ];
 
 let order={type:'asporto',items:[]};
@@ -821,7 +828,7 @@ function updTotal(){
   document.getElementById('totval').textContent=fmt(getTotal());
   document.getElementById('delrow').style.display=order.type==='domicilio'?'flex':'none';
   if(order.type==='domicilio'){
-    document.getElementById('delrow').innerHTML=`<span>🛵 Consegna</span><span style="color:var(--g)">${fmt(DELIVERY_COST)}</span>`;
+    document.getElementById('delrow').innerHTML=`<span>🛵 Consegna</span><span style="color:var(--g)">${fmt(currentDeliveryCost)}</span>`;
   }
 }
 
@@ -839,6 +846,10 @@ function setType(t){
   document.getElementById('ta').classList.toggle('active',t==='asporto');
   document.getElementById('td').classList.toggle('active',t==='domicilio');
   document.getElementById('domfields').style.display=t==='domicilio'?'block':'none';
+  if(t==='domicilio'){
+    currentDeliveryCost=DELIVERY_COST;
+    setDelivery(DELIVERY_COST);
+  }
   updTotal();
 }
 
@@ -1020,9 +1031,21 @@ function renderStats(){
   const totSconti=completedOrders.reduce((s,o)=>s+(o.sconto||0),0);
   const nSconti=completedOrders.filter(o=>o.sconto>0).length;
   const incassoReale=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
+  // Ora più affollata — conta tutti gli ordini (asporto + domicilio) per ora di conferma
   const byHour={};
-  completedOrders.forEach(o=>{if(o.paidTime){const h=o.paidTime.split(':')[0];byHour[h]=(byHour[h]||0)+1;}});
+  completedOrders.forEach(o=>{
+    const t=o.time||o.paidTime;
+    if(t){const h=t.split(':')[0];byHour[h]=(byHour[h]||0)+1;}
+  });
   const peakHour=Object.entries(byHour).sort((a,b)=>b[1]-a[1])[0];
+
+  // Conteggio pizze
+  const pizzeCount=completedOrders.reduce((s,o)=>s+o.items.filter(i=>{
+    for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro']){
+      if(MENU[cat]&&MENU[cat].find(p=>p.n===i.name))return true;
+    }
+    return false;
+  }).reduce((ss,i)=>ss+i.qty,0),0);
   const prodCount={};
   completedOrders.forEach(o=>o.items.forEach(i=>{prodCount[i.name]=(prodCount[i.name]||0)+i.qty;}));
   const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -1040,7 +1063,8 @@ function renderStats(){
     ${sc(cash.length+' ord · '+fmt(totCash),'💵 Contanti','')}
     ${sc(card.length+' ord · '+fmt(totCard),'💳 Carta','','#3498db')}
     ${sc(asporto.length+' asporto / '+domicilio.length+' dom','🛵 Tipo ordini','')}
-    ${peakHour?sc(peakHour[0]+':00 — '+peakHour[1]+' ordini','⏰ Ora più affollata',''):''}
+    ${peakHour?sc(peakHour[0]+':00 — '+peakHour[1]+' ordini','⏰ Ora più affollata','Asporto + domicilio'):''}
+    ${sc(pizzeCount+'  🍕','🍕 Pizze sfornate stasera','')}
     <div style="background:linear-gradient(145deg,rgba(45,90,27,0.6),rgba(26,58,26,0.8));border:2px solid var(--vc);border-radius:14px;padding:16px;grid-column:1/-1">
       <div style="font-size:11px;color:rgba(255,255,255,0.45);font-weight:700;text-transform:uppercase;margin-bottom:10px;">🍕 Prodotti più venduti stasera</div>
       ${topProds.map((p,i)=>`
@@ -1339,7 +1363,7 @@ function openEx(name,ing,isMax=false,excl=[]){
   document.getElementById('mex-title').textContent='🍕 '+name;
   document.getElementById('mex-note').value='';
   document.getElementById('mex-note-label').textContent=noteLabel;
-  document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')">${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
+  document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')" ${e.special?'style="border-color:#3498db;color:#3498db;"':''}>${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
   const ings=ing.split(',').map(s=>s.trim()).filter(Boolean);
   document.getElementById('mex-removes').innerHTML=ings.length?ings.map(e=>`<button class="rbtn" onclick="togRm(this,'${e.replace(/'/g,"\\'")}')">${e}</button>`).join(''):'<span style="color:rgba(255,255,255,0.3);font-size:12px;">Nessun ingrediente base</span>';
   document.getElementById('mex').classList.add('show');
@@ -1349,35 +1373,52 @@ function openEx(name,ing,isMax=false,excl=[]){
 let metaMetaName='';
 let metaMetaPrice=0;
 let metaMetaIsMax=false;
-let metaMetaSelected={prima:'',seconda:''};
+let metaMetaGusti={prima:[],seconda:[]};
 let metaMetaExtras=[];
 
 function openMetaMeta(name,price,isMax){
   metaMetaName=name;metaMetaPrice=price;metaMetaIsMax=isMax;
-  metaMetaSelected={prima:'',seconda:''};
+  metaMetaGusti={prima:[],seconda:[]};
   metaMetaExtras=[];
   document.getElementById('mmeta-title').textContent='⬡ '+name;
   document.getElementById('mmeta-note').value='';
-  document.getElementById('mmeta-prima-sel').textContent='Scegli gusto...';
+  document.getElementById('mmeta-prima-sel').textContent='Tocca i gusti...';
   document.getElementById('mmeta-prima-sel').style.color='rgba(255,255,255,0.4)';
-  document.getElementById('mmeta-seconda-sel').textContent='Scegli gusto...';
+  document.getElementById('mmeta-seconda-sel').textContent='Tocca i gusti...';
   document.getElementById('mmeta-seconda-sel').style.color='rgba(255,255,255,0.4)';
 
-  // Griglia gusti in ordine alfabetico
   const gusti=MENU['Pizze Tonde'].map(p=>p.n).sort((a,b)=>a.localeCompare(b,'it'));
-  const makeBtn=(gridId,g)=>`<button onclick="selMeta('${gridId}','${g.replace(/'/g,"\\'")}',this)"
+  const makeBtn=(gridId,g)=>`<button onclick="togMeta('${gridId}','${g.replace(/'/g,"\\'")}',this)"
     style="padding:6px 4px;background:rgba(45,90,27,0.4);border:1px solid var(--vc);color:#fff;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;transition:all 0.15s;text-align:center;">${g}</button>`;
   document.getElementById('mmeta-grid-prima').innerHTML=gusti.map(g=>makeBtn('prima',g)).join('');
   document.getElementById('mmeta-grid-seconda').innerHTML=gusti.map(g=>makeBtn('seconda',g)).join('');
 
-  // Extra
   document.getElementById('mmeta-extras').innerHTML=EXTRAS_MAX.map(e=>`
     <button onclick="togMetaExtra(this,'${e.n.replace(/'/g,"\\'")}')"
-      style="padding:5px 8px;background:rgba(0,0,0,0.3);border:1.5px solid rgba(245,216,0,0.25);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;transition:all 0.15s;white-space:nowrap;">
+      style="padding:5px 8px;background:rgba(0,0,0,0.3);border:1.5px solid rgba(245,216,0,0.25);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;transition:all 0.15s;white-space:nowrap;${e.special?'border-color:#3498db;color:#3498db;':''}">
       ${e.n} <span style="color:var(--g);">${e.p===0?'gratis':'+€'+e.p}</span>
     </button>`).join('');
 
   document.getElementById('mmeta').classList.add('show');
+}
+
+function togMeta(gridId,gusto,btn){
+  const arr=metaMetaGusti[gridId];
+  if(arr.includes(gusto)){
+    metaMetaGusti[gridId]=arr.filter(g=>g!==gusto);
+    btn.style.background='rgba(45,90,27,0.4)';btn.style.borderColor='var(--vc)';btn.style.color='#fff';
+  } else {
+    metaMetaGusti[gridId].push(gusto);
+    btn.style.background='var(--g)';btn.style.borderColor='var(--g)';btn.style.color='var(--vs)';
+  }
+  const selEl=document.getElementById('mmeta-'+gridId+'-sel');
+  if(metaMetaGusti[gridId].length){
+    selEl.textContent='✅ '+metaMetaGusti[gridId].join(' + ');
+    selEl.style.color='var(--g)';selEl.style.borderColor='var(--g)';
+  } else {
+    selEl.textContent='Tocca i gusti...';
+    selEl.style.color='rgba(255,255,255,0.4)';selEl.style.borderColor='rgba(245,216,0,0.3)';
+  }
 }
 
 function togMetaExtra(btn,n){
@@ -1390,21 +1431,10 @@ function togMetaExtra(btn,n){
   }
 }
 
-function selMeta(gridId,gusto,btn){
-  const gridEl=document.getElementById('mmeta-grid-'+gridId);
-  gridEl.querySelectorAll('button').forEach(b=>{b.style.background='rgba(45,90,27,0.4)';b.style.borderColor='var(--vc)';b.style.color='#fff';});
-  btn.style.background='var(--g)';btn.style.borderColor='var(--g)';btn.style.color='var(--vs)';
-  metaMetaSelected[gridId]=gusto;
-  const selEl=document.getElementById('mmeta-'+gridId+'-sel');
-  selEl.textContent='✅ '+gusto;
-  selEl.style.color='var(--g)';
-  selEl.style.borderColor='var(--g)';
-}
-
 function confirmMetaMeta(){
-  if(!metaMetaSelected.prima||!metaMetaSelected.seconda){toast('Scegli entrambe le metà!','err');return;}
+  if(!metaMetaGusti.prima.length||!metaMetaGusti.seconda.length){toast('Scegli almeno un gusto per ogni metà!','err');return;}
   const nota=(document.getElementById('mmeta-note').value.trim()?document.getElementById('mmeta-note').value.trim()+' · ':'')+
-    'Meta\': '+metaMetaSelected.prima+' / Meta\': '+metaMetaSelected.seconda;
+    'Meta\': '+metaMetaGusti.prima.join(' e ')+' / Meta\': '+metaMetaGusti.seconda.join(' e ');
   const ep=metaMetaExtras.reduce((s,en)=>{const ex=EXTRAS_MAX.find(x=>x.n===en);return s+(ex?ex.p:2);},0);
   const fp=+(metaMetaPrice+ep).toFixed(2);
   order.items.push({name:metaMetaName,price:fp,extras:[...metaMetaExtras],removes:[],note:nota,qty:1});
@@ -1567,7 +1597,9 @@ function buildEscPosText(o){
     });
   }
   addSection('PIZZE',pizze);if(rosticceria.length)addSection('ROSTICCERIA',rosticceria);if(bibite.length||altro.length)addSection('BIBITE',[...bibite,...altro]);
-  txt+='================================\n  '+o.cognome.toUpperCase()+'\n  ORA: '+(o.orario||'-')+'\n================================\n\n\n';
+  txt+='================================\n  '+o.cognome.toUpperCase()+'\n  ORA: '+(o.orario||'-')+'\n================================\n';
+  if(o.total)txt+='  TOT = '+fmt(o.total)+'\n';
+  txt+='================================\n\n\n';
   return txt;
 }
 
@@ -1648,6 +1680,7 @@ function printViaRawBT(o){
   txt+='================================\n';
   txt+=CENTER+FONT_GRANDE+o.cognome.toUpperCase()+'\n';
   txt+=FONT_MEDIO+'ORA: '+(o.orario||'-')+'\n'+FONT_NORMALE;
+  if(o.total)txt+=FONT_MEDIO+'TOT: '+fmt(o.total)+'\n'+FONT_NORMALE;
   txt+=LEFT+'================================\n\n\n';
   txt+=GS+'\x56\x41\x03'; // taglia carta
 
@@ -1726,13 +1759,24 @@ async function printComanda(o){
   }
 }
 
-// ADMIN
+// DELIVERY COST SELECTOR
+let currentDeliveryCost=DELIVERY_COST;
+function setDelivery(cost){
+  currentDeliveryCost=cost;
+  document.getElementById('del-3').style.background=cost===3?'var(--g)':'rgba(0,0,0,0.3)';
+  document.getElementById('del-3').style.color=cost===3?'#000':'rgba(255,255,255,0.6)';
+  document.getElementById('del-3').style.borderColor=cost===3?'var(--g)':'rgba(245,216,0,0.3)';
+  document.getElementById('del-5').style.background=cost===5?'var(--g)':'rgba(0,0,0,0.3)';
+  document.getElementById('del-5').style.color=cost===5?'#000':'rgba(255,255,255,0.6)';
+  document.getElementById('del-5').style.borderColor=cost===5?'var(--g)':'rgba(245,216,0,0.3)';
+  renderTot();
+}
 let DELIVERY_COST=parseFloat(localStorage.getItem('bb_delivery')||'3');
 let ADMIN_PWD=localStorage.getItem('bb_adminpwd')||'1234';
 
 function getTotal(){
   let t=order.items.reduce((s,i)=>s+i.price*i.qty,0);
-  if(order.type==='domicilio')t+=DELIVERY_COST;
+  if(order.type==='domicilio')t+=currentDeliveryCost;
   return +t.toFixed(2);
 }
 
