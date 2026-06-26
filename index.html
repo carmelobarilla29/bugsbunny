@@ -1313,9 +1313,9 @@ function printViaRawBT(o){
     return;
   }
   const testo=buildEscPosText(o);
-  // Base64 encoding per RawBT — formato corretto
   const b64=btoa(unescape(encodeURIComponent(testo)));
-  const url='rawbt://base64/'+b64;
+  // Formato intent:// corretto per Samsung Internet + RawBT
+  const url='intent:base64,'+b64+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end';
   window.location.href=url;
   setTimeout(()=>{toast('Stampa inviata! 🖨️','ok',2000);},300);
 }
