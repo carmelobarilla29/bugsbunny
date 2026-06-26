@@ -1576,8 +1576,7 @@ function printViaRawBT(o){
   if(isIOS){printBrowser(o);return;}
   const testo=buildEscPosText(o);
   const b64=btoa(unescape(encodeURIComponent(testo)));
-  const uri='rawbt://base64/'+b64;
-  window.open(uri,'_blank');
+  window.location.href='rawbt://base64/'+b64;
   setTimeout(()=>{toast('Stampa inviata! 🖨️','ok',2000);},300);
 }
 
