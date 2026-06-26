@@ -1460,10 +1460,27 @@ function buildEscPosText(o){
     txt+='\n  *** '+title+' ***\n';
     txt+='--------------------------------\n';
     items.forEach(i=>{
-      txt+='  '+i.qty+'x  '+i.name+'\n';
+      // Nome pulito — rimuovi (meta/meta) dal nome perché le info sono nella nota
+      const nomeStampa=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim();
+      txt+='  '+i.qty+'x  '+nomeStampa+'\n';
+      // Se è metà/metà, stampa le due metà su righe separate e chiare
+      if(i.note&&i.note.includes("Meta'")){
+        const parti=i.note.split(' · ');
+        // Prima la nota libera se c'è
+        parti.forEach(p=>{
+          if(p.includes("Meta':")){
+            // Separa le due metà
+            const halves=p.split(' / ');
+            halves.forEach(h=>txt+='       >> '+h.trim()+'\n');
+          } else {
+            txt+='       ! '+p+'\n';
+          }
+        });
+      } else {
+        if(i.note)txt+='       ! '+i.note+'\n';
+      }
       if(i.extras.length)txt+='       + '+i.extras.join('\n       + ')+'\n';
       if(i.removes.length)txt+='       - '+i.removes.join('\n       - ')+'\n';
-      if(i.note)txt+='       ! '+i.note+'\n';
     });
   }
 
