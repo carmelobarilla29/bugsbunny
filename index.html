@@ -1460,27 +1460,54 @@ function buildEscPosText(o){
     txt+='\n  *** '+title+' ***\n';
     txt+='--------------------------------\n';
     items.forEach(i=>{
-      // Nome pulito — rimuovi (meta/meta) dal nome perché le info sono nella nota
-      const nomeStampa=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim();
+      // Nome pulito — rimuovi (meta/meta) e tronca a 22 caratteri se troppo lungo
+      let nomeStampa=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim();
+      // Abbreviazioni nomi lunghi
+      nomeStampa=nomeStampa
+        .replace('Bolognese Burrata','Bol. Burrata')
+        .replace('Quattro Stagioni','4 Stagioni')
+        .replace('Quattro Formaggi','4 Formaggi')
+        .replace('Granella di pistacchio','Gran. pistacchio')
+        .replace('Mezzo Metro','M.Metro')
+        .replace('Melanzane','Mel.')
+        .replace('Zucchine','Zucc.')
+        .replace('Peperoni arrosto','Pep.arrosto')
+        .replace('Mozzarella di bufala','Moz.bufala')
+        .replace('Crema di pistacchio','Cr.pistacchio');
       txt+='  '+i.qty+'x  '+nomeStampa+'\n';
-      // Se è metà/metà, stampa le due metà su righe separate e chiare
+      // Metà/metà prima
       if(i.note&&i.note.includes("Meta'")){
         const parti=i.note.split(' · ');
-        // Prima la nota libera se c'è
         parti.forEach(p=>{
           if(p.includes("Meta':")){
-            // Separa le due metà
             const halves=p.split(' / ');
-            halves.forEach(h=>txt+='       >> '+h.trim()+'\n');
-          } else {
-            txt+='       ! '+p+'\n';
+            halves.forEach(h=>{
+              // Abbrevia anche i gusti nelle metà
+              const hClean=h.trim()
+                .replace('Meta\': Bolognese Burrata',"Meta': Bol.Burrata")
+                .replace('Meta\': Quattro Stagioni',"Meta': 4 Stagioni")
+                .replace('Meta\': Quattro Formaggi',"Meta': 4 Formaggi");
+              txt+='     >> '+hClean+'\n';
+            });
+          } else if(p.trim()){
+            txt+='     ! '+p.trim()+'\n';
           }
         });
       } else {
-        if(i.note)txt+='       ! '+i.note+'\n';
+        // Note normali dopo i gusti
+        if(i.note)txt+='     ! '+i.note+'\n';
       }
-      if(i.extras.length)txt+='       + '+i.extras.join('\n       + ')+'\n';
-      if(i.removes.length)txt+='       - '+i.removes.join('\n       - ')+'\n';
+      // Extra per ultimi
+      if(i.extras.length)i.extras.forEach(e=>{
+        const eClean=e
+          .replace('Granella di pistacchio','Gran.pistacchio')
+          .replace('Crema di pistacchio','Cr.pistacchio')
+          .replace('Mozzarella di bufala','Moz.bufala')
+          .replace('Mozzarella extra','Moz.extra')
+          .replace('Scaglie di grana','Scag.grana');
+        txt+='     + '+eClean+'\n';
+      });
+      if(i.removes.length)i.removes.forEach(r=>txt+='     - '+r+'\n');
     });
   }
 
