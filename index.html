@@ -1571,63 +1571,6 @@ function buildEscPosText(o){
   return txt;
 }
 
-  function addSection(title,items){
-    if(!items.length)return;
-    txt+='\n  *** '+title+' ***\n';
-    txt+='--------------------------------\n';
-    items.forEach(i=>{
-      let nomeStampa=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim();
-      nomeStampa=nomeStampa
-        .replace('Bolognese Burrata','Bol. Burrata')
-        .replace('Quattro Stagioni','4 Stagioni')
-        .replace('Quattro Formaggi','4 Formaggi')
-        .replace('Mezzo Metro','M.Metro');
-      txt+='  '+i.qty+'x  '+nomeStampa+'\n';
-
-      let notaLibera='';
-
-      // 1. Prima metà/metà
-      if(i.note&&i.note.includes("Meta'")){
-        const parti=i.note.split(' · ');
-        parti.forEach(p=>{
-          if(p.includes("Meta':")){
-            const halves=p.split(' / ');
-            halves.forEach(h=>{
-              const hClean=h.trim()
-                .replace("Meta': Bolognese Burrata","Meta': Bol.Burrata")
-                .replace("Meta': Quattro Stagioni","Meta': 4 Stagioni")
-                .replace("Meta': Quattro Formaggi","Meta': 4 Formaggi");
-              txt+='     >> '+hClean+'\n';
-            });
-          } else if(p.trim()){
-            notaLibera=p.trim();
-          }
-        });
-      } else if(i.note){
-        notaLibera=i.note;
-      }
-
-      // 2. Extra
-      if(i.extras.length)i.extras.forEach(e=>txt+='     + '+e+'\n');
-      if(i.removes.length)i.removes.forEach(r=>txt+='     - '+r+'\n');
-
-      // 3. Nota per ultima
-      if(notaLibera)txt+='     ! '+notaLibera+'\n';
-    });
-  }
-
-  addSection('PIZZE',pizze);
-  if(rosticceria.length)addSection('ROSTICCERIA',rosticceria);
-  if(bibite.length||altro.length)addSection('BIBITE',[...bibite,...altro]);
-
-  txt+='\n================================\n';
-  txt+='  '+o.cognome.toUpperCase()+'\n';
-  txt+='  ORA: '+(o.orario||'-')+'\n';
-  txt+='================================\n';
-  txt+='\n\n\n';
-  return txt;
-}
-
 function printViaRawBT(o){
   const isIOS=(/iPad|iPhone|iPod/.test(navigator.userAgent))||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   if(isIOS){
