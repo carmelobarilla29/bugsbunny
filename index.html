@@ -550,7 +550,7 @@ const MENU={
     {n:"Max Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
     {n:"Max Baby",p:15,ing:"pomodoro, mozzarella, würstel, patatine",extraMax:true,cat:"pizza",excl:["würstel","patate"]},
     {n:"Max Bestemmia",p:15,ing:"pomodoro, mozzarella, salame, funghi",extraMax:true,cat:"pizza",excl:["salame piccante","salame dolce","funghi"]},
-    {n:"Max Biancaneve",p:15,ing:"mozzarella, origano",extraMax:true,cat:"pizza",excl:["origano"]},
+    {n:"Max Biancaneve",p:12,ing:"mozzarella, origano",extraMax:true,cat:"pizza",excl:["origano"]},
     {n:"Max Bolognese",p:15,ing:"mortadella, mozzarella, pesto e granella di pistacchio",extraMax:true,cat:"pizza",excl:["mortadella","granella di pistacchio"]},
     {n:"Max Bolognese Burrata",p:15,ing:"mortadella, mozzarella, burrata, pesto e granella di pistacchio",extraMax:true,cat:"pizza",excl:["mortadella","granella di pistacchio","mozzarella di bufala"]},
     {n:"Max Boscaiola",p:15,ing:"pomodoro, mozzarella, speck, funghi, scamorza",extraMax:true,cat:"pizza",excl:["speck","funghi","scamorza"]},
@@ -579,7 +579,7 @@ const MENU={
     {n:"Mezzo Metro Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
     {n:"Mezzo Metro Baby",p:15,ing:"pomodoro, mozzarella, würstel, patatine",extraMax:true,cat:"pizza",excl:["würstel","patate"]},
     {n:"Mezzo Metro Bestemmia",p:15,ing:"pomodoro, mozzarella, salame, funghi",extraMax:true,cat:"pizza",excl:["salame piccante","funghi"]},
-    {n:"Mezzo Metro Biancaneve",p:15,ing:"mozzarella, origano",extraMax:true,cat:"pizza",excl:["origano"]},
+    {n:"Mezzo Metro Biancaneve",p:12,ing:"mozzarella, origano",extraMax:true,cat:"pizza",excl:["origano"]},
     {n:"Mezzo Metro Bolognese",p:15,ing:"mortadella, mozzarella, pesto e granella di pistacchio",extraMax:true,cat:"pizza",excl:["mortadella","granella di pistacchio"]},
     {n:"Mezzo Metro Bolognese Burrata",p:15,ing:"mortadella, mozzarella, burrata, pesto e granella di pistacchio",extraMax:true,cat:"pizza",excl:["mortadella","granella di pistacchio"]},
     {n:"Mezzo Metro Boscaiola",p:15,ing:"pomodoro, mozzarella, speck, funghi, scamorza",extraMax:true,cat:"pizza",excl:["speck","funghi","scamorza"]},
@@ -641,9 +641,8 @@ const MENU={
     {n:"Fanta vetro",p:3,ing:"",cat:"bibita"},
     {n:"Sprite lattina",p:2,ing:"",cat:"bibita"},
     {n:"Sprite vetro",p:3,ing:"",cat:"bibita"},
-    {n:"Thè Pesca/Limone",p:1.5,ing:"",cat:"bibita"}
-  ],
-  "Birre":[
+    {n:"Thè Pesca/Limone",p:1.5,ing:"",cat:"bibita"},
+    {n:"🍺 ── BIRRE ──",p:0,ing:"",cat:"separatore",separatore:true},
     {n:"Björne",p:3,ing:"",cat:"birra"},
     {n:"Corona",p:4,ing:"",cat:"birra"},
     {n:"Nastro Azzurro 33cl",p:2,ing:"",cat:"birra"},
@@ -727,21 +726,22 @@ function selCat(cat,btn){
   renderProds(cat);
 }
 function renderProds(cat){
-  const isPizza=cat==='Pizze Tonde'||cat==='Pizze Max';
-  document.getElementById('pgrid').innerHTML=MENU[cat].map(p=>`
-    <button class="pbtn" onclick="addProd('${cat}','${p.n.replace(/'/g,"\\'")}',${p.p})">
+  document.getElementById('pgrid').innerHTML=MENU[cat].map(p=>{
+    if(p.separatore){
+      return `<div style="grid-column:1/-1;background:rgba(245,216,0,0.1);border:1px solid rgba(245,216,0,0.3);border-radius:8px;padding:8px;text-align:center;font-size:13px;font-weight:900;color:var(--g);pointer-events:none;">${p.n}</div>`;
+    }
+    return `<button class="pbtn" onclick="addProd('${cat}','${p.n.replace(/'/g,"\\'")}',${p.p})">
       <div class="pn">${p.n}</div>
       <div class="pp">${fmt(p.p)}</div>
-    </button>`).join('');
+    </button>`;
+  }).join('');
 }
 
-// ADD PRODUCT
 function addProd(cat,name,price){
   const isPizza=cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro';
   if(isPizza){
     const prod=MENU[cat].find(p=>p.n===name);
     const isMax=prod&&prod.extraMax;
-    // Metà/metà
     if(prod&&prod.metaMeta){
       openMetaMeta(name,price,isMax);
       return;
