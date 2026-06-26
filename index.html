@@ -1421,10 +1421,49 @@ function confirmEx(){
   closeEx();
 }
 
-// RAWBT PRINTING
-function buildEscPosText(o){
+// RAWBT PRINTING - ESC/POS bytes
+function buildEscPosBytes(o){
   const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   const data=o.date||new Date().toLocaleDateString('it-IT');
+  const enc=new TextEncoder();
+  const ESC=0x1B, GS=0x1D, LF=0x0A;
+
+  // Helper per aggiungere bytes
+  const bytes=[];
+  const add=(...b)=>bytes.push(...b);
+  const str=s=>bytes.push(...enc.encode(s));
+  const nl=()=>bytes.push(LF);
+
+  // Reset stampante
+  add(ESC,0x40);
+  // Allineamento centro
+  add(ESC,0x61,0x01);
+  // Testo doppio (width+height)
+  add(ESC,0x21,0x30);
+  str('BUGS BUNNY\n');
+  // Testo normale
+  add(ESC,0x21,0x00);
+  str(data+'  '+ora+'\n');
+  str('================================\n');
+
+  // Tipo ordine — doppio
+  add(ESC,0x21,0x30);
+  if(o.type==='domicilio'){
+    str('DOMICILIO\n');
+  } else {
+    str('ASPORTO\n');
+  }
+  add(ESC,0x21,0x00);
+
+  if(o.type==='domicilio'){
+    // Allineamento sinistra
+    add(ESC,0x61,0x00);
+    add(ESC,0x21,0x10); // altezza doppia
+    str((o.indirizzo||'N/D')+'\n');
+    str('Tel: '+(o.telefono||'-')+'\n');
+    add(ESC,0x21,0x00);
+  }
+  str('================================\n');
 
   function getCat(name){
     for(const [cat,items] of Object.entries(MENU)){
@@ -1438,22 +1477,99 @@ function buildEscPosText(o){
   const bibite=o.items.filter(i=>['bibita','birra'].includes(getCat(i.name)));
   const altro=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getCat(i.name)));
 
-  let txt='';
-  txt+='================================\n';
-  txt+='        BUGS BUNNY\n';
-  txt+='================================\n';
-  txt+='  '+data+'   '+ora+'\n';
-  txt+='================================\n';
+  function addSection(title,items){
+    if(!items.length)return;
+    add(ESC,0x61,0x01); // centro
+    add(ESC,0x21,0x08); // bold
+    str('\n*** '+title+' ***\n');
+    add(ESC,0x61,0x00); // sinistra
+    str('--------------------------------\n');
+    add(ESC,0x21,0x00);
 
-  if(o.type==='domicilio'){
-    txt+='  >>> DOMICILIO <<<\n';
-    txt+='--------------------------------\n';
-    txt+='  '+( o.indirizzo||'N/D')+'\n';
-    txt+='  Tel: '+(o.telefono||'-')+'\n';
-  } else {
-    txt+='   >>> ASPORTO <<<\n';
+    items.forEach(i=>{
+      let nomeStampa=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim();
+      nomeStampa=nomeStampa
+        .replace('Bolognese Burrata','Bol.Burrata')
+        .replace('Quattro Stagioni','4 Stagioni')
+        .replace('Quattro Formaggi','4 Formaggi')
+        .replace('Mezzo Metro','M.Metro');
+
+      // Quantità e nome — testo grande
+      add(ESC,0x21,0x20); // larghezza doppia
+      str(i.qty+'x '+nomeStampa+'\n');
+      add(ESC,0x21,0x00); // normale
+
+      let notaLibera='';
+      if(i.note&&i.note.includes("Meta'")){
+        const parti=i.note.split(' · ');
+        parti.forEach(p=>{
+          if(p.includes("Meta':")){
+            p.split(' / ').forEach(h=>{
+              const hc=h.trim()
+                .replace("Meta': Bolognese Burrata","Meta': Bol.Burrata")
+                .replace("Meta': Quattro Stagioni","Meta': 4 Stagioni")
+                .replace("Meta': Quattro Formaggi","Meta': 4 Formaggi");
+              str('   >> '+hc+'\n');
+            });
+          } else if(p.trim()) notaLibera=p.trim();
+        });
+      } else if(i.note) notaLibera=i.note;
+
+      if(i.extras.length)i.extras.forEach(e=>str('   + '+e+'\n'));
+      if(i.removes.length)i.removes.forEach(r=>str('   - '+r+'\n'));
+      if(notaLibera)str('   ! '+notaLibera+'\n');
+    });
   }
-  txt+='================================\n';
+
+  addSection('PIZZE',pizze);
+  if(rosticceria.length)addSection('ROSTICCERIA',rosticceria);
+  if(bibite.length||altro.length)addSection('BIBITE',[...bibite,...altro]);
+
+  str('================================\n');
+  // Cliente e orario grandi
+  add(ESC,0x61,0x01);
+  add(ESC,0x21,0x30);
+  str(o.cognome.toUpperCase()+'\n');
+  add(ESC,0x21,0x10);
+  str('ORA: '+(o.orario||'-')+'\n');
+  add(ESC,0x21,0x00);
+  str('================================\n');
+  // Avanza carta e taglia
+  add(LF,LF,LF);
+  add(GS,0x56,0x41,0x03);
+
+  return new Uint8Array(bytes);
+}
+
+function buildEscPosText(o){
+  // Fallback testo per compatibilità
+  const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const data=o.date||new Date().toLocaleDateString('it-IT');
+  function getCat(name){for(const [cat,items] of Object.entries(MENU)){const found=items.find(i=>i.n===name);if(found)return found.cat||'altro';}return 'altro';}
+  const pizze=o.items.filter(i=>getCat(i.name)==='pizza');
+  const rosticceria=o.items.filter(i=>getCat(i.name)==='rosticceria');
+  const bibite=o.items.filter(i=>['bibita','birra'].includes(getCat(i.name)));
+  const altro=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getCat(i.name)));
+  let txt='================================\n        BUGS BUNNY\n================================\n';
+  txt+='  '+data+'   '+ora+'\n================================\n';
+  txt+=(o.type==='domicilio'?'  >>> DOMICILIO <<<\n  '+(o.indirizzo||'N/D')+'\n  Tel: '+(o.telefono||'-'):'   >>> ASPORTO <<<')+'\n================================\n';
+  function addSection(title,items){
+    if(!items.length)return;
+    txt+='\n  *** '+title+' ***\n--------------------------------\n';
+    items.forEach(i=>{
+      let n=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim().replace('Bolognese Burrata','Bol.Burrata').replace('Quattro Stagioni','4 Stagioni').replace('Quattro Formaggi','4 Formaggi').replace('Mezzo Metro','M.Metro');
+      txt+='  '+i.qty+'x  '+n+'\n';
+      let notaLibera='';
+      if(i.note&&i.note.includes("Meta'")){const parti=i.note.split(' · ');parti.forEach(p=>{if(p.includes("Meta':")){p.split(' / ').forEach(h=>txt+='     >> '+h.trim()+'\n');}else if(p.trim())notaLibera=p.trim();});}else if(i.note)notaLibera=i.note;
+      if(i.extras.length)i.extras.forEach(e=>txt+='     + '+e+'\n');
+      if(i.removes.length)i.removes.forEach(r=>txt+='     - '+r+'\n');
+      if(notaLibera)txt+='     ! '+notaLibera+'\n';
+    });
+  }
+  addSection('PIZZE',pizze);if(rosticceria.length)addSection('ROSTICCERIA',rosticceria);if(bibite.length||altro.length)addSection('BIBITE',[...bibite,...altro]);
+  txt+='================================\n  '+o.cognome.toUpperCase()+'\n  ORA: '+(o.orario||'-')+'\n================================\n\n\n';
+  return txt;
+}
 
   function addSection(title,items){
     if(!items.length)return;
@@ -1518,10 +1634,13 @@ function printViaRawBT(o){
     printBrowser(o);
     return;
   }
-  const testo=buildEscPosText(o);
-  const b64=btoa(unescape(encodeURIComponent(testo)));
-  // Formato intent:// corretto per Samsung Internet + RawBT
-  const url='intent:base64,'+b64+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end';
+  // Usa ESC/POS bytes per testo grande e formattato
+  const bytes=buildEscPosBytes(o);
+  // Converti in base64
+  let binary='';
+  bytes.forEach(b=>binary+=String.fromCharCode(b));
+  const b64=btoa(binary);
+  const url='rawbt://base64/'+b64;
   window.location.href=url;
   setTimeout(()=>{toast('Stampa inviata! 🖨️','ok',2000);},300);
 }
