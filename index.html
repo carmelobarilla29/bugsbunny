@@ -1575,8 +1575,8 @@ function printViaRawBT(o){
   const isIOS=(/iPad|iPhone|iPod/.test(navigator.userAgent))||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   if(isIOS){printBrowser(o);return;}
   const testo=buildEscPosText(o);
-  const b64=btoa(unescape(encodeURIComponent(testo)));
-  window.location.href='rawbt://base64/'+b64;
+  const url='rawbt:'+encodeURIComponent(testo);
+  window.location.href=url;
   setTimeout(()=>{toast('Stampa inviata! 🖨️','ok',2000);},300);
 }
 
