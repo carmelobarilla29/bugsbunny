@@ -1363,8 +1363,8 @@ function openMetaMeta(name,price,isMax){
   document.getElementById('mmeta-seconda-sel').textContent='Scegli gusto...';
   document.getElementById('mmeta-seconda-sel').style.color='rgba(255,255,255,0.4)';
 
-  // Griglia gusti
-  const gusti=MENU['Pizze Tonde'].map(p=>p.n);
+  // Griglia gusti in ordine alfabetico
+  const gusti=MENU['Pizze Tonde'].map(p=>p.n).sort((a,b)=>a.localeCompare(b,'it'));
   const makeBtn=(gridId,g)=>`<button onclick="selMeta('${gridId}','${g.replace(/'/g,"\\'")}',this)"
     style="padding:6px 4px;background:rgba(45,90,27,0.4);border:1px solid var(--vc);color:#fff;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;transition:all 0.15s;text-align:center;">${g}</button>`;
   document.getElementById('mmeta-grid-prima').innerHTML=gusti.map(g=>makeBtn('prima',g)).join('');
@@ -1398,12 +1398,13 @@ function selMeta(gridId,gusto,btn){
   const selEl=document.getElementById('mmeta-'+gridId+'-sel');
   selEl.textContent='✅ '+gusto;
   selEl.style.color='var(--g)';
+  selEl.style.borderColor='var(--g)';
 }
 
 function confirmMetaMeta(){
   if(!metaMetaSelected.prima||!metaMetaSelected.seconda){toast('Scegli entrambe le metà!','err');return;}
   const nota=(document.getElementById('mmeta-note').value.trim()?document.getElementById('mmeta-note').value.trim()+' · ':'')+
-    'Metà: '+metaMetaSelected.prima+' / Metà: '+metaMetaSelected.seconda;
+    'Meta\': '+metaMetaSelected.prima+' / Meta\': '+metaMetaSelected.seconda;
   const ep=metaMetaExtras.reduce((s,en)=>{const ex=EXTRAS_MAX.find(x=>x.n===en);return s+(ex?ex.p:2);},0);
   const fp=+(metaMetaPrice+ep).toFixed(2);
   order.items.push({name:metaMetaName,price:fp,extras:[...metaMetaExtras],removes:[],note:nota,qty:1});
