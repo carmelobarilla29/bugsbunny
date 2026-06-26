@@ -1576,7 +1576,15 @@ function printViaRawBT(o){
   if(isIOS){printBrowser(o);return;}
   const testo=buildEscPosText(o);
   const b64=btoa(unescape(encodeURIComponent(testo)));
-  window.location.href='rawbt://base64/'+b64;
+  const uri='rawbt://base64/'+b64;
+  let iframe=document.getElementById('rawbt-iframe');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.id='rawbt-iframe';
+    iframe.style.display='none';
+    document.body.appendChild(iframe);
+  }
+  iframe.src=uri;
   setTimeout(()=>{toast('Stampa inviata! 🖨️','ok',2000);},300);
 }
 
