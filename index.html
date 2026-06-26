@@ -421,6 +421,19 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
   </div>
 </div>
 
+<!-- MODAL METÀ/METÀ -->
+<div class="moverlay" id="mmeta">
+  <div class="modal" style="width:540px;max-height:90vh;display:flex;flex-direction:column;">
+    <h3 id="mmeta-title">🍕 Metà/Metà</h3>
+    <div style="font-size:12px;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:10px;">Scegli il gusto per ogni metà</div>
+    <div id="mmeta-content" style="flex:1;overflow-y:auto;margin-bottom:10px;"></div>
+    <div class="mbtns">
+      <button class="bcan" onclick="document.getElementById('mmeta').classList.remove('show')">✕ Annulla</button>
+      <button class="bok" onclick="confirmMetaMeta()">✅ Aggiungi</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL EXTRA -->
 <div class="moverlay" id="mex">
   <div class="modal">
@@ -495,38 +508,66 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 <script>
 const MENU={
   "Pizze Tonde":[
-    {n:"Margherita",p:5,ing:"pomodoro, mozzarella, basilico",cat:"pizza"},
-    {n:"Biancaneve",p:4.5,ing:"mozzarella, origano",cat:"pizza"},
-    {n:"Baby",p:7,ing:"pomodoro, mozzarella, würstel, patatine",cat:"pizza"},
-    {n:"Bestemmia",p:8,ing:"pomodoro, mozzarella, salame, funghi",cat:"pizza"},
-    {n:"Bolognese",p:8,ing:"mortadella, mozzarella, pesto e granella di pistacchio",cat:"pizza"},
-    {n:"Bolognese Burrata",p:12,ing:"mortadella, mozzarella, burrata, pesto e granella di pistacchio",cat:"pizza"},
-    {n:"Boscaiola",p:8,ing:"pomodoro, mozzarella, speck, funghi, scamorza",cat:"pizza"},
-    {n:"Bugs Bunny",p:7,ing:"pomodorini pachino, mozzarella, capperi, acciughe",cat:"pizza"},
-    {n:"Calabrese",p:8,ing:"pomodoro, mozzarella, peperoni, melanzane fritte, olive, peperoncino",cat:"pizza"},
-    {n:"Caprese",p:7,ing:"mozzarella di bufala, pomodorini, basilico",cat:"pizza"},
-    {n:"Capricciosa",p:8,ing:"pomodoro, mozzarella, würstel, carciofini, funghi",cat:"pizza"},
-    {n:"Diavola",p:7,ing:"pomodoro, mozzarella, salame, olive",cat:"pizza"},
-    {n:"Fantasy",p:8,ing:"pomodoro, mozzarella, salame, lattuga, olive",cat:"pizza"},
-    {n:"Gustosa",p:8,ing:"pomodorini pachino, mozzarella, prosciutto crudo, rucola, scaglie di grana",cat:"pizza"},
-    {n:"Marinara",p:4,ing:"pomodoro, olio, aglio, origano",cat:"pizza"},
-    {n:"Napoli",p:7,ing:"pomodoro, mozzarella, capperi, acciughe",cat:"pizza"},
-    {n:"No Glutine",p:8,ing:"pomodoro, mozzarella",cat:"pizza"},
-    {n:"Ortolana",p:8,ing:"pomodoro, mozzarella, peperoni arrosto, melanzane fritte, zucchine fritte",cat:"pizza"},
-    {n:"Quattro Formaggi",p:8,ing:"mozzarella, scamorza, edamer, gorgonzola",cat:"pizza"},
-    {n:"Quattro Stagioni",p:8,ing:"pomodoro, mozzarella, carciofini, funghi, olive, prosciutto cotto",cat:"pizza"},
-    {n:"Regina",p:5,ing:"pomodoro, pomodorini, mozzarella, basilico",cat:"pizza"},
-    {n:"Suprema",p:9,ing:"pomodorini pachino, mozzarella, bresaola, rucola, scaglie di grana",cat:"pizza"},
-    {n:"Tonnara",p:7,ing:"pomodoro, mozzarella, tonno",cat:"pizza"},
-    {n:"Vegetariana",p:7,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",cat:"pizza"}
+    {n:"Margherita",p:5,ing:"pomodoro, mozzarella, basilico",cat:"pizza",excl:["basilico"]},
+    {n:"Biancaneve",p:4.5,ing:"mozzarella, origano",cat:"pizza",excl:["origano"]},
+    {n:"Baby",p:7,ing:"pomodoro, mozzarella, würstel, patatine",cat:"pizza",excl:["würstel","patate"]},
+    {n:"Bestemmia",p:8,ing:"pomodoro, mozzarella, salame, funghi",cat:"pizza",excl:["salame piccante","salame dolce","funghi"]},
+    {n:"Bolognese",p:8,ing:"mortadella, mozzarella, pesto e granella di pistacchio",cat:"pizza",excl:["mortadella","granella di pistacchio","crema di pistacchio"]},
+    {n:"Bolognese Burrata",p:12,ing:"mortadella, mozzarella, burrata, pesto e granella di pistacchio",cat:"pizza",excl:["mortadella","granella di pistacchio","crema di pistacchio","mozzarella di bufala"]},
+    {n:"Boscaiola",p:8,ing:"pomodoro, mozzarella, speck, funghi, scamorza",cat:"pizza",excl:["speck","funghi","scamorza"]},
+    {n:"Bugs Bunny",p:7,ing:"pomodorini pachino, mozzarella, capperi, acciughe",cat:"pizza",excl:["capperi","acciughe","pomodorini"]},
+    {n:"Calabrese",p:8,ing:"pomodoro, mozzarella, peperoni, melanzane fritte, olive, peperoncino",cat:"pizza",excl:["peperoni","melanzane fritte","olive"]},
+    {n:"Caprese",p:7,ing:"mozzarella di bufala, pomodorini, basilico",cat:"pizza",excl:["mozzarella di bufala","pomodorini","basilico"]},
+    {n:"Capricciosa",p:8,ing:"pomodoro, mozzarella, würstel, carciofini, funghi",cat:"pizza",excl:["würstel","funghi"]},
+    {n:"Diavola",p:7,ing:"pomodoro, mozzarella, salame, olive",cat:"pizza",excl:["salame piccante","salame dolce","olive"]},
+    {n:"Fantasy",p:8,ing:"pomodoro, mozzarella, salame, lattuga, olive",cat:"pizza",excl:["salame piccante","salame dolce","olive"]},
+    {n:"Gustosa",p:8,ing:"pomodorini pachino, mozzarella, prosciutto crudo, rucola, scaglie di grana",cat:"pizza",excl:["crudo","rucola","scaglie di grana","pomodorini"]},
+    {n:"Marinara",p:4,ing:"pomodoro, olio, aglio, origano",cat:"pizza",excl:["origano"]},
+    {n:"Napoli",p:7,ing:"pomodoro, mozzarella, capperi, acciughe",cat:"pizza",excl:["capperi","acciughe"]},
+    {n:"No Glutine",p:8,ing:"pomodoro, mozzarella",cat:"pizza",excl:[]},
+    {n:"Ortolana",p:8,ing:"pomodoro, mozzarella, peperoni arrosto, melanzane fritte, zucchine fritte",cat:"pizza",excl:["peperoni arrosto","melanzane fritte","zucchine fritte"]},
+    {n:"Quattro Formaggi",p:8,ing:"mozzarella, scamorza, edamer, gorgonzola",cat:"pizza",excl:["scamorza","edamer","gorgonzola"]},
+    {n:"Quattro Stagioni",p:8,ing:"pomodoro, mozzarella, carciofini, funghi, olive, prosciutto cotto",cat:"pizza",excl:["funghi","olive","cotto"]},
+    {n:"Regina",p:5,ing:"pomodoro, pomodorini, mozzarella, basilico",cat:"pizza",excl:["basilico","pomodorini"]},
+    {n:"Suprema",p:9,ing:"pomodorini pachino, mozzarella, bresaola, rucola, scaglie di grana",cat:"pizza",excl:["bresaola","rucola","scaglie di grana","pomodorini"]},
+    {n:"Tonnara",p:7,ing:"pomodoro, mozzarella, tonno",cat:"pizza",excl:["tonno"]},
+    {n:"Vegetariana",p:7,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",cat:"pizza",excl:["rucola"]}
   ],
   "Pizze Max":[
-    {n:"Max Margherita (8pz)",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza"},
-    {n:"Max Farcita (8pz)",p:15,ing:"ingredienti vari",extraMax:true,cat:"pizza"},
-    {n:"Mezzo Metro Farcita",p:15,ing:"ingredienti vari",extraMax:true,cat:"pizza"},
-    {n:"Mezzo Metro Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza"},
-    {n:"Teglia Farcita (8pz)",p:20,ing:"ingredienti vari",extraMax:true,cat:"pizza"},
-    {n:"Teglia Margherita (8pz)",p:16,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza"}
+    {n:"Max Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Max Baby",p:15,ing:"pomodoro, mozzarella, würstel, patatine",extraMax:true,cat:"pizza",excl:["würstel","patate"]},
+    {n:"Max Bestemmia",p:15,ing:"pomodoro, mozzarella, salame, funghi",extraMax:true,cat:"pizza",excl:["salame piccante","salame dolce","funghi"]},
+    {n:"Max Bolognese",p:15,ing:"mortadella, mozzarella, pesto e granella di pistacchio",extraMax:true,cat:"pizza",excl:["mortadella","granella di pistacchio"]},
+    {n:"Max Boscaiola",p:15,ing:"pomodoro, mozzarella, speck, funghi, scamorza",extraMax:true,cat:"pizza",excl:["speck","funghi","scamorza"]},
+    {n:"Max Bugs Bunny",p:15,ing:"pomodorini, mozzarella, capperi, acciughe",extraMax:true,cat:"pizza",excl:["capperi","acciughe","pomodorini"]},
+    {n:"Max Calabrese",p:15,ing:"pomodoro, mozzarella, peperoni, melanzane fritte, olive",extraMax:true,cat:"pizza",excl:["peperoni","melanzane fritte","olive"]},
+    {n:"Max Capricciosa",p:15,ing:"pomodoro, mozzarella, würstel, carciofini, funghi",extraMax:true,cat:"pizza",excl:["würstel","funghi"]},
+    {n:"Max Diavola",p:15,ing:"pomodoro, mozzarella, salame, olive",extraMax:true,cat:"pizza",excl:["salame piccante","salame dolce","olive"]},
+    {n:"Max Farcita (metà/metà)",p:15,ing:"",extraMax:true,cat:"pizza",excl:[],metaMeta:true},
+    {n:"Max Quattro Formaggi",p:15,ing:"mozzarella, scamorza, edamer, gorgonzola",extraMax:true,cat:"pizza",excl:["scamorza","edamer","gorgonzola"]},
+    {n:"Max Quattro Stagioni",p:15,ing:"pomodoro, mozzarella, carciofini, funghi, olive, cotto",extraMax:true,cat:"pizza",excl:["funghi","olive","cotto"]},
+    {n:"Max Suprema",p:15,ing:"pomodorini, mozzarella, bresaola, rucola, scaglie di grana",extraMax:true,cat:"pizza",excl:["bresaola","rucola","scaglie di grana"]},
+    {n:"Max Tonnara",p:15,ing:"pomodoro, mozzarella, tonno",extraMax:true,cat:"pizza",excl:["tonno"]},
+    {n:"Max Vegetariana",p:15,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",extraMax:true,cat:"pizza",excl:["rucola"]},
+    {n:"Teglia Margherita (8pz)",p:16,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Farcita (8pz)",p:20,ing:"ingredienti vari",extraMax:true,cat:"pizza",excl:[]}
+  ],
+  "Pizze Mezzo Metro":[
+    {n:"Mezzo Metro Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Mezzo Metro Baby",p:15,ing:"pomodoro, mozzarella, würstel, patatine",extraMax:true,cat:"pizza",excl:["würstel","patate"]},
+    {n:"Mezzo Metro Bestemmia",p:15,ing:"pomodoro, mozzarella, salame, funghi",extraMax:true,cat:"pizza",excl:["salame piccante","funghi"]},
+    {n:"Mezzo Metro Bolognese",p:15,ing:"mortadella, mozzarella, pesto e granella di pistacchio",extraMax:true,cat:"pizza",excl:["mortadella","granella di pistacchio"]},
+    {n:"Mezzo Metro Boscaiola",p:15,ing:"pomodoro, mozzarella, speck, funghi, scamorza",extraMax:true,cat:"pizza",excl:["speck","funghi","scamorza"]},
+    {n:"Mezzo Metro Bugs Bunny",p:15,ing:"pomodorini, mozzarella, capperi, acciughe",extraMax:true,cat:"pizza",excl:["capperi","acciughe"]},
+    {n:"Mezzo Metro Calabrese",p:15,ing:"pomodoro, mozzarella, peperoni, melanzane fritte, olive",extraMax:true,cat:"pizza",excl:["peperoni","melanzane fritte","olive"]},
+    {n:"Mezzo Metro Capricciosa",p:15,ing:"pomodoro, mozzarella, würstel, carciofini, funghi",extraMax:true,cat:"pizza",excl:["würstel","funghi"]},
+    {n:"Mezzo Metro Diavola",p:15,ing:"pomodoro, mozzarella, salame, olive",extraMax:true,cat:"pizza",excl:["salame piccante","olive"]},
+    {n:"Mezzo Metro Farcita (metà/metà)",p:15,ing:"",extraMax:true,cat:"pizza",excl:[],metaMeta:true},
+    {n:"Mezzo Metro Quattro Formaggi",p:15,ing:"mozzarella, scamorza, edamer, gorgonzola",extraMax:true,cat:"pizza",excl:["scamorza","edamer","gorgonzola"]},
+    {n:"Mezzo Metro Quattro Stagioni",p:15,ing:"pomodoro, mozzarella, carciofini, funghi, olive, cotto",extraMax:true,cat:"pizza",excl:["funghi","olive","cotto"]},
+    {n:"Mezzo Metro Suprema",p:15,ing:"pomodorini, mozzarella, bresaola, rucola, scaglie di grana",extraMax:true,cat:"pizza",excl:["bresaola","rucola","scaglie di grana"]},
+    {n:"Mezzo Metro Tonnara",p:15,ing:"pomodoro, mozzarella, tonno",extraMax:true,cat:"pizza",excl:["tonno"]},
+    {n:"Mezzo Metro Vegetariana",p:15,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",extraMax:true,cat:"pizza",excl:["rucola"]}
   ],
   "Rosticceria":[
     {n:"Arancino al Ragù",p:2.5,ing:"riso, mozzarella, sugo alla bolognese",cat:"rosticceria"},
@@ -663,12 +704,17 @@ function renderProds(cat){
 
 // ADD PRODUCT
 function addProd(cat,name,price){
-  const isPizza=cat==='Pizze Tonde'||cat==='Pizze Max';
+  const isPizza=cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro';
   if(isPizza){
     const prod=MENU[cat].find(p=>p.n===name);
     const isMax=prod&&prod.extraMax;
-    pendProd={name,price,ing:prod?prod.ing:'',isMax};
-    openEx(name,prod?prod.ing:'',isMax);
+    // Metà/metà
+    if(prod&&prod.metaMeta){
+      openMetaMeta(name,price,isMax);
+      return;
+    }
+    pendProd={name,price,ing:prod?prod.ing:'',isMax,excl:prod?prod.excl||[]:[]};
+    openEx(name,prod?prod.ing:'',isMax,prod?prod.excl||[]:[]);
   } else {
     pushItem(name,price,[],[]);
   }
@@ -1227,9 +1273,9 @@ function completePay(){
 }
 
 // EXTRA MODAL
-function openEx(name,ing,isMax=false){
+function openEx(name,ing,isMax=false,excl=[]){
   selEx=[];selRm=[];
-  const extrasList=isMax?EXTRAS_MAX:EXTRAS;
+  const extrasList=(isMax?EXTRAS_MAX:EXTRAS).filter(e=>!excl.includes(e.n));
   const noteLabel=isMax?'➕ Extra (+€2,00 | bufala/bresaola +€4,00 | basilico/origano gratis)':'➕ Ingredienti extra (+€1,00 cad.)';
   document.getElementById('mex-title').textContent='🍕 '+name;
   document.getElementById('mex-note').value='';
@@ -1238,6 +1284,44 @@ function openEx(name,ing,isMax=false){
   const ings=ing.split(',').map(s=>s.trim()).filter(Boolean);
   document.getElementById('mex-removes').innerHTML=ings.length?ings.map(e=>`<button class="rbtn" onclick="togRm(this,'${e.replace(/'/g,"\\'")}')">${e}</button>`).join(''):'<span style="color:rgba(255,255,255,0.3);font-size:12px;">Nessun ingrediente base</span>';
   document.getElementById('mex').classList.add('show');
+}
+
+// METÀ/METÀ MODAL
+let metaMetaName='';
+let metaMetaPrice=0;
+let metaMetaIsMax=false;
+let metaMetaSelected={prima:'',seconda:''};
+
+function openMetaMeta(name,price,isMax){
+  metaMetaName=name;metaMetaPrice=price;metaMetaIsMax=isMax;
+  metaMetaSelected={prima:'',seconda:''};
+  // Prendi gusti disponibili dalle pizze tonde
+  const gusti=MENU['Pizze Tonde'].map(p=>p.n);
+  const makeGrid=(id,label)=>`
+    <div style="font-size:13px;font-weight:900;color:var(--g);margin-bottom:6px;">${label}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;" id="${id}">
+      ${gusti.map(g=>`<button onclick="selMeta('${id}','${g.replace(/'/g,"\\'")}',this)"
+        style="padding:8px;background:rgba(45,90,27,0.4);border:1.5px solid var(--vc);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.15s;">${g}</button>`).join('')}
+    </div>`;
+  document.getElementById('mmeta-content').innerHTML=makeGrid('mmeta-prima','1a metà:')+makeGrid('mmeta-seconda','2a metà:');
+  document.getElementById('mmeta-title').textContent='🍕 '+name;
+  document.getElementById('mmeta').classList.add('show');
+}
+
+function selMeta(gridId,gusto,btn){
+  document.querySelectorAll('#'+gridId+' button').forEach(b=>{b.style.background='rgba(45,90,27,0.4)';b.style.borderColor='var(--vc)';});
+  btn.style.background='var(--g)';btn.style.borderColor='var(--g)';btn.style.color='var(--vs)';
+  if(gridId==='mmeta-prima')metaMetaSelected.prima=gusto;
+  else metaMetaSelected.seconda=gusto;
+}
+
+function confirmMetaMeta(){
+  if(!metaMetaSelected.prima||!metaMetaSelected.seconda){toast('Scegli entrambe le metà!','err');return;}
+  const nomeFinale=metaMetaName;
+  const note=`Metà: ${metaMetaSelected.prima} / Metà: ${metaMetaSelected.seconda}`;
+  pushItem(nomeFinale,metaMetaPrice,[],[],note,metaMetaIsMax);
+  document.getElementById('mmeta').classList.remove('show');
+  toast('Aggiunto metà/metà!','ok',2000);
 }
 function togEx(btn,n){selEx.includes(n)?(selEx=selEx.filter(e=>e!==n),btn.classList.remove('sel')):(selEx.push(n),btn.classList.add('sel'));}
 function togRm(btn,n){selRm.includes(n)?(selRm=selRm.filter(e=>e!==n),btn.classList.remove('sel')):(selRm.push(n),btn.classList.add('sel'));}
