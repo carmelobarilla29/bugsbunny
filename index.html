@@ -1299,26 +1299,16 @@ function buildEscPosText(o){
 }
 
 function printViaRawBT(o){
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isIOS=(/iPad|iPhone|iPod/.test(navigator.userAgent))||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   if(isIOS){
-    // Su iOS stampa browser classica
     printBrowser(o);
     return;
   }
-  // Su Android usa RawBT
   const testo=buildEscPosText(o);
   const b64=btoa(unescape(encodeURIComponent(testo)));
-  const url='rawbt://base64/'+b64;
-  // Usa iframe per non navigare via dalla pagina
-  let fr=document.getElementById('rawbt-fr');
-  if(!fr){
-    fr=document.createElement('iframe');
-    fr.id='rawbt-fr';
-    fr.style.cssText='display:none;';
-    document.body.appendChild(fr);
-  }
-  fr.src=url;
-  toast('Stampa inviata a RawBT! 🖨️','ok',2000);
+  const url='rawbt://base64,'+b64;
+  window.location.href=url;
+  toast('Stampa inviata! 🖨️','ok',2000);
 }
 
 function printBrowser(o){
