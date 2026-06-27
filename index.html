@@ -989,8 +989,10 @@ function renderCompleted(){
     return;
   }
   grid.innerHTML=[...completedOrders].reverse().map(o=>`
-    <div class="ocard" style="border-color:#27ae60;opacity:0.9;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+    <div class="ocard" style="border-color:#27ae60;opacity:0.9;position:relative;">
+      <button onclick="deleteCompleted('${o.id}')" title="Elimina ordine"
+        style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:#e74c3c;border:none;border-radius:50%;color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;">🗑</button>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-right:28px;">
         <div class="ocname">${o.cognome}</div>
         <span class="octype ${o.type}">${o.type==='domicilio'?'🛵 Dom':'🥡 Asp'}</span>
       </div>
@@ -1001,6 +1003,15 @@ function renderCompleted(){
         <span class="octime">Pagato: ${o.paidTime||o.time}</span>
       </div>
     </div>`).join('');
+}
+
+function deleteCompleted(id){
+  completedOrders=completedOrders.filter(o=>o.id!==id);
+  localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
+  updCount();
+  renderCompleted();
+  if(view==='stats')renderStats();
+  toast('Ordine eliminato','ok',2000);
 }
 
 function resetCompleted(){
