@@ -258,14 +258,13 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 
       <!-- DOMICILIO FIELDS -->
       <div id="domfields" style="display:none;">
-        <div style="display:flex;gap:5px;margin-bottom:5px;">
-          <input class="finput" type="text" id="telefono" placeholder="📞 Telefono *" style="flex:1;margin-bottom:0;">
+        <div style="display:flex;gap:5px;margin-bottom:4px;">
+          <input class="finput" type="text" id="telefono" placeholder="📞 Tel *" style="flex:1;margin-bottom:0;">
           <input class="finput" type="text" id="indirizzo" placeholder="📍 Indirizzo" style="flex:2;margin-bottom:0;">
-        </div>
-        <div style="display:flex;gap:6px;margin-top:4px;">
-          <div style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:700;align-self:center;">🛵 Consegna:</div>
-          <button id="del-3" onclick="setDelivery(3)" style="flex:1;padding:7px;background:var(--g);border:2px solid var(--g);color:#000;border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">€ 3,00</button>
-          <button id="del-5" onclick="setDelivery(5)" style="flex:1;padding:7px;background:rgba(0,0,0,0.3);border:2px solid rgba(245,216,0,0.3);color:rgba(255,255,255,0.6);border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">€ 5,00</button>
+          <div style="display:flex;flex-direction:column;gap:3px;min-width:70px;">
+            <button id="del-3" onclick="setDelivery(3)" style="flex:1;padding:4px 6px;background:var(--g);border:2px solid var(--g);color:#000;border-radius:6px;cursor:pointer;font-size:11px;font-weight:900;">🛵 €3</button>
+            <button id="del-5" onclick="setDelivery(5)" style="flex:1;padding:4px 6px;background:rgba(0,0,0,0.3);border:2px solid rgba(245,216,0,0.3);color:rgba(255,255,255,0.6);border-radius:6px;cursor:pointer;font-size:11px;font-weight:900;">🛵 €5</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1760,6 +1759,7 @@ async function printComanda(o){
 }
 
 // DELIVERY COST SELECTOR
+let DELIVERY_COST=parseFloat(localStorage.getItem('bb_delivery')||'3');
 let currentDeliveryCost=DELIVERY_COST;
 function setDelivery(cost){
   currentDeliveryCost=cost;
@@ -1771,7 +1771,6 @@ function setDelivery(cost){
   document.getElementById('del-5').style.borderColor=cost===5?'var(--g)':'rgba(245,216,0,0.3)';
   renderTot();
 }
-let DELIVERY_COST=parseFloat(localStorage.getItem('bb_delivery')||'3');
 let ADMIN_PWD=localStorage.getItem('bb_adminpwd')||'1234';
 
 function getTotal(){
