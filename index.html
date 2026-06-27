@@ -311,7 +311,10 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
       <span style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g);">✅ Ordini Completati</span>
       <div style="display:flex;gap:8px;align-items:center;">
         <span id="cinfo" style="color:rgba(255,255,255,0.45);font-size:13px;font-weight:700;"></span>
-        <button onclick="resetCompleted()" style="background:rgba(200,0,0,0.4);border:1px solid var(--r);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:900;">🗑️ Azzera serata</button>
+        <div style="display:flex;gap:6px;">
+          <button onclick="printRiepilogo()" style="background:rgba(0,100,0,0.5);border:1px solid var(--g);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:900;">🖨️ Stampa riepilogo</button>
+          <button onclick="resetCompleted()" style="background:rgba(200,0,0,0.4);border:1px solid var(--r);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:900;">🗑️ Azzera serata</button>
+        </div>
       </div>
     </div>
     <div class="ogrid" id="cgrid"></div>
@@ -480,6 +483,13 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
     <div class="mnote">➖ Ingredienti da togliere</div>
     <div class="rlist" id="mex-removes"></div>
     <div class="mnote">📝 Note aggiuntive</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">
+      <button onclick="addNote('Ben cotta')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Ben cotta</button>
+      <button onclick="addNote('Poco cotta')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Poco cotta</button>
+      <button onclick="addNote('Senza bordo')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Senza bordo</button>
+      <button onclick="addNote('Poco sale')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Poco sale</button>
+      <button onclick="addNote('Senza aglio')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Senza aglio</button>
+    </div>
     <input class="minput" type="text" id="mex-note" placeholder="Es: ben cotta, senza sale...">
     <div class="mbtns">
       <button class="bcan" onclick="closeEx()">✕ Annulla</button>
@@ -1769,7 +1779,60 @@ async function printComanda(o){
   }
 }
 
-// DELIVERY COST SELECTOR
+function addNote(txt){
+  const el=document.getElementById('mex-note');
+  el.value=el.value?(el.value+', '+txt):txt;
+}
+
+function printRiepilogo(){
+  if(!completedOrders.length){toast('Nessun ordine completato','err');return;}
+  const ora=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const data=new Date().toLocaleDateString('it-IT');
+  const tot=completedOrders.reduce((s,o)=>s+(o.total||0),0);
+  const incassoReale=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
+  const totSconti=completedOrders.reduce((s,o)=>s+(o.sconto||0),0);
+  const cash=completedOrders.filter(o=>o.payMethod==='cash');
+  const card=completedOrders.filter(o=>o.payMethod==='card');
+  const asporto=completedOrders.filter(o=>o.type==='asporto');
+  const domicilio=completedOrders.filter(o=>o.type==='domicilio');
+  const prodCount={};
+  completedOrders.forEach(o=>o.items.forEach(i=>{prodCount[i.name]=(prodCount[i.name]||0)+i.qty;}));
+  const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]);
+  const pizzeCount=completedOrders.reduce((s,o)=>s+o.items.filter(i=>{
+    for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro']){if(MENU[cat]&&MENU[cat].find(p=>p.n===i.name))return true;}return false;
+  }).reduce((ss,i)=>ss+i.qty,0),0);
+  const byHour={};
+  completedOrders.forEach(o=>{const t=o.time||o.paidTime;if(t){const h=t.split(':')[0];byHour[h]=(byHour[h]||0)+1;}});
+  const peakHour=Object.entries(byHour).sort((a,b)=>b[1]-a[1])[0];
+
+  const ESC='\x1B',FONT_GRANDE=ESC+'\x21\x30',FONT_MEDIO=ESC+'\x21\x10',FONT_NORMALE=ESC+'\x21\x00',CENTER=ESC+'\x61\x01',LEFT=ESC+'\x61\x00',BOLD=ESC+'\x45\x01',BOLD_OFF=ESC+'\x45\x00';
+
+  let txt='';
+  txt+=CENTER+FONT_GRANDE+'BUGS BUNNY\n'+FONT_NORMALE;
+  txt+=CENTER+'RIEPILOGO SERATA\n';
+  txt+=CENTER+data+'  '+ora+'\n';
+  txt+='================================\n';
+  txt+=LEFT;
+  txt+=FONT_MEDIO+'Ordini: '+completedOrders.length+'\n'+FONT_NORMALE;
+  txt+=FONT_MEDIO+'Asporto: '+asporto.length+'  Domicilio: '+domicilio.length+'\n'+FONT_NORMALE;
+  txt+='================================\n';
+  txt+=FONT_MEDIO+'Incasso lordo:  '+fmt(tot)+'\n'+FONT_NORMALE;
+  if(totSconti>0)txt+='Sconti:         -'+fmt(totSconti)+'\n';
+  txt+=FONT_MEDIO+'Incasso netto:  '+fmt(incassoReale)+'\n'+FONT_NORMALE;
+  txt+='--------------------------------\n';
+  txt+='Contanti: '+fmt(cash.reduce((s,o)=>s+(o.totalePagato||o.total||0),0))+' ('+cash.length+' ord)\n';
+  txt+='Carta:    '+fmt(card.reduce((s,o)=>s+(o.totalePagato||o.total||0),0))+' ('+card.length+' ord)\n';
+  txt+='================================\n';
+  txt+=FONT_MEDIO+'Pizze sfornate: '+pizzeCount+'\n'+FONT_NORMALE;
+  if(peakHour)txt+='Ora piu affollata: '+peakHour[0]+':00 ('+peakHour[1]+' ord)\n';
+  txt+='================================\n';
+  txt+=BOLD+'PRODOTTI:\n'+BOLD_OFF;
+  topProds.forEach(p=>txt+=p[1]+'x  '+p[0]+'\n');
+  txt+='================================\n\n\n';
+
+  window.location.href='rawbt:'+encodeURIComponent(txt);
+  toast('Riepilogo inviato! 🖨️','ok',2000);
+}
 let DELIVERY_COST=parseFloat(localStorage.getItem('bb_delivery')||'3');
 let currentDeliveryCost=DELIVERY_COST;
 function setDelivery(cost){
@@ -1780,7 +1843,7 @@ function setDelivery(cost){
   document.getElementById('del-5').style.background=cost===5?'var(--g)':'rgba(0,0,0,0.3)';
   document.getElementById('del-5').style.color=cost===5?'#000':'rgba(255,255,255,0.6)';
   document.getElementById('del-5').style.borderColor=cost===5?'var(--g)':'rgba(245,216,0,0.3)';
-  renderTot();
+  updTotal();
 }
 let ADMIN_PWD=localStorage.getItem('bb_adminpwd')||'1234';
 
