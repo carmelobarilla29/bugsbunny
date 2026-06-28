@@ -469,7 +469,7 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
     </div>
     <div id="mmeta-totrow" style="text-align:center;font-size:14px;font-weight:900;color:var(--g);margin-bottom:8px;"></div>
     <div class="mbtns">
-      <button class="bcan" onclick="document.getElementById('mmeta').classList.remove('show')">✕ Annulla</button>
+      <button class="bcan" onclick="document.getElementById('mmeta').classList.remove('show');window._editMode=false;window._editCartIdx=undefined;">✕ Annulla</button>
       <button onclick="confirmMetaMeta()" style="flex:1;padding:12px;background:linear-gradient(135deg,#b8860b,#f39c12);border:2px solid var(--g);color:#000;border-radius:10px;cursor:pointer;font-size:14px;font-weight:900;">✅ Aggiungi</button>
     </div>
   </div>
@@ -1537,7 +1537,11 @@ function completePay(){
 
 // EXTRA MODAL
 function openEx(name,ing,isMax=false,excl=[],keepSel=false,farcitaPlus=false){
-  if(!keepSel){selEx=[];selRm=[];}
+  if(!keepSel){
+    selEx=[];selRm=[];
+    window._editMode=false;
+    window._editCartIdx=undefined;
+  }
   const baseList=farcitaPlus?EXTRAS_FARCITA:(isMax?EXTRAS_MAX:EXTRAS);
   const extrasList=baseList.filter(e=>!excl.includes(e.n));
   const noteLabel='📝 Note aggiuntive';
@@ -1612,6 +1616,8 @@ function openMetaMeta(name,price,isMax,skipReset=false){
   if(!skipReset){
     metaMetaGusti={prima:[],seconda:[]};
     metaMetaExtras={prima:[],seconda:[]};
+    window._editMode=false;
+    window._editCartIdx=undefined;
   }
   document.getElementById('mmeta-title').textContent='⬡ '+name;
   document.getElementById('mmeta-note').value='';
@@ -1708,7 +1714,12 @@ function confirmMetaMeta(){
 
 function togEx(btn,n){selEx.includes(n)?(selEx=selEx.filter(e=>e!==n),btn.classList.remove('sel')):(selEx.push(n),btn.classList.add('sel'));}
 function togRm(btn,n){selRm.includes(n)?(selRm=selRm.filter(e=>e!==n),btn.classList.remove('sel')):(selRm.push(n),btn.classList.add('sel'));}
-function closeEx(){document.getElementById('mex').classList.remove('show');pendProd=null;}
+function closeEx(){
+  document.getElementById('mex').classList.remove('show');
+  pendProd=null;
+  window._editMode=false;
+  window._editCartIdx=undefined;
+}
 function confirmEx(){
   if(!pendProd)return;
   const nota=document.getElementById('mex-note').value.trim();
