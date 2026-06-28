@@ -430,43 +430,44 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 
 <!-- MODAL METÀ/METÀ -->
 <div class="moverlay" id="mmeta">
-  <div class="modal" style="width:620px;max-height:94vh;display:flex;flex-direction:column;">
+  <div class="modal" style="width:680px;max-height:95vh;display:flex;flex-direction:column;">
     <h3 id="mmeta-title" style="color:#f39c12;">⬡ Metà / Metà</h3>
-
-    <!-- SCELTA GUSTI -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-      <!-- Prima metà -->
-      <div>
-        <div style="font-size:12px;font-weight:900;color:var(--g);margin-bottom:6px;text-align:center;">🍕 1a METÀ</div>
-        <div id="mmeta-prima-sel" style="background:rgba(0,0,0,0.3);border:2px solid rgba(245,216,0,0.3);border-radius:8px;padding:8px;text-align:center;font-size:13px;font-weight:900;color:rgba(255,255,255,0.4);min-height:40px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
-          Scegli gusto...
+    <div style="font-size:10px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:6px;">Gusto opzionale · Primi 4 extra per metà gratis · Dal 5° +€2 · Bresaola/Bufala sempre +€4</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;overflow-y:auto;margin-bottom:8px;">
+      <!-- PRIMA METÀ -->
+      <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:8px;">
+        <div style="font-size:12px;font-weight:900;color:#f39c12;text-align:center;margin-bottom:5px;">🍕 1a METÀ</div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">GUSTO (opzionale)</div>
+        <div id="mmeta-prima-sel" onclick="toggleGustiGrid('prima')"
+          style="background:rgba(0,0,0,0.3);border:1.5px solid rgba(245,216,0,0.3);border-radius:7px;padding:6px;text-align:center;font-size:11px;font-weight:900;color:rgba(255,255,255,0.4);cursor:pointer;margin-bottom:4px;">
+          Tocca per scegliere gusto...
         </div>
-        <div style="max-height:180px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:4px;" id="mmeta-grid-prima">
+        <div id="mmeta-grid-prima-wrap" style="display:none;max-height:120px;overflow-y:auto;margin-bottom:5px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;" id="mmeta-grid-prima"></div>
         </div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">EXTRA <span id="mmeta-count-prima" style="color:#f39c12;font-size:10px;"></span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:3px;" id="mmeta-extra-prima"></div>
       </div>
-      <!-- Seconda metà -->
-      <div>
-        <div style="font-size:12px;font-weight:900;color:var(--g);margin-bottom:6px;text-align:center;">🍕 2a METÀ</div>
-        <div id="mmeta-seconda-sel" style="background:rgba(0,0,0,0.3);border:2px solid rgba(245,216,0,0.3);border-radius:8px;padding:8px;text-align:center;font-size:13px;font-weight:900;color:rgba(255,255,255,0.4);min-height:40px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
-          Scegli gusto...
+      <!-- SECONDA METÀ -->
+      <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:8px;">
+        <div style="font-size:12px;font-weight:900;color:#f39c12;text-align:center;margin-bottom:5px;">🍕 2a METÀ</div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">GUSTO (opzionale)</div>
+        <div id="mmeta-seconda-sel" onclick="toggleGustiGrid('seconda')"
+          style="background:rgba(0,0,0,0.3);border:1.5px solid rgba(245,216,0,0.3);border-radius:7px;padding:6px;text-align:center;font-size:11px;font-weight:900;color:rgba(255,255,255,0.4);cursor:pointer;margin-bottom:4px;">
+          Tocca per scegliere gusto...
         </div>
-        <div style="max-height:180px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:4px;" id="mmeta-grid-seconda">
+        <div id="mmeta-grid-seconda-wrap" style="display:none;max-height:120px;overflow-y:auto;margin-bottom:5px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;" id="mmeta-grid-seconda"></div>
         </div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">EXTRA <span id="mmeta-count-seconda" style="color:#f39c12;font-size:10px;"></span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:3px;" id="mmeta-extra-seconda"></div>
       </div>
     </div>
-
-    <!-- EXTRA -->
-    <div style="margin-bottom:8px;">
-      <div style="font-size:11px;font-weight:900;color:#f39c12;margin-bottom:5px;">➕ EXTRA (+€2,00 | bufala/bresaola +€4,00 | basilico/origano gratis)</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;max-height:100px;overflow-y:auto;" id="mmeta-extras"></div>
+    <div style="margin-bottom:6px;">
+      <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">📝 NOTE</div>
+      <input class="finput" type="text" id="mmeta-note" placeholder="Es: ben cotta..." style="margin-bottom:0;">
     </div>
-
-    <!-- NOTE -->
-    <div style="margin-bottom:8px;">
-      <div style="font-size:11px;font-weight:900;color:rgba(255,255,255,0.5);margin-bottom:4px;">📝 NOTE</div>
-      <input class="finput" type="text" id="mmeta-note" placeholder="Es: ben cotta, poco sale..." style="margin-bottom:0;">
-    </div>
-
+    <div id="mmeta-totrow" style="text-align:center;font-size:14px;font-weight:900;color:var(--g);margin-bottom:8px;"></div>
     <div class="mbtns">
       <button class="bcan" onclick="document.getElementById('mmeta').classList.remove('show')">✕ Annulla</button>
       <button onclick="confirmMetaMeta()" style="flex:1;padding:12px;background:linear-gradient(135deg,#b8860b,#f39c12);border:2px solid var(--g);color:#000;border-radius:10px;cursor:pointer;font-size:14px;font-weight:900;">✅ Aggiungi</button>
@@ -638,7 +639,7 @@ const MENU={
   "Rosticceria":[
     {n:"Arancino al Ragù",p:2.5,ing:"riso, mozzarella, sugo alla bolognese",cat:"rosticceria"},
     {n:"Arancino Salsiccia",p:2.5,ing:"riso, sugo con salsiccia",cat:"rosticceria"},
-    {n:"Calzone al Forno",p:2,ing:"pomodoro, mozzarella, prosciutto cotto",cat:"rosticceria"},
+    {n:"Fagottino",p:2.5,ing:"",cat:"rosticceria"},
     {n:"Calzone Baby",p:2.5,ing:"pomodoro, würstel, patatine",cat:"rosticceria"},
     {n:"Calzone Fritto",p:2,ing:"pomodoro, mozzarella, prosciutto cotto",cat:"rosticceria"},
     {n:"Calzone Fritto Impanato",p:2.5,ing:"pomodoro, mozzarella, prosciutto cotto",cat:"rosticceria"},
@@ -690,14 +691,14 @@ const MENU={
 
 const EXTRAS=[
   {n:"Würstel",p:1},{n:"Patate",p:1},
-  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:1},
-  {n:"Capperi",p:1},{n:"Cipolla",p:1},{n:"Cotto",p:1},{n:"Crudo",p:1},
+  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:2},
+  {n:"Capperi",p:1},{n:"Carciofi",p:1},{n:"Cipolla",p:1},{n:"Cotto",p:1},{n:"Crudo",p:1},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:1},{n:"Fiori di zucca",p:1},
   {n:"Funghi",p:1},{n:"Gorgonzola",p:1},{n:"Granella di pistacchio",p:2},
   {n:"Mais",p:1},{n:"Melanzane arrosto",p:1},{n:"Melanzane fritte",p:1},
-  {n:"Mortadella",p:1},{n:"Mozzarella di bufala",p:2},{n:"Mozzarella extra",p:1},
+  {n:"Mortadella",p:1},{n:"Bufala",p:2},{n:"Mozzarella extra",p:1},
   {n:"Nduja",p:1},{n:"Olive",p:1},{n:"Origano",p:0},{n:"Pancetta",p:1},
-  {n:"Patate al forno",p:1},{n:"Peperoncino",p:1},{n:"Peperoni",p:1},{n:"Peperoni arrosto",p:1},
+  {n:"Panna",p:1},{n:"Patate al forno",p:1},{n:"Peperoncino",p:1},{n:"Peperoni",p:1},{n:"Peperoni arrosto",p:1},
   {n:"Pomodorini",p:1},{n:"Porchetta",p:2},{n:"Porcini",p:1},{n:"Rucola",p:1},
   {n:"Salame dolce",p:1},{n:"Salame piccante",p:1},{n:"Salsiccia",p:2},
   {n:"Scaglie di grana",p:1},{n:"Scamorza",p:1},{n:"Speck",p:1},
@@ -708,13 +709,13 @@ const EXTRAS=[
 const EXTRAS_MAX=[
   {n:"Würstel",p:2},{n:"Patate",p:2},
   {n:"Acciughe",p:2},{n:"Basilico",p:0},{n:"Bresaola",p:4},
-  {n:"Capperi",p:2},{n:"Cipolla",p:2},{n:"Cotto",p:2},{n:"Crudo",p:2},
+  {n:"Capperi",p:2},{n:"Carciofi",p:2},{n:"Cipolla",p:2},{n:"Cotto",p:2},{n:"Crudo",p:2},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:2},{n:"Fiori di zucca",p:2},
   {n:"Funghi",p:2},{n:"Gorgonzola",p:2},{n:"Granella di pistacchio",p:2},
   {n:"Mais",p:2},{n:"Melanzane arrosto",p:2},{n:"Melanzane fritte",p:2},
-  {n:"Mortadella",p:2},{n:"Mozzarella di bufala",p:4},{n:"Mozzarella extra",p:2},
+  {n:"Mortadella",p:2},{n:"Bufala",p:4},{n:"Mozzarella extra",p:2},
   {n:"Nduja",p:2},{n:"Olive",p:2},{n:"Origano",p:0},{n:"Pancetta",p:2},
-  {n:"Patate al forno",p:2},{n:"Peperoncino",p:2},{n:"Peperoni",p:2},{n:"Peperoni arrosto",p:2},
+  {n:"Panna",p:2},{n:"Patate al forno",p:2},{n:"Peperoncino",p:2},{n:"Peperoni",p:2},{n:"Peperoni arrosto",p:2},
   {n:"Pomodorini",p:2},{n:"Porchetta",p:2},{n:"Porcini",p:2},{n:"Rucola",p:2},
   {n:"Salame dolce",p:2},{n:"Salame piccante",p:2},{n:"Salsiccia",p:2},
   {n:"Scaglie di grana",p:2},{n:"Scamorza",p:2},{n:"Speck",p:2},
@@ -997,9 +998,11 @@ function renderCompleted(){
     grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">✅</div><p>Nessun ordine completato stasera</p></div>';
     return;
   }
-  grid.innerHTML=[...completedOrders].reverse().map(o=>`
+  grid.innerHTML=[...completedOrders].reverse().map(o=>{
+    const eid=o.id||(o.cognome+'_'+o.time+'_'+o.total);
+    return `
     <div class="ocard" style="border-color:#27ae60;opacity:0.9;position:relative;">
-      <button onclick="deleteCompleted('${o.id}')" title="Elimina ordine"
+      <button onclick="deleteCompleted('${eid}')" title="Elimina ordine"
         style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:#e74c3c;border:none;border-radius:50%;color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;">🗑</button>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-right:28px;">
         <div class="ocname">${o.cognome}</div>
@@ -1011,11 +1014,15 @@ function renderCompleted(){
         <span class="octot">${fmt(o.total)}</span>
         <span class="octime">Pagato: ${o.paidTime||o.time}</span>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function deleteCompleted(id){
-  completedOrders=completedOrders.filter(o=>o.id!==id);
+  // Cerca per id, se non c'è usa indice
+  const idx=completedOrders.findIndex(o=>o.id===id||(o.cognome+'_'+o.time+'_'+o.total)===id);
+  if(idx===-1){toast('Ordine non trovato','err');return;}
+  completedOrders.splice(idx,1);
   localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
   updCount();
   renderCompleted();
@@ -1050,11 +1057,19 @@ function renderStats(){
   const totSconti=completedOrders.reduce((s,o)=>s+(o.sconto||0),0);
   const nSconti=completedOrders.filter(o=>o.sconto>0).length;
   const incassoReale=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
-  // Ora più affollata — conta tutti gli ordini (asporto + domicilio) per ora di conferma
+  // Ora più affollata — usa orario consegna se disponibile, altrimenti ora creazione ordine
   const byHour={};
   completedOrders.forEach(o=>{
-    const t=o.time||o.paidTime;
-    if(t){const h=t.split(':')[0];byHour[h]=(byHour[h]||0)+1;}
+    let t=null;
+    if(o.orario&&o.orario!=='Appena possibile'){
+      t=o.orario.replace('.',':');
+    } else {
+      t=o.time; // ora in cui è stata presa la comanda
+    }
+    if(t){
+      const h=t.split(':')[0].trim();
+      if(h&&!isNaN(h))byHour[h]=(byHour[h]||0)+1;
+    }
   });
   const peakHour=Object.entries(byHour).sort((a,b)=>b[1]-a[1])[0];
 
@@ -1100,8 +1115,10 @@ function renderOpen(){
 
   const sorted=[...openOrders].sort((a,b)=>{
     const getMin=o=>{
-      if(!o.orario||o.orario==='Appena possibile')return 0;
-      const parts=o.orario.split(':');
+      if(!o.orario||o.orario==='Appena possibile')return 9999;
+      // Supporta sia 20:30 che 20.30
+      const norm=o.orario.replace('.',':');
+      const parts=norm.split(':');
       return parseInt(parts[0]||0)*60+parseInt(parts[1]||0);
     };
     return getMin(a)-getMin(b);
@@ -1365,12 +1382,13 @@ function completePay(){
     completedOrders.push(paidOrder);
     localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
   }
-  saveOrders();updCount();closePay();
+  saveOrders();updCount();
   if(view==='open')renderOpen();
   if(view==='comp')renderCompleted();
   if(view==='stats')renderStats();
   const scontoTxt=sconto>0?` (sconto ${fmt(sconto)})`:'';
   const methodLabel=payMethod==='cash'?'💵 Contanti':'💳 Carta';
+  closePay();
   toast(`Pagamento ${methodLabel} completato${scontoTxt}!`,'ok',4000);
 }
 
@@ -1393,74 +1411,120 @@ let metaMetaName='';
 let metaMetaPrice=0;
 let metaMetaIsMax=false;
 let metaMetaGusti={prima:[],seconda:[]};
-let metaMetaExtras=[];
+let metaMetaExtras={prima:[],seconda:[]};
+
+function calcMetaPrice(){
+  let extra=0;
+  ['prima','seconda'].forEach(lato=>{
+    const exs=metaMetaExtras[lato];
+    let contatore=0;
+    exs.forEach(n=>{
+      const ex=EXTRAS_MAX.find(e=>e.n===n);
+      if(!ex)return;
+      if(ex.p===4){extra+=4;}
+      else if(ex.p===0){}
+      else{contatore++;if(contatore>4)extra+=2;}
+    });
+  });
+  return +(metaMetaPrice+extra).toFixed(2);
+}
+
+function updateMetaTot(){
+  document.getElementById('mmeta-totrow').textContent='Totale: '+fmt(calcMetaPrice());
+}
+
+function updateMetaCount(lato){
+  const exs=metaMetaExtras[lato];
+  let c=0;
+  exs.forEach(n=>{const ex=EXTRAS_MAX.find(e=>e.n===n);if(ex&&ex.p!==0&&ex.p!==4)c++;});
+  const r=Math.max(0,4-c);
+  document.getElementById('mmeta-count-'+lato).textContent=c<=4?`(${r} gratis rim.)`:`(${c-4} a €2)`;
+}
 
 function openMetaMeta(name,price,isMax){
   metaMetaName=name;metaMetaPrice=price;metaMetaIsMax=isMax;
   metaMetaGusti={prima:[],seconda:[]};
-  metaMetaExtras=[];
+  metaMetaExtras={prima:[],seconda:[]};
   document.getElementById('mmeta-title').textContent='⬡ '+name;
   document.getElementById('mmeta-note').value='';
-  document.getElementById('mmeta-prima-sel').textContent='Tocca i gusti...';
-  document.getElementById('mmeta-prima-sel').style.color='rgba(255,255,255,0.4)';
-  document.getElementById('mmeta-seconda-sel').textContent='Tocca i gusti...';
-  document.getElementById('mmeta-seconda-sel').style.color='rgba(255,255,255,0.4)';
-
+  ['prima','seconda'].forEach(lato=>{
+    document.getElementById('mmeta-'+lato+'-sel').textContent='Tocca per scegliere gusto...';
+    document.getElementById('mmeta-'+lato+'-sel').style.color='rgba(255,255,255,0.4)';
+    document.getElementById('mmeta-grid-'+lato+'-wrap').style.display='none';
+  });
   const gusti=MENU['Pizze Tonde'].map(p=>p.n).sort((a,b)=>a.localeCompare(b,'it'));
-  const makeBtn=(gridId,g)=>`<button onclick="togMeta('${gridId}','${g.replace(/'/g,"\\'")}',this)"
-    style="padding:6px 4px;background:rgba(45,90,27,0.4);border:1px solid var(--vc);color:#fff;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;transition:all 0.15s;text-align:center;">${g}</button>`;
-  document.getElementById('mmeta-grid-prima').innerHTML=gusti.map(g=>makeBtn('prima',g)).join('');
-  document.getElementById('mmeta-grid-seconda').innerHTML=gusti.map(g=>makeBtn('seconda',g)).join('');
-
-  document.getElementById('mmeta-extras').innerHTML=EXTRAS_MAX.map(e=>`
-    <button onclick="togMetaExtra(this,'${e.n.replace(/'/g,"\\'")}')"
-      style="padding:5px 8px;background:rgba(0,0,0,0.3);border:1.5px solid rgba(245,216,0,0.25);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;transition:all 0.15s;white-space:nowrap;${e.special?'border-color:#3498db;color:#3498db;':''}">
-      ${e.n} <span style="color:var(--g);">${e.p===0?'gratis':'+€'+e.p}</span>
-    </button>`).join('');
-
+  ['prima','seconda'].forEach(lato=>{
+    document.getElementById('mmeta-grid-'+lato).innerHTML=gusti.map(g=>`
+      <button onclick="togMetaGusto('${lato}','${g.replace(/'/g,"\'")}',this)"
+        style="padding:5px 3px;background:rgba(45,90,27,0.4);border:1px solid var(--vc);color:#fff;border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;text-align:center;">${g}</button>`).join('');
+    document.getElementById('mmeta-extra-'+lato).innerHTML=EXTRAS_MAX.map(e=>`
+      <button onclick="togMetaExtraLato('${lato}',this,'${e.n.replace(/'/g,"\'")}')"
+        style="padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(245,216,0,0.2);color:rgba(255,255,255,0.65);border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;white-space:nowrap;${e.special?'border-color:#3498db;color:#7fb3d3;':''}">
+        ${e.n}<span style="color:var(--g);"> ${e.p===0?'gr':e.p===4?'€4':'+€?'}</span>
+      </button>`).join('');
+    updateMetaCount(lato);
+  });
+  updateMetaTot();
   document.getElementById('mmeta').classList.add('show');
 }
 
-function togMeta(gridId,gusto,btn){
-  const arr=metaMetaGusti[gridId];
+function toggleGustiGrid(lato){
+  const wrap=document.getElementById('mmeta-grid-'+lato+'-wrap');
+  wrap.style.display=wrap.style.display==='none'?'block':'none';
+}
+
+function togMetaGusto(lato,gusto,btn){
+  const arr=metaMetaGusti[lato];
+  const wrap=document.getElementById('mmeta-grid-'+lato+'-wrap');
   if(arr.includes(gusto)){
-    metaMetaGusti[gridId]=arr.filter(g=>g!==gusto);
+    metaMetaGusti[lato]=arr.filter(g=>g!==gusto);
     btn.style.background='rgba(45,90,27,0.4)';btn.style.borderColor='var(--vc)';btn.style.color='#fff';
   } else {
-    metaMetaGusti[gridId].push(gusto);
+    metaMetaGusti[lato].push(gusto);
     btn.style.background='var(--g)';btn.style.borderColor='var(--g)';btn.style.color='var(--vs)';
   }
-  const selEl=document.getElementById('mmeta-'+gridId+'-sel');
-  if(metaMetaGusti[gridId].length){
-    selEl.textContent='✅ '+metaMetaGusti[gridId].join(' + ');
-    selEl.style.color='var(--g)';selEl.style.borderColor='var(--g)';
+  const sel=document.getElementById('mmeta-'+lato+'-sel');
+  if(metaMetaGusti[lato].length){
+    sel.textContent='✅ '+metaMetaGusti[lato].join(' + ');
+    sel.style.color='var(--g)';
+    wrap.style.display='none';
   } else {
-    selEl.textContent='Tocca i gusti...';
-    selEl.style.color='rgba(255,255,255,0.4)';selEl.style.borderColor='rgba(245,216,0,0.3)';
+    sel.textContent='Tocca per scegliere gusto...';
+    sel.style.color='rgba(255,255,255,0.4)';
   }
 }
 
-function togMetaExtra(btn,n){
-  if(metaMetaExtras.includes(n)){
-    metaMetaExtras=metaMetaExtras.filter(e=>e!==n);
-    btn.style.background='rgba(0,0,0,0.3)';btn.style.borderColor='rgba(245,216,0,0.25)';btn.style.color='rgba(255,255,255,0.7)';
+function togMetaExtraLato(lato,btn,n){
+  const arr=metaMetaExtras[lato];
+  if(arr.includes(n)){
+    metaMetaExtras[lato]=arr.filter(e=>e!==n);
+    btn.style.background='rgba(0,0,0,0.3)';btn.style.borderColor='rgba(245,216,0,0.2)';btn.style.color='rgba(255,255,255,0.65)';
   } else {
-    metaMetaExtras.push(n);
+    metaMetaExtras[lato].push(n);
     btn.style.background='var(--g)';btn.style.borderColor='var(--g)';btn.style.color='var(--vs)';
   }
+  updateMetaCount(lato);
+  updateMetaTot();
 }
 
 function confirmMetaMeta(){
-  if(!metaMetaGusti.prima.length||!metaMetaGusti.seconda.length){toast('Scegli almeno un gusto per ogni metà!','err');return;}
-  const nota=(document.getElementById('mmeta-note').value.trim()?document.getElementById('mmeta-note').value.trim()+' · ':'')+
-    'Meta\': '+metaMetaGusti.prima.join(' e ')+' / Meta\': '+metaMetaGusti.seconda.join(' e ');
-  const ep=metaMetaExtras.reduce((s,en)=>{const ex=EXTRAS_MAX.find(x=>x.n===en);return s+(ex?ex.p:2);},0);
-  const fp=+(metaMetaPrice+ep).toFixed(2);
-  order.items.push({name:metaMetaName,price:fp,extras:[...metaMetaExtras],removes:[],note:nota,qty:1});
+  const p1=metaMetaGusti.prima.length||metaMetaExtras.prima.length;
+  const p2=metaMetaGusti.seconda.length||metaMetaExtras.seconda.length;
+  if(!p1||!p2){toast('Ogni meta deve avere almeno un gusto o un extra!','err');return;}
+  const descMeta=(lato)=>{
+    const g=metaMetaGusti[lato].join(' e ');
+    const e=metaMetaExtras[lato].join(', ');
+    if(g&&e)return g+' + '+e;
+    return g||e;
+  };
+  const nota=(document.getElementById('mmeta-note').value.trim()?document.getElementById('mmeta-note').value.trim()+' - ':'')+'Meta\': '+descMeta('prima')+' / Meta\': '+descMeta('seconda');
+  const fp=calcMetaPrice();
+  order.items.push({name:metaMetaName,price:fp,extras:[],removes:[],note:nota,qty:1});
   renderItems();
   document.getElementById('mmeta').classList.remove('show');
-  toast('Metà/Metà aggiunto!','ok',2000);
+  toast('Meta/Meta aggiunto! '+fmt(fp),'ok',2000);
 }
+
 function togEx(btn,n){selEx.includes(n)?(selEx=selEx.filter(e=>e!==n),btn.classList.remove('sel')):(selEx.push(n),btn.classList.add('sel'));}
 function togRm(btn,n){selRm.includes(n)?(selRm=selRm.filter(e=>e!==n),btn.classList.remove('sel')):(selRm.push(n),btn.classList.add('sel'));}
 function closeEx(){document.getElementById('mex').classList.remove('show');pendProd=null;}
@@ -1623,145 +1687,14 @@ function buildEscPosText(o){
 }
 
 function printViaRawBT(o){
-  const isIOS=(/iPad|iPhone|iPod/.test(navigator.userAgent))||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  if(isIOS){printBrowser(o);return;}
-
-  // Comandi ESC/POS come caratteri reali
-  const ESC='\x1B';
-  const GS='\x1D';
-
-  // Imposta font grande — doppia altezza e larghezza
-  const FONT_GRANDE=ESC+'\x21\x30'; // double width + double height
-  const FONT_MEDIO=ESC+'\x21\x10';  // double height only
-  const FONT_NORMALE=ESC+'\x21\x00'; // normal
-  const BOLD_ON=ESC+'\x45\x01';
-  const BOLD_OFF=ESC+'\x45\x00';
-  const CENTER=ESC+'\x61\x01';
-  const LEFT=ESC+'\x61\x00';
-
-  const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  const data=o.date||new Date().toLocaleDateString('it-IT');
-
-  let txt='';
-  txt+=CENTER+FONT_GRANDE+'BUGS BUNNY\n'+FONT_NORMALE;
-  txt+=CENTER+data+'  '+ora+'\n';
-  txt+='================================\n';
-  txt+=CENTER+FONT_GRANDE+(o.type==='domicilio'?'DOMICILIO':'ASPORTO')+'\n'+FONT_NORMALE;
-  txt+=LEFT;
-
-  if(o.type==='domicilio'){
-    txt+=FONT_MEDIO+(o.indirizzo||'N/D')+'\n'+FONT_NORMALE;
-    txt+='Tel: '+(o.telefono||'-')+'\n';
-  }
-  txt+='================================\n';
-
-  function getCat(name){
-    for(const [cat,items] of Object.entries(MENU)){
-      const found=items.find(i=>i.n===name);
-      if(found)return found.cat||'altro';
-    }
-    return 'altro';
-  }
-  const pizze=o.items.filter(i=>getCat(i.name)==='pizza');
-  const rosticceria=o.items.filter(i=>getCat(i.name)==='rosticceria');
-  const bibite=o.items.filter(i=>['bibita','birra'].includes(getCat(i.name)));
-  const altro=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getCat(i.name)));
-
-  function addSection(title,items){
-    if(!items.length)return;
-    txt+=CENTER+BOLD_ON+'\n'+title+'\n'+BOLD_OFF+LEFT;
-    txt+='--------------------------------\n';
-    items.forEach(i=>{
-      let n=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim()
-        .replace('Bolognese Burrata','Bol.Burrata')
-        .replace('Quattro Stagioni','4 Stagioni')
-        .replace('Quattro Formaggi','4 Formaggi')
-        .replace('Mezzo Metro','M.Metro');
-      txt+=FONT_MEDIO+i.qty+'x '+n+'\n'+FONT_NORMALE;
-      let notaLibera='';
-      if(i.note&&i.note.includes("Meta'")){
-        const parti=i.note.split(' · ');
-        parti.forEach(p=>{
-          if(p.includes("Meta':")){p.split(' / ').forEach(h=>txt+='  >> '+h.trim()+'\n');}
-          else if(p.trim())notaLibera=p.trim();
-        });
-      } else if(i.note) notaLibera=i.note;
-      if(i.extras.length)i.extras.forEach(e=>txt+='  + '+e+'\n');
-      if(i.removes.length)i.removes.forEach(r=>txt+='  - '+r+'\n');
-      if(notaLibera)txt+='  ! '+notaLibera+'\n';
-    });
-  }
-
-  addSection('*** PIZZE ***',pizze);
-  if(rosticceria.length)addSection('*** ROSTICCERIA ***',rosticceria);
-  if(bibite.length||altro.length)addSection('*** BIBITE ***',[...bibite,...altro]);
-
-  txt+='================================\n';
-  txt+=CENTER+FONT_GRANDE+o.cognome.toUpperCase()+'\n';
-  txt+=FONT_MEDIO+'ORA: '+(o.orario||'-')+'\n'+FONT_NORMALE;
-  if(o.total)txt+=FONT_MEDIO+'TOT: '+fmt(o.total)+'\n'+FONT_NORMALE;
-  txt+=LEFT+'================================\n\n\n';
-  txt+=GS+'\x56\x41\x03'; // taglia carta
-
-  window.location.href='rawbt:'+encodeURIComponent(txt);
+  const testo=buildEscPosText(o);
+  window.location.href='rawbt:'+encodeURIComponent(testo);
   setTimeout(()=>{toast('Stampa inviata! 🖨️','ok',2000);},300);
 }
 
-function printBrowser(o){
-  const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  const data=o.date||new Date().toLocaleDateString('it-IT');
-  const tipoSub=o.type==='domicilio'
-    ?`<div style="font-size:14px;font-weight:bold;text-align:center;margin-top:4px;">${o.indirizzo||'N/D'}</div>
-       <div style="font-size:12px;text-align:center;">Tel: ${o.telefono||'-'}</div>`:'';
-  function getC(name){for(const [,items] of Object.entries(MENU)){const f=items.find(i=>i.n===name);if(f)return f.cat||'altro';}return 'altro';}
-  const pizze=o.items.filter(i=>getC(i.name)==='pizza');
-  const rost=o.items.filter(i=>getC(i.name)==='rosticceria');
-  const bib=o.items.filter(i=>['bibita','birra'].includes(getC(i.name)));
-  const alt=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getC(i.name)));
-  const rI=items=>items.map(i=>`
-    <div style="display:flex;gap:4px;margin:5px 0 2px;">
-      <span style="font-size:18px;font-weight:900;min-width:22px;">${i.qty}x</span>
-      <span style="font-size:14px;font-weight:900;">${i.name}</span>
-    </div>
-    ${i.extras.length?`<div style="font-size:11px;font-weight:bold;margin-left:26px;">+ ${i.extras.join(', ')}</div>`:''}
-    ${i.removes.length?`<div style="font-size:11px;font-weight:bold;margin-left:26px;text-decoration:underline;">- ${i.removes.join(', ')}</div>`:''}
-    ${i.note?`<div style="font-size:11px;font-style:italic;margin-left:26px;">⚠️ ${i.note}</div>`:''}`).join('');
-  const rS=(t,items)=>items.length?`<div style="font-size:10px;font-weight:900;text-align:center;border-bottom:1px solid #000;padding-bottom:2px;margin:4px 0 3px;">${t}</div>${rI(items)}`:'';
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    @page{margin:2mm;size:80mm auto;}
-    body{font-family:Arial,sans-serif;width:76mm;padding:2mm;}
-    .sep{border:none;border-top:1px dashed #000;margin:4px 0;}
-  </style></head><body>
-    <div style="text-align:center;font-size:14px;font-weight:900;">BUGS BUNNY</div>
-    <div style="text-align:center;font-size:11px;">${data} — ${ora}</div>
-    <hr class="sep">
-    <div style="background:${o.type==='domicilio'?'#000':'#fff'};color:${o.type==='domicilio'?'#fff':'#000'};padding:5px;text-align:center;font-size:18px;font-weight:900;border:2px solid #000;">${o.type==='domicilio'?'DOMICILIO':'ASPORTO'}</div>
-    ${tipoSub}<hr class="sep">
-    ${rS('— PIZZE —',pizze)}${rost.length&&pizze.length?'<hr class="sep">':''}${rS('— ROSTICCERIA —',rost)}${(bib.length||alt.length)&&(pizze.length||rost.length)?'<hr class="sep">':''}${rS('— BIBITE —',[...bib,...alt])}
-    <hr class="sep">
-    <div style="text-align:center;font-size:22px;font-weight:900;margin:3px 0;">${o.cognome.toUpperCase()}</div>
-    <div style="text-align:center;font-size:16px;font-weight:900;margin-bottom:3px;">⏰ ${o.orario||'-'}</div>
-    <hr class="sep">
-  </body></html>`;
 
-  // Apre una nuova finestra e stampa — funziona su Safari iPad
-  const w=window.open('','_blank','width=400,height=600');
-  if(w){
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-    w.onload=function(){w.focus();w.print();};
-    setTimeout(()=>{w.focus();w.print();},500);
-  }
-}
 
 function connectBluetooth(){
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-  if(isIOS){
-    toast('Su iPad la stampa si apre automaticamente quando confermi','ok',3000);
-    return;
-  }
   toast('RawBT gestisce la connessione automaticamente!','ok',3000);
   document.getElementById('bt-status').textContent='🖨️ RawBT ✅';
   document.getElementById('bt-status').style.color='#2ecc71';
@@ -1770,12 +1703,7 @@ function connectBluetooth(){
 // PRINT
 async function printComanda(o){
   if(!o)return;
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-  if(isIOS){
-    printBrowser(o);
-  } else {
-    printViaRawBT(o);
-  }
+  printViaRawBT(o);
 }
 
 function addNote(txt){
@@ -1801,7 +1729,12 @@ function printRiepilogo(){
     for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro']){if(MENU[cat]&&MENU[cat].find(p=>p.n===i.name))return true;}return false;
   }).reduce((ss,i)=>ss+i.qty,0),0);
   const byHour={};
-  completedOrders.forEach(o=>{const t=o.time||o.paidTime;if(t){const h=t.split(':')[0];byHour[h]=(byHour[h]||0)+1;}});
+  completedOrders.forEach(o=>{
+    let t=null;
+    if(o.orario&&o.orario!=='Appena possibile'){t=o.orario.replace('.',':');}
+    else{t=o.time;}
+    if(t){const h=t.split(':')[0].trim();if(h&&!isNaN(h))byHour[h]=(byHour[h]||0)+1;}
+  });
   const peakHour=Object.entries(byHour).sort((a,b)=>b[1]-a[1])[0];
 
   const ESC='\x1B',FONT_GRANDE=ESC+'\x21\x30',FONT_MEDIO=ESC+'\x21\x10',FONT_NORMALE=ESC+'\x21\x00',CENTER=ESC+'\x61\x01',LEFT=ESC+'\x61\x00',BOLD=ESC+'\x45\x01',BOLD_OFF=ESC+'\x45\x00';
@@ -1835,13 +1768,24 @@ function printRiepilogo(){
 let DELIVERY_COST=parseFloat(localStorage.getItem('bb_delivery')||'3');
 let currentDeliveryCost=DELIVERY_COST;
 function setDelivery(cost){
-  currentDeliveryCost=cost;
-  document.getElementById('del-3').style.background=cost===3?'var(--g)':'rgba(0,0,0,0.3)';
-  document.getElementById('del-3').style.color=cost===3?'#000':'rgba(255,255,255,0.6)';
-  document.getElementById('del-3').style.borderColor=cost===3?'var(--g)':'rgba(245,216,0,0.3)';
-  document.getElementById('del-5').style.background=cost===5?'var(--g)':'rgba(0,0,0,0.3)';
-  document.getElementById('del-5').style.color=cost===5?'#000':'rgba(255,255,255,0.6)';
-  document.getElementById('del-5').style.borderColor=cost===5?'var(--g)':'rgba(245,216,0,0.3)';
+  if(cost!==0&&currentDeliveryCost===cost){
+    // Tocco stesso tasto — deseleziona → consegna 0€
+    currentDeliveryCost=0;
+    document.getElementById('del-3').style.background='rgba(0,0,0,0.3)';
+    document.getElementById('del-3').style.color='rgba(255,255,255,0.6)';
+    document.getElementById('del-3').style.borderColor='rgba(245,216,0,0.3)';
+    document.getElementById('del-5').style.background='rgba(0,0,0,0.3)';
+    document.getElementById('del-5').style.color='rgba(255,255,255,0.6)';
+    document.getElementById('del-5').style.borderColor='rgba(245,216,0,0.3)';
+  } else {
+    currentDeliveryCost=cost;
+    document.getElementById('del-3').style.background=cost===3?'var(--g)':'rgba(0,0,0,0.3)';
+    document.getElementById('del-3').style.color=cost===3?'#000':'rgba(255,255,255,0.6)';
+    document.getElementById('del-3').style.borderColor=cost===3?'var(--g)':'rgba(245,216,0,0.3)';
+    document.getElementById('del-5').style.background=cost===5?'var(--g)':'rgba(0,0,0,0.3)';
+    document.getElementById('del-5').style.color=cost===5?'#000':'rgba(255,255,255,0.6)';
+    document.getElementById('del-5').style.borderColor=cost===5?'var(--g)':'rgba(245,216,0,0.3)';
+  }
   updTotal();
 }
 let ADMIN_PWD=localStorage.getItem('bb_adminpwd')||'1234';
@@ -1938,19 +1882,7 @@ function saveAdminPwd(){
 }
 
 // INIT
-// Detect iOS/iPadOS (iPad in Safari ha userAgent desktop da iOS 13+)
-const isIOS=(/iPad|iPhone|iPod/.test(navigator.userAgent))||
-            (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 
-const btBtn=document.getElementById('bt-status');
-if(btBtn){
-  if(isIOS){
-    btBtn.style.display='none';
-  } else {
-    btBtn.textContent='🖨️ RawBT';
-    btBtn.style.color='rgba(255,255,255,0.6)';
-  }
-}
 
 renderCats();
 updCount();
