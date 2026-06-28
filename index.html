@@ -933,7 +933,7 @@ function editCartItem(idx){
       }
       metaMetaExtras[lato].forEach(e=>{
         document.querySelectorAll(`#mmeta-extra-${lato} button`).forEach(b=>{
-          if(b.textContent.trim()===e){
+          if((b.dataset.name||b.textContent.trim())===e){
             b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
           }
         });
@@ -1548,14 +1548,14 @@ function openEx(name,ing,isMax=false,excl=[],keepSel=false,farcitaPlus=false){
   document.getElementById('mex-title').textContent='🍕 '+name;
   if(!keepSel)document.getElementById('mex-note').value='';
   document.getElementById('mex-note-label').textContent='📝 Note aggiuntive';
-  document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')" ${e.special?'style="border-color:#3498db;color:#3498db;"':''}>${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
+  document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" data-name="${e.n.replace(/"/g,'&quot;')}" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')" ${e.special?'style="border-color:#3498db;color:#3498db;"':''}>${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
   const ings=ing.split(',').map(s=>s.trim()).filter(Boolean);
   document.getElementById('mex-removes').innerHTML=ings.length?ings.map(e=>`<button class="rbtn" onclick="togRm(this,'${e.replace(/'/g,"\\'")}')">${e}</button>`).join(''):'<span style="color:rgba(255,255,255,0.3);font-size:12px;">Nessun ingrediente base</span>';
   // Evidenzia subito senza setTimeout
   if(keepSel){
     document.querySelectorAll('#mex-extras .ebtn').forEach(btn=>{
-      const label=btn.childNodes[0].textContent.trim();
-      if(selEx.includes(label)){
+      const name=btn.dataset.name||btn.childNodes[0].textContent.trim();
+      if(selEx.includes(name)){
         btn.style.background='var(--g)';btn.style.color='var(--vs)';btn.style.borderColor='var(--g)';
       }
     });
@@ -1634,7 +1634,7 @@ function openMetaMeta(name,price,isMax,skipReset=false){
       <button onclick="togMetaGusto('${lato}','${g.replace(/'/g,"\'")}',this)"
         style="padding:5px 3px;background:rgba(45,90,27,0.4);border:1px solid var(--vc);color:#fff;border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;text-align:center;">${g}</button>`).join('');
     document.getElementById('mmeta-extra-'+lato).innerHTML=EXTRAS_MAX.map(e=>`
-      <button onclick="togMetaExtraLato('${lato}',this,'${e.n.replace(/'/g,"\'")}')"
+      <button data-name="${e.n}" onclick="togMetaExtraLato('${lato}',this,'${e.n.replace(/'/g,"\'")}')"
         style="padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(245,216,0,0.2);color:rgba(255,255,255,0.65);border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;white-space:nowrap;${e.special?'border-color:#3498db;color:#7fb3d3;':''}">
         ${e.n}
       </button>`).join('');
@@ -1714,7 +1714,17 @@ function confirmMetaMeta(){
   }
 }
 
-function togEx(btn,n){selEx.includes(n)?(selEx=selEx.filter(e=>e!==n),btn.classList.remove('sel')):(selEx.push(n),btn.classList.add('sel'));}
+function togEx(btn,n){
+  if(selEx.includes(n)){
+    selEx=selEx.filter(e=>e!==n);
+    btn.style.background='';btn.style.color='';btn.style.borderColor='';
+    btn.classList.remove('sel');
+  } else {
+    selEx.push(n);
+    btn.style.background='var(--g)';btn.style.color='var(--vs)';btn.style.borderColor='var(--g)';
+    btn.classList.add('sel');
+  }
+}
 function togRm(btn,n){selRm.includes(n)?(selRm=selRm.filter(e=>e!==n),btn.classList.remove('sel')):(selRm.push(n),btn.classList.add('sel'));}
 function closeEx(){
   document.getElementById('mex').classList.remove('show');
