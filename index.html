@@ -734,6 +734,7 @@ const EXTRAS_FARCITA=EXTRAS_MAX.map(e=>{
   if(e.n==='Bresaola'||e.n==='Bufala')return {...e,p:3};
   return {...e,p:0};
 });
+let order={type:'asporto',items:[]};
 let openOrders=JSON.parse(localStorage.getItem('bb_ord')||'[]');
 let completedOrders=JSON.parse(localStorage.getItem('bb_comp')||'[]');
 let clienti=JSON.parse(localStorage.getItem('bb_cli')||'[]');
@@ -839,8 +840,8 @@ function renderItems(){
     <div class="oitem">
       <div style="flex:1">
         <div class="iname">${it.name}</div>
-        ${it.extras.length?`<div class="inote-p">➕ ${it.extras.join(', ')}</div>`:''}
-        ${it.removes.length?`<div class="inote-m">➖ ${it.removes.join(', ')}</div>`:''}
+        ${(it.extras||[]).length?`<div class="inote-p">➕ ${it.extras.join(', ')}</div>`:''}
+        ${(it.removes||[]).length?`<div class="inote-m">➖ ${it.removes.join(', ')}</div>`:''}
         ${it.note?`<div class="inote-t">📝 ${it.note}</div>`:''}
       </div>
       <div class="qrow">
