@@ -432,7 +432,7 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
 <div class="moverlay" id="mmeta">
   <div class="modal" style="width:680px;max-height:95vh;display:flex;flex-direction:column;">
     <h3 id="mmeta-title" style="color:#f39c12;">⬡ Metà / Metà</h3>
-    <div style="font-size:10px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:6px;">Gusto opzionale · Primi 4 extra per metà gratis · Dal 5° +€2 · Bresaola/Bufala sempre +€4</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:6px;">Gusto opzionale · Primi 4 extra per metà gratis · Bresaola/Bufala sempre +€3</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;overflow-y:auto;margin-bottom:8px;">
       <!-- PRIMA METÀ -->
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:8px;">
@@ -1397,7 +1397,7 @@ function completePay(){
 function openEx(name,ing,isMax=false,excl=[]){
   selEx=[];selRm=[];
   const extrasList=(isMax?EXTRAS_MAX:EXTRAS).filter(e=>!excl.includes(e.n));
-  const noteLabel=isMax?'➕ Extra (+€2,00 | bufala/bresaola +€4,00 | basilico/origano gratis)':'➕ Ingredienti extra (+€1,00 cad.)';
+  const noteLabel='📝 Note aggiuntive';
   document.getElementById('mex-title').textContent='🍕 '+name;
   document.getElementById('mex-note').value='';
   document.getElementById('mex-note-label').textContent=noteLabel;
@@ -1422,8 +1422,9 @@ function calcMetaPrice(){
     exs.forEach(n=>{
       const ex=EXTRAS_MAX.find(e=>e.n===n);
       if(!ex)return;
-      if(ex.p===0){} // gratis
-      else{contatore++;if(contatore>4)extra+=2;}
+      if(n==='Bresaola'||n==='Bufala'){extra+=3;} // sempre €3
+      else if(ex.p===0){} // gratis
+      else{contatore++;if(contatore>4)extra+=2;} // dal 5° in poi €2
     });
   });
   return +(metaMetaPrice+extra).toFixed(2);
@@ -1460,7 +1461,7 @@ function openMetaMeta(name,price,isMax){
     document.getElementById('mmeta-extra-'+lato).innerHTML=EXTRAS_MAX.map(e=>`
       <button onclick="togMetaExtraLato('${lato}',this,'${e.n.replace(/'/g,"\'")}')"
         style="padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(245,216,0,0.2);color:rgba(255,255,255,0.65);border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;white-space:nowrap;${e.special?'border-color:#3498db;color:#7fb3d3;':''}">
-        ${e.n}<span style="color:var(--g);"> ${e.p===0?'gr':e.p===4?'€4':'+€?'}</span>
+        ${e.n}
       </button>`).join('');
     updateMetaCount(lato);
   });
