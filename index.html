@@ -489,6 +489,7 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
       <button onclick="addNote('Stirata')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Stirata</button>
       <button onclick="addNote('Sottile')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Sottile</button>
       <button onclick="addNote('Croccante')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Croccante</button>
+      <button onclick="addNote('Piccola')" style="padding:4px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Piccola</button>
     </div>
     <input class="minput" type="text" id="mex-note" placeholder="Es: ben cotta, senza sale...">
     <div class="mbtns">
@@ -691,12 +692,12 @@ const MENU={
 
 const EXTRAS=[
   {n:"Würstel",p:1},{n:"Patate",p:1},
-  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:2},
+  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:2},{n:"Bufala",p:3},
   {n:"Capperi",p:1},{n:"Carciofi",p:1},{n:"Cipolla",p:1},{n:"Cotto",p:1},{n:"Crudo",p:1},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:1},{n:"Fiori di zucca",p:1},
   {n:"Funghi",p:1},{n:"Gorgonzola",p:1},{n:"Granella di pistacchio",p:2},
   {n:"Mais",p:1},{n:"Melanzane arrosto",p:1},{n:"Melanzane fritte",p:1},
-  {n:"Mortadella",p:1},{n:"Bufala",p:2},{n:"Mozzarella extra",p:1},
+  {n:"Mortadella",p:1},{n:"Mozzarella extra",p:1},
   {n:"Nduja",p:1},{n:"Olive",p:1},{n:"Origano",p:0},{n:"Pancetta",p:1},
   {n:"Panna",p:1},{n:"Patate al forno",p:1},{n:"Peperoncino",p:1},{n:"Peperoni",p:1},{n:"Peperoni arrosto",p:1},
   {n:"Pomodorini",p:1},{n:"Porchetta",p:2},{n:"Porcini",p:1},{n:"Rucola",p:1},
@@ -708,12 +709,12 @@ const EXTRAS=[
 
 const EXTRAS_MAX=[
   {n:"Würstel",p:2},{n:"Patate",p:2},
-  {n:"Acciughe",p:2},{n:"Basilico",p:0},{n:"Bresaola",p:4},
+  {n:"Acciughe",p:2},{n:"Basilico",p:0},{n:"Bresaola",p:3},{n:"Bufala",p:3},
   {n:"Capperi",p:2},{n:"Carciofi",p:2},{n:"Cipolla",p:2},{n:"Cotto",p:2},{n:"Crudo",p:2},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:2},{n:"Fiori di zucca",p:2},
   {n:"Funghi",p:2},{n:"Gorgonzola",p:2},{n:"Granella di pistacchio",p:2},
   {n:"Mais",p:2},{n:"Melanzane arrosto",p:2},{n:"Melanzane fritte",p:2},
-  {n:"Mortadella",p:2},{n:"Bufala",p:4},{n:"Mozzarella extra",p:2},
+  {n:"Mortadella",p:2},{n:"Mozzarella extra",p:2},
   {n:"Nduja",p:2},{n:"Olive",p:2},{n:"Origano",p:0},{n:"Pancetta",p:2},
   {n:"Panna",p:2},{n:"Patate al forno",p:2},{n:"Peperoncino",p:2},{n:"Peperoni",p:2},{n:"Peperoni arrosto",p:2},
   {n:"Pomodorini",p:2},{n:"Porchetta",p:2},{n:"Porcini",p:2},{n:"Rucola",p:2},
@@ -856,8 +857,8 @@ function setType(t){
   document.getElementById('td').classList.toggle('active',t==='domicilio');
   document.getElementById('domfields').style.display=t==='domicilio'?'block':'none';
   if(t==='domicilio'){
-    currentDeliveryCost=DELIVERY_COST;
-    setDelivery(DELIVERY_COST);
+    currentDeliveryCost=0; // reset prima così force funziona
+    setDelivery(DELIVERY_COST,true);
   }
   updTotal();
 }
@@ -998,11 +999,12 @@ function renderCompleted(){
     grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">✅</div><p>Nessun ordine completato stasera</p></div>';
     return;
   }
-  grid.innerHTML=[...completedOrders].reverse().map(o=>{
-    const eid=o.id||(o.cognome+'_'+o.time+'_'+o.total);
+  const rev=[...completedOrders].reverse();
+  grid.innerHTML=rev.map((o,i)=>{
+    const realIdx=completedOrders.length-1-i;
     return `
     <div class="ocard" style="border-color:#27ae60;opacity:0.9;position:relative;">
-      <button onclick="deleteCompleted('${eid}')" title="Elimina ordine"
+      <button onclick="deleteCompleted(${realIdx})" title="Elimina ordine"
         style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:#e74c3c;border:none;border-radius:50%;color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;">🗑</button>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-right:28px;">
         <div class="ocname">${o.cognome}</div>
@@ -1018,10 +1020,9 @@ function renderCompleted(){
   }).join('');
 }
 
-function deleteCompleted(id){
-  // Cerca per id, se non c'è usa indice
-  const idx=completedOrders.findIndex(o=>o.id===id||(o.cognome+'_'+o.time+'_'+o.total)===id);
-  if(idx===-1){toast('Ordine non trovato','err');return;}
+function deleteCompleted(idx){
+  idx=parseInt(idx);
+  if(isNaN(idx)||idx<0||idx>=completedOrders.length){toast('Ordine non trovato','err');return;}
   completedOrders.splice(idx,1);
   localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
   updCount();
@@ -1421,8 +1422,7 @@ function calcMetaPrice(){
     exs.forEach(n=>{
       const ex=EXTRAS_MAX.find(e=>e.n===n);
       if(!ex)return;
-      if(ex.p===4){extra+=4;}
-      else if(ex.p===0){}
+      if(ex.p===0){} // gratis
       else{contatore++;if(contatore>4)extra+=2;}
     });
   });
@@ -1767,9 +1767,8 @@ function printRiepilogo(){
 }
 let DELIVERY_COST=parseFloat(localStorage.getItem('bb_delivery')||'3');
 let currentDeliveryCost=DELIVERY_COST;
-function setDelivery(cost){
-  if(cost!==0&&currentDeliveryCost===cost){
-    // Tocco stesso tasto — deseleziona → consegna 0€
+function setDelivery(cost,force=false){
+  if(!force&&cost!==0&&currentDeliveryCost===cost){
     currentDeliveryCost=0;
     document.getElementById('del-3').style.background='rgba(0,0,0,0.3)';
     document.getElementById('del-3').style.color='rgba(255,255,255,0.6)';
