@@ -893,7 +893,7 @@ function editCartItem(idx){
       if(extrasPart)metaMetaExtras[lato]=extrasPart.split(', ').map(e=>e.trim()).filter(Boolean);
     });
 
-    openMetaMeta(it.name,metaMetaPrice,metaMetaIsMax);
+    openMetaMeta(it.name,metaMetaPrice,metaMetaIsMax,true);
 
     setTimeout(()=>{
       ['prima','seconda'].forEach(lato=>{
@@ -931,24 +931,11 @@ function editCartItem(idx){
     const isMax=prod&&prod.extraMax;
     window._editCartIdx=idx;
     window._editMode=true;
-    pendProd={name:it.name,price:prod?prod.p:it.price,ing:prod?prod.ing:'',isMax,excl:[]};
+    pendProd={name:it.name,price:prod?prod.p:it.price,ing:prod?prod.ing:'',isMax,excl:[],farcitaPlus:prod?prod.farcitaPlus:false};
     selEx=[...it.extras];
     selRm=[...it.removes];
-    openEx(it.name,prod?prod.ing:'',isMax,[]);
+    openEx(it.name,prod?prod.ing:'',isMax,[],true);
     document.getElementById('mex-note').value=it.note||'';
-    setTimeout(()=>{
-      document.querySelectorAll('#mex-extras .ebtn').forEach(btn=>{
-        const label=btn.childNodes[0].textContent.trim();
-        if(selEx.includes(label)){
-          btn.style.background='var(--g)';btn.style.color='var(--vs)';btn.style.borderColor='var(--g)';
-        }
-      });
-      document.querySelectorAll('#mex-removes .rbtn').forEach(btn=>{
-        if(selRm.includes(btn.textContent.trim())){
-          btn.style.background='var(--r)';btn.style.borderColor='var(--r)';
-        }
-      });
-    },50);
   } else {
     const nota=prompt('Modifica nota per '+it.name+':',it.note||'');
     if(nota!==null){order.items[idx].note=nota;renderItems();}
@@ -1531,16 +1518,28 @@ function completePay(){
 }
 
 // EXTRA MODAL
-function openEx(name,ing,isMax=false,excl=[]){
-  selEx=[];selRm=[];
+function openEx(name,ing,isMax=false,excl=[],keepSel=false){
+  if(!keepSel){selEx=[];selRm=[];}
   const extrasList=(isMax?EXTRAS_MAX:EXTRAS).filter(e=>!excl.includes(e.n));
   const noteLabel='📝 Note aggiuntive';
   document.getElementById('mex-title').textContent='🍕 '+name;
-  document.getElementById('mex-note').value='';
+  if(!keepSel)document.getElementById('mex-note').value='';
   document.getElementById('mex-note-label').textContent=noteLabel;
   document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')" ${e.special?'style="border-color:#3498db;color:#3498db;"':''}>${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
   const ings=ing.split(',').map(s=>s.trim()).filter(Boolean);
   document.getElementById('mex-removes').innerHTML=ings.length?ings.map(e=>`<button class="rbtn" onclick="togRm(this,'${e.replace(/'/g,"\\'")}')">${e}</button>`).join(''):'<span style="color:rgba(255,255,255,0.3);font-size:12px;">Nessun ingrediente base</span>';
+  // Se keepSel, evidenzia già selezionati
+  if(keepSel){
+    setTimeout(()=>{
+      document.querySelectorAll('#mex-extras .ebtn').forEach(btn=>{
+        const label=btn.childNodes[0].textContent.trim();
+        if(selEx.includes(label)){btn.style.background='var(--g)';btn.style.color='var(--vs)';btn.style.borderColor='var(--g)';}
+      });
+      document.querySelectorAll('#mex-removes .rbtn').forEach(btn=>{
+        if(selRm.includes(btn.textContent.trim())){btn.style.background='var(--r)';btn.style.borderColor='var(--r)';}
+      });
+    },30);
+  }
   document.getElementById('mex').classList.add('show');
 }
 
@@ -1589,10 +1588,12 @@ function updateMetaCount(lato){
   document.getElementById('mmeta-count-'+lato).textContent=c<=4?`(${r} gratis rim.)`:`(${c-4} a €2)`;
 }
 
-function openMetaMeta(name,price,isMax){
+function openMetaMeta(name,price,isMax,skipReset=false){
   metaMetaName=name;metaMetaPrice=price;metaMetaIsMax=isMax;
-  metaMetaGusti={prima:[],seconda:[]};
-  metaMetaExtras={prima:[],seconda:[]};
+  if(!skipReset){
+    metaMetaGusti={prima:[],seconda:[]};
+    metaMetaExtras={prima:[],seconda:[]};
+  }
   document.getElementById('mmeta-title').textContent='⬡ '+name;
   document.getElementById('mmeta-note').value='';
   ['prima','seconda'].forEach(lato=>{
@@ -1693,26 +1694,15 @@ function confirmEx(){
   if(!pendProd)return;
   const nota=document.getElementById('mex-note').value.trim();
 
-  // Calcola prezzo extra
   let extraPrice=0;
   if(pendProd.farcitaPlus){
-    // Smart pricing: bresaola/bufala sempre €3, altri primi 4 gratis, dal 5° €2
-    let contatore=0;
-    let hasBresaolaBufala=false;
-    selEx.forEach(n=>{
-      if(n==='Bresaola'||n==='Bufala'){hasBresaolaBufala=true;}
-      else{
-        const ex=EXTRAS_MAX.find(x=>x.n===n);
-        if(ex&&ex.p>0){contatore++;if(contatore>4)extraPrice+=2;}
-      }
-    });
-    if(hasBresaolaBufala)extraPrice+=3;
+    // Farcita+: tutti gratis tranne Bresaola/Bufala sempre €3
+    const hasPrestige=selEx.includes('Bresaola')||selEx.includes('Bufala');
+    if(hasPrestige)extraPrice=3;
   } else {
-    extraPrice=selEx.reduce((s,n)=>{
-      const list=pendProd.isMax?EXTRAS_MAX:EXTRAS;
-      const ex=list.find(x=>x.n===n);
-      return s+(ex?ex.p:0);
-    },0);
+    // Pizze normali: usa prezzi da lista
+    const list=pendProd.isMax?EXTRAS_MAX:EXTRAS;
+    extraPrice=selEx.reduce((s,n)=>{const ex=list.find(x=>x.n===n);return s+(ex?ex.p:0);},0);
   }
 
   const fp=+(pendProd.price+extraPrice).toFixed(2);
