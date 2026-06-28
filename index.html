@@ -9,6 +9,9 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
+*:focus{outline:none;}
+button:focus{outline:none;}
+input:focus{outline:none;}
 :root{
   --vs:#1a3a1a;--vm:#2d5a1b;--vc:#4a7c2f;
   --g:#f5d800;--gs:#c8a800;
@@ -914,34 +917,31 @@ function editCartItem(idx){
 
     openMetaMeta(it.name,metaMetaPrice,metaMetaIsMax,true);
 
-    setTimeout(()=>{
-      ['prima','seconda'].forEach(lato=>{
-        // Pre-seleziona gusti
-        metaMetaGusti[lato].forEach(g=>{
-          document.querySelectorAll(`#mmeta-grid-${lato} button`).forEach(b=>{
-            if(b.textContent.trim()===g){
-              b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
-            }
-          });
+    // Pre-seleziona subito senza setTimeout
+    ['prima','seconda'].forEach(lato=>{
+      metaMetaGusti[lato].forEach(g=>{
+        document.querySelectorAll(`#mmeta-grid-${lato} button`).forEach(b=>{
+          if(b.textContent.trim()===g){
+            b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
+          }
         });
-        const sel=document.getElementById('mmeta-'+lato+'-sel');
-        if(metaMetaGusti[lato].length){
-          sel.textContent='✅ '+metaMetaGusti[lato].join(' + ');
-          sel.style.color='var(--g)';
-        }
-        // Pre-seleziona extras
-        metaMetaExtras[lato].forEach(e=>{
-          document.querySelectorAll(`#mmeta-extra-${lato} button`).forEach(b=>{
-            if(b.textContent.trim()===e){
-              b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
-            }
-          });
-        });
-        updateMetaCount(lato);
       });
-      document.getElementById('mmeta-note').value=notaLibera;
-      updateMetaTot();
-    },150);
+      const sel=document.getElementById('mmeta-'+lato+'-sel');
+      if(metaMetaGusti[lato].length){
+        sel.textContent='✅ '+metaMetaGusti[lato].join(' + ');
+        sel.style.color='var(--g)';
+      }
+      metaMetaExtras[lato].forEach(e=>{
+        document.querySelectorAll(`#mmeta-extra-${lato} button`).forEach(b=>{
+          if(b.textContent.trim()===e){
+            b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
+          }
+        });
+      });
+      updateMetaCount(lato);
+    });
+    document.getElementById('mmeta-note').value=notaLibera;
+    updateMetaTot();
     return;
   }
 
@@ -1545,24 +1545,25 @@ function openEx(name,ing,isMax=false,excl=[],keepSel=false,farcitaPlus=false){
   }
   const baseList=farcitaPlus?EXTRAS_FARCITA:(isMax?EXTRAS_MAX:EXTRAS);
   const extrasList=baseList.filter(e=>!excl.includes(e.n));
-  const noteLabel='📝 Note aggiuntive';
   document.getElementById('mex-title').textContent='🍕 '+name;
   if(!keepSel)document.getElementById('mex-note').value='';
-  document.getElementById('mex-note-label').textContent=noteLabel;
+  document.getElementById('mex-note-label').textContent='📝 Note aggiuntive';
   document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')" ${e.special?'style="border-color:#3498db;color:#3498db;"':''}>${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
   const ings=ing.split(',').map(s=>s.trim()).filter(Boolean);
   document.getElementById('mex-removes').innerHTML=ings.length?ings.map(e=>`<button class="rbtn" onclick="togRm(this,'${e.replace(/'/g,"\\'")}')">${e}</button>`).join(''):'<span style="color:rgba(255,255,255,0.3);font-size:12px;">Nessun ingrediente base</span>';
-  // Se keepSel, evidenzia già selezionati
+  // Evidenzia subito senza setTimeout
   if(keepSel){
-    setTimeout(()=>{
-      document.querySelectorAll('#mex-extras .ebtn').forEach(btn=>{
-        const label=btn.childNodes[0].textContent.trim();
-        if(selEx.includes(label)){btn.style.background='var(--g)';btn.style.color='var(--vs)';btn.style.borderColor='var(--g)';}
-      });
-      document.querySelectorAll('#mex-removes .rbtn').forEach(btn=>{
-        if(selRm.includes(btn.textContent.trim())){btn.style.background='var(--r)';btn.style.borderColor='var(--r)';}
-      });
-    },30);
+    document.querySelectorAll('#mex-extras .ebtn').forEach(btn=>{
+      const label=btn.childNodes[0].textContent.trim();
+      if(selEx.includes(label)){
+        btn.style.background='var(--g)';btn.style.color='var(--vs)';btn.style.borderColor='var(--g)';
+      }
+    });
+    document.querySelectorAll('#mex-removes .rbtn').forEach(btn=>{
+      if(selRm.includes(btn.textContent.trim())){
+        btn.style.background='var(--r)';btn.style.borderColor='var(--r)';
+      }
+    });
   }
   document.getElementById('mex').classList.add('show');
 }
