@@ -692,7 +692,7 @@ const MENU={
 
 const EXTRAS=[
   {n:"Würstel",p:1},{n:"Patate",p:1},
-  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:2},{n:"Bufala",p:3},
+  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:2},{n:"Bufala",p:2},
   {n:"Capperi",p:1},{n:"Carciofi",p:1},{n:"Cipolla",p:1},{n:"Cotto",p:1},{n:"Crudo",p:1},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:1},{n:"Fiori di zucca",p:1},
   {n:"Funghi",p:1},{n:"Gorgonzola",p:1},{n:"Granella di pistacchio",p:2},
@@ -1416,17 +1416,27 @@ let metaMetaExtras={prima:[],seconda:[]};
 
 function calcMetaPrice(){
   let extra=0;
+  let hasPrestige=false; // Bresaola o Bufala presenti in qualsiasi metà
+
   ['prima','seconda'].forEach(lato=>{
     const exs=metaMetaExtras[lato];
     let contatore=0;
     exs.forEach(n=>{
       const ex=EXTRAS_MAX.find(e=>e.n===n);
       if(!ex)return;
-      if(n==='Bresaola'||n==='Bufala'){extra+=3;} // sempre €3
-      else if(ex.p===0){} // gratis
-      else{contatore++;if(contatore>4)extra+=2;} // dal 5° in poi €2
+      if(n==='Bresaola'||n==='Bufala'){
+        hasPrestige=true; // segna presenza ma non aggiunge ancora
+      } else if(ex.p===0){
+        // gratis
+      } else {
+        contatore++;
+        if(contatore>4)extra+=2; // dal 5° in poi €2
+      }
     });
   });
+
+  if(hasPrestige)extra+=3; // Bresaola/Bufala: sempre +€3 a prescindere da quante metà
+
   return +(metaMetaPrice+extra).toFixed(2);
 }
 
