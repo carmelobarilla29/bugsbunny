@@ -729,7 +729,11 @@ const EXTRAS_MAX=[
   {n:"No Lattosio",p:0,special:true}
 ];
 
-let order={type:'asporto',items:[]};
+// Lista per Farcita(+): tutto gratis tranne Bresaola e Bufala a €3
+const EXTRAS_FARCITA=EXTRAS_MAX.map(e=>{
+  if(e.n==='Bresaola'||e.n==='Bufala')return {...e,p:3};
+  return {...e,p:0};
+});
 let openOrders=JSON.parse(localStorage.getItem('bb_ord')||'[]');
 let completedOrders=JSON.parse(localStorage.getItem('bb_comp')||'[]');
 let clienti=JSON.parse(localStorage.getItem('bb_cli')||'[]');
@@ -804,7 +808,7 @@ function addProd(cat,name,price){
     // Farcita+ : apre modal con lista Max, prezzi smart (4 gratis, dal 5° €2, bresaola/bufala €3)
     if(prod&&prod.farcitaPlus){
       pendProd={name,price,ing:'',isMax:true,farcitaPlus:true,excl:[]};
-      openEx(name,'',true,[]);
+      openEx(name,'',true,[],false,true);
       return;
     }
     // Pizza normale
@@ -875,22 +879,36 @@ function editCartItem(idx){
     metaMetaGusti={prima:[],seconda:[]};
     metaMetaExtras={prima:[],seconda:[]};
 
-    // Ricostruisci da nota: "nota - Meta': gusto1 e gusto2 / Meta': gusto3"
+    // Ricostruisci da nota: "Meta': [gusto] + extra1, extra2 / Meta': [gusto] + extra1"
     const nota=it.note||'';
     const dashIdx=nota.indexOf("Meta':");
     let notaLibera='';
     if(dashIdx>0)notaLibera=nota.substring(0,dashIdx).replace(/ - $/,'').trim();
     const metaPart=dashIdx>=0?nota.substring(dashIdx):'';
     const halves=metaPart.split(' / ');
+    
+    // Lista di tutti i nomi pizza (gusti validi)
+    const gustiValidi=MENU['Pizze Tonde'].map(p=>p.n);
+    
     halves.forEach((h,hi)=>{
       const lato=hi===0?'prima':'seconda';
-      const content=h.replace("Meta':","").trim();
-      // Separa gusti da extras (gusti sono nomi senza +)
+      const content=h.replace(/Meta':/,'').trim();
+      // Separa con ' + '
       const parts=content.split(' + ');
-      const gustiPart=parts[0]||'';
-      const extrasPart=parts.slice(1).join(' + ');
-      metaMetaGusti[lato]=gustiPart.split(' e ').map(g=>g.trim()).filter(Boolean);
-      if(extrasPart)metaMetaExtras[lato]=extrasPart.split(', ').map(e=>e.trim()).filter(Boolean);
+      const primaParte=parts[0].trim();
+      const restoParte=parts.slice(1).join(' + ').trim();
+      
+      // Controlla se primaParte contiene gusti validi
+      const possibiliGusti=primaParte.split(' e ').map(g=>g.trim());
+      const gustiTrovati=possibiliGusti.filter(g=>gustiValidi.includes(g));
+      const nonGusti=possibiliGusti.filter(g=>!gustiValidi.includes(g));
+      
+      metaMetaGusti[lato]=gustiTrovati;
+      
+      // Extra = nonGusti + restoParte
+      const tuttiExtra=[...nonGusti];
+      if(restoParte)tuttiExtra.push(...restoParte.split(', ').map(e=>e.trim()).filter(Boolean));
+      metaMetaExtras[lato]=tuttiExtra.filter(Boolean);
     });
 
     openMetaMeta(it.name,metaMetaPrice,metaMetaIsMax,true);
@@ -934,7 +952,7 @@ function editCartItem(idx){
     pendProd={name:it.name,price:prod?prod.p:it.price,ing:prod?prod.ing:'',isMax,excl:[],farcitaPlus:prod?prod.farcitaPlus:false};
     selEx=[...it.extras];
     selRm=[...it.removes];
-    openEx(it.name,prod?prod.ing:'',isMax,[],true);
+    openEx(it.name,prod?prod.ing:'',isMax,[],true,pendProd.farcitaPlus||false);
     document.getElementById('mex-note').value=it.note||'';
   } else {
     const nota=prompt('Modifica nota per '+it.name+':',it.note||'');
@@ -1518,9 +1536,10 @@ function completePay(){
 }
 
 // EXTRA MODAL
-function openEx(name,ing,isMax=false,excl=[],keepSel=false){
+function openEx(name,ing,isMax=false,excl=[],keepSel=false,farcitaPlus=false){
   if(!keepSel){selEx=[];selRm=[];}
-  const extrasList=(isMax?EXTRAS_MAX:EXTRAS).filter(e=>!excl.includes(e.n));
+  const baseList=farcitaPlus?EXTRAS_FARCITA:(isMax?EXTRAS_MAX:EXTRAS);
+  const extrasList=baseList.filter(e=>!excl.includes(e.n));
   const noteLabel='📝 Note aggiuntive';
   document.getElementById('mex-title').textContent='🍕 '+name;
   if(!keepSel)document.getElementById('mex-note').value='';
