@@ -595,6 +595,7 @@ const MENU={
     {n:"Max Capricciosa",p:15,ing:"pomodoro, mozzarella, würstel, carciofini, funghi",extraMax:true,cat:"pizza",excl:[]},
     {n:"Max Diavola",p:15,ing:"pomodoro, mozzarella, salame, olive",extraMax:true,cat:"pizza",excl:[]},
     {n:"Max Farcita (metà/metà)",p:15,ing:"",extraMax:true,cat:"pizza",excl:[],metaMeta:true},
+    {n:"Max Farcita (+)",p:15,ing:"",extraMax:true,cat:"pizza",excl:[],farcitaPlus:true},
     {n:"Max Fantasy",p:15,ing:"pomodoro, mozzarella, salame, lattuga, olive",extraMax:true,cat:"pizza",excl:[]},
     {n:"Max Gustosa",p:15,ing:"pomodorini, mozzarella, prosciutto crudo, rucola, scaglie di grana",extraMax:true,cat:"pizza",excl:[]},
     {n:"Max Marinara",p:15,ing:"pomodoro, olio, aglio, origano",extraMax:true,cat:"pizza",excl:[]},
@@ -624,6 +625,7 @@ const MENU={
     {n:"Mezzo Metro Capricciosa",p:15,ing:"pomodoro, mozzarella, würstel, carciofini, funghi",extraMax:true,cat:"pizza",excl:[]},
     {n:"Mezzo Metro Diavola",p:15,ing:"pomodoro, mozzarella, salame, olive",extraMax:true,cat:"pizza",excl:[]},
     {n:"Mezzo Metro Farcita (metà/metà)",p:15,ing:"",extraMax:true,cat:"pizza",excl:[],metaMeta:true},
+    {n:"Mezzo Metro Farcita (+)",p:15,ing:"",extraMax:true,cat:"pizza",excl:[],farcitaPlus:true},
     {n:"Mezzo Metro Fantasy",p:15,ing:"pomodoro, mozzarella, salame, lattuga, olive",extraMax:true,cat:"pizza",excl:[]},
     {n:"Mezzo Metro Gustosa",p:15,ing:"pomodorini, mozzarella, prosciutto crudo, rucola, scaglie di grana",extraMax:true,cat:"pizza",excl:[]},
     {n:"Mezzo Metro Marinara",p:15,ing:"pomodoro, olio, aglio, origano",extraMax:true,cat:"pizza",excl:[]},
@@ -641,6 +643,8 @@ const MENU={
     {n:"Arancino al Ragù",p:2.5,ing:"riso, mozzarella, sugo alla bolognese",cat:"rosticceria"},
     {n:"Arancino Salsiccia",p:2.5,ing:"riso, sugo con salsiccia",cat:"rosticceria"},
     {n:"Fagottino",p:2.5,ing:"",cat:"rosticceria"},
+    {n:"Pizza Al Taglio",p:2,ing:"",cat:"rosticceria"},
+    {n:"Pizza Farcita",p:2.5,ing:"",cat:"rosticceria"},
     {n:"Calzone Baby",p:2.5,ing:"pomodoro, würstel, patatine",cat:"rosticceria"},
     {n:"Calzone Fritto",p:2,ing:"pomodoro, mozzarella, prosciutto cotto",cat:"rosticceria"},
     {n:"Calzone Fritto Impanato",p:2.5,ing:"pomodoro, mozzarella, prosciutto cotto",cat:"rosticceria"},
@@ -663,7 +667,8 @@ const MENU={
     {n:"Noisette",p:3.5,ing:"",cat:"rosticceria"},
     {n:"Olive Ascolane (8pz)",p:3.5,ing:"",cat:"rosticceria"},
     {n:"Patatine",p:2.5,ing:"",cat:"rosticceria"},
-    {n:"Patatine e Würstel",p:3,ing:"",cat:"rosticceria"}
+    {n:"Patatine e Würstel",p:3,ing:"",cat:"rosticceria"},
+    {n:"Porzione Pat. Würstel e Pancetta",p:4,ing:"",cat:"rosticceria"}
   ],
   "Bibite":[
     {n:"Acqua piccola",p:1,ing:"",cat:"bibita"},
@@ -767,6 +772,12 @@ function renderProds(cat){
     if(p.separatore){
       return `<div style="grid-column:1/-1;background:rgba(245,216,0,0.1);border:1px solid rgba(245,216,0,0.3);border-radius:8px;padding:8px;text-align:center;font-size:13px;font-weight:900;color:var(--g);pointer-events:none;">${p.n}</div>`;
     }
+    if(p.farcitaPlus){
+      return `<button class="pbtn" onclick="addProd('${cat}','${p.n.replace(/'/g,"\\'")}',${p.p})" style="background:linear-gradient(145deg,rgba(180,150,0,0.8),rgba(140,110,0,0.9));border-color:var(--g);">
+        <div class="pn" style="color:#fff;">✚ ${p.n}</div>
+        <div class="pp">${fmt(p.p)}</div>
+      </button>`;
+    }
     if(p.metaMeta){
       return `<button class="pbtn" onclick="addProd('${cat}','${p.n.replace(/'/g,"\\'")}',${p.p})" style="background:linear-gradient(145deg,rgba(180,100,0,0.8),rgba(140,70,0,0.9));border-color:#f39c12;">
         <div class="pn" style="color:#fff;">⬡ ${p.n}</div>
@@ -789,8 +800,9 @@ function addProd(cat,name,price){
       openMetaMeta(name,price,isMax);
       return;
     }
-    pendProd={name,price,ing:prod?prod.ing:'',isMax,excl:prod?prod.excl||[]:[]};
-    openEx(name,prod?prod.ing:'',isMax,prod?prod.excl||[]:[]);
+    // farcitaPlus: apre modal extra come pizza normale ma con lista Max
+    pendProd={name,price,ing:'',isMax:true,excl:[]};
+    openEx(name,'',true,[]);
   } else {
     pushItem(name,price,[],[]);
   }
@@ -826,12 +838,122 @@ function renderItems(){
         <button class="qbtn" onclick="chgQ(${i},1)">+</button>
       </div>
       <div class="iprice">${fmt(it.price*it.qty)}</div>
+      <button onclick="editCartItem(${i})" style="background:rgba(52,152,219,0.3);border:1px solid #3498db;color:#3498db;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:13px;margin-right:3px;">✏️</button>
       <button class="idel" onclick="delI(${i})">✕</button>
     </div>`).join('');
   updTotal();
 }
 
 function chgQ(i,d){order.items[i].qty+=d;if(order.items[i].qty<=0)order.items.splice(i,1);renderItems();}
+
+function editCartItem(idx){
+  const it=order.items[idx];
+  if(!it)return;
+
+  // Trova la categoria del prodotto
+  let cat=null;
+  for(const c of Object.keys(MENU)){
+    if(MENU[c].find(p=>p.n===it.name)){cat=c;break;}
+  }
+  const isPizza=cat&&(cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro');
+  const isMetaMeta=it.note&&it.note.includes("Meta':");
+
+  if(isMetaMeta){
+    // Apri modal metà/metà con dati esistenti
+    const prod=cat?MENU[cat].find(p=>p.n===it.name):null;
+    window._editCartIdx=idx;
+    window._editMode=true;
+    metaMetaName=it.name;
+    metaMetaPrice=prod?prod.p:it.price;
+    metaMetaIsMax=prod?prod.extraMax:true;
+    metaMetaGusti={prima:[],seconda:[]};
+    metaMetaExtras={prima:[],seconda:[]};
+
+    // Ricostruisci stato da nota esistente
+    // Formato: "nota - Meta': gusto1 e gusto2 / Meta': gusto3"
+    const nota=it.note||'';
+    const partiNota=nota.split(' - ');
+    let notaLibera='';
+    partiNota.forEach(p=>{
+      if(p.includes("Meta':")){
+        const halves=p.split(' / ');
+        halves.forEach((h,hi)=>{
+          const lato=hi===0?'prima':'seconda';
+          const gusti=h.replace("Meta':","").trim().split(' e ').map(g=>g.trim()).filter(Boolean);
+          metaMetaGusti[lato]=gusti;
+        });
+      } else if(p.trim()){
+        notaLibera=p.trim();
+      }
+    });
+    // Ricostruisci extras da it.extras — non sappiamo per quale metà erano
+    // Li mettiamo tutti nella prima metà come punto di partenza
+    metaMetaExtras.prima=[...it.extras];
+
+    openMetaMeta(it.name,metaMetaPrice,metaMetaIsMax);
+
+    // Pre-seleziona gusti e extras dopo apertura modal
+    setTimeout(()=>{
+      // Gusti prima metà
+      ['prima','seconda'].forEach(lato=>{
+        metaMetaGusti[lato].forEach(g=>{
+          const btn=document.querySelector(`#mmeta-grid-${lato} button`);
+          document.querySelectorAll(`#mmeta-grid-${lato} button`).forEach(b=>{
+            if(b.textContent.trim()===g){
+              b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
+            }
+          });
+        });
+        // Aggiorna label
+        const sel=document.getElementById('mmeta-'+lato+'-sel');
+        if(metaMetaGusti[lato].length){
+          sel.textContent='✅ '+metaMetaGusti[lato].join(' + ');
+          sel.style.color='var(--g)';
+        }
+        // Extras
+        metaMetaExtras[lato].forEach(e=>{
+          document.querySelectorAll(`#mmeta-extra-${lato} button`).forEach(b=>{
+            if(b.textContent.trim()===e){
+              b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
+            }
+          });
+        });
+        updateMetaCount(lato);
+      });
+      document.getElementById('mmeta-note').value=notaLibera;
+      updateMetaTot();
+    },100);
+    return;
+  }
+
+  if(isPizza){
+    const prod=MENU[cat].find(p=>p.n===it.name);
+    const isMax=prod&&prod.extraMax;
+    window._editCartIdx=idx;
+    window._editMode=true;
+    pendProd={name:it.name,price:prod?prod.p:it.price,ing:prod?prod.ing:'',isMax,excl:[]};
+    selEx=[...it.extras];
+    selRm=[...it.removes];
+    openEx(it.name,prod?prod.ing:'',isMax,[]);
+    document.getElementById('mex-note').value=it.note||'';
+    setTimeout(()=>{
+      document.querySelectorAll('#mex-extras .ebtn').forEach(btn=>{
+        const label=btn.childNodes[0].textContent.trim();
+        if(selEx.includes(label)){
+          btn.style.background='var(--g)';btn.style.color='var(--vs)';btn.style.borderColor='var(--g)';
+        }
+      });
+      document.querySelectorAll('#mex-removes .rbtn').forEach(btn=>{
+        if(selRm.includes(btn.textContent.trim())){
+          btn.style.background='var(--r)';btn.style.borderColor='var(--r)';
+        }
+      });
+    },50);
+  } else {
+    const nota=prompt('Modifica nota per '+it.name+':',it.note||'');
+    if(nota!==null){order.items[idx].note=nota;renderItems();}
+  }
+}
 function delI(i){order.items.splice(i,1);renderItems();}
 
 function updTotal(){
@@ -1004,20 +1126,36 @@ function renderCompleted(){
     const realIdx=completedOrders.length-1-i;
     return `
     <div class="ocard" style="border-color:#27ae60;opacity:0.9;position:relative;">
-      <button onclick="deleteCompleted(${realIdx})" title="Elimina ordine"
-        style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:#e74c3c;border:none;border-radius:50%;color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;">🗑</button>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-right:28px;">
+      <div style="position:absolute;top:6px;right:6px;display:flex;gap:4px;">
+        <button onclick="reprintOrder(${realIdx})" title="Ristampa comanda"
+          style="width:24px;height:24px;background:rgba(39,174,96,0.4);border:1px solid #27ae60;border-radius:50%;color:#fff;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0;">🖨</button>
+        <button onclick="deleteCompleted(${realIdx})" title="Elimina ordine"
+          style="width:24px;height:24px;background:#e74c3c;border:none;border-radius:50%;color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0;">🗑</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;padding-right:56px;">
         <div class="ocname">${o.cognome}</div>
         <span class="octype ${o.type}">${o.type==='domicilio'?'🛵 Dom':'🥡 Asp'}</span>
       </div>
       ${o.orario?`<div style="font-size:12px;color:var(--g);margin-bottom:3px;">⏰ ${o.orario}</div>`:''}
-      <div class="ocitems">${o.items.map(i=>`${i.qty}x ${i.name}`).join('<br>')}</div>
+      <div class="ocitems">${o.items.map(i=>{
+        let s=`${i.qty}x ${i.name}`;
+        if(i.extras&&i.extras.length)s+=` <span style="color:rgba(100,200,100,0.8);font-size:10px;">+${i.extras.join(', ')}</span>`;
+        if(i.note)s+=` <span style="color:rgba(255,200,100,0.8);font-size:10px;">📝${i.note}</span>`;
+        return s;
+      }).join('<br>')}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
         <span class="octot">${fmt(o.total)}</span>
         <span class="octime">Pagato: ${o.paidTime||o.time}</span>
       </div>
     </div>`;
   }).join('');
+}
+
+function reprintOrder(idx){
+  const o=completedOrders[idx];
+  if(!o)return;
+  printViaRawBT(o);
+  toast('Ristampa inviata! 🖨️','ok',2000);
 }
 
 function deleteCompleted(idx){
@@ -1048,16 +1186,16 @@ function renderStats(){
     el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">📊</div><p>Nessun ordine completato stasera</p></div>';
     return;
   }
-  const tot=completedOrders.reduce((s,o)=>s+(o.total||0),0);
+  const tot=completedOrders.reduce((s,o)=>s+(o.total||0),0); // lordo = prima degli sconti
   const cash=completedOrders.filter(o=>o.payMethod==='cash');
   const card=completedOrders.filter(o=>o.payMethod==='card');
   const asporto=completedOrders.filter(o=>o.type==='asporto');
   const domicilio=completedOrders.filter(o=>o.type==='domicilio');
-  const totCash=cash.reduce((s,o)=>s+(o.total||0),0);
-  const totCard=card.reduce((s,o)=>s+(o.total||0),0);
+  const totCash=cash.reduce((s,o)=>s+(o.totalePagato||o.total||0),0); // reale contanti
+  const totCard=card.reduce((s,o)=>s+(o.totalePagato||o.total||0),0); // reale carta
   const totSconti=completedOrders.reduce((s,o)=>s+(o.sconto||0),0);
   const nSconti=completedOrders.filter(o=>o.sconto>0).length;
-  const incassoReale=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
+  const incassoReale=totCash+totCard; // reale = contanti reali + carta reali
   // Ora più affollata — usa orario consegna se disponibile, altrimenti ora creazione ordine
   const byHour={};
   completedOrders.forEach(o=>{
@@ -1116,8 +1254,7 @@ function renderOpen(){
 
   const sorted=[...openOrders].sort((a,b)=>{
     const getMin=o=>{
-      if(!o.orario||o.orario==='Appena possibile')return 9999;
-      // Supporta sia 20:30 che 20.30
+      if(!o.orario||o.orario==='Appena possibile')return -1; // in cima
       const norm=o.orario.replace('.',':');
       const parts=norm.split(':');
       return parseInt(parts[0]||0)*60+parseInt(parts[1]||0);
@@ -1530,10 +1667,23 @@ function confirmMetaMeta(){
   };
   const nota=(document.getElementById('mmeta-note').value.trim()?document.getElementById('mmeta-note').value.trim()+' - ':'')+'Meta\': '+descMeta('prima')+' / Meta\': '+descMeta('seconda');
   const fp=calcMetaPrice();
-  order.items.push({name:metaMetaName,price:fp,extras:[],removes:[],note:nota,qty:1});
-  renderItems();
-  document.getElementById('mmeta').classList.remove('show');
-  toast('Meta/Meta aggiunto! '+fmt(fp),'ok',2000);
+
+  if(window._editMode&&window._editCartIdx!==undefined){
+    // Modalità modifica
+    const idx=window._editCartIdx;
+    order.items[idx].note=nota;
+    order.items[idx].price=fp;
+    order.items[idx].extras=[];
+    window._editMode=false;window._editCartIdx=undefined;
+    renderItems();
+    document.getElementById('mmeta').classList.remove('show');
+    toast('Metà/Metà modificata! ✅','ok',2000);
+  } else {
+    order.items.push({name:metaMetaName,price:fp,extras:[],removes:[],note:nota,qty:1});
+    renderItems();
+    document.getElementById('mmeta').classList.remove('show');
+    toast('Meta/Meta aggiunto! '+fmt(fp),'ok',2000);
+  }
 }
 
 function togEx(btn,n){selEx.includes(n)?(selEx=selEx.filter(e=>e!==n),btn.classList.remove('sel')):(selEx.push(n),btn.classList.add('sel'));}
@@ -1541,8 +1691,23 @@ function togRm(btn,n){selRm.includes(n)?(selRm=selRm.filter(e=>e!==n),btn.classL
 function closeEx(){document.getElementById('mex').classList.remove('show');pendProd=null;}
 function confirmEx(){
   if(!pendProd)return;
-  pushItem(pendProd.name,pendProd.price,[...selEx],[...selRm],document.getElementById('mex-note').value.trim(),pendProd.isMax);
-  closeEx();
+  const nota=document.getElementById('mex-note').value.trim();
+  if(window._editMode&&window._editCartIdx!==undefined){
+    // Modalità modifica — aggiorna invece di aggiungere
+    const idx=window._editCartIdx;
+    const extraPrice=selEx.reduce((s,n)=>{const e=(pendProd.isMax?EXTRAS_MAX:EXTRAS).find(x=>x.n===n);return s+(e?e.p:0);},0);
+    order.items[idx].extras=[...selEx];
+    order.items[idx].removes=[...selRm];
+    order.items[idx].note=nota;
+    order.items[idx].price=pendProd.price+extraPrice;
+    window._editMode=false;window._editCartIdx=undefined;
+    renderItems();
+    closeEx();
+    toast('Prodotto modificato! ✅','ok',2000);
+  } else {
+    pushItem(pendProd.name,pendProd.price,[...selEx],[...selRm],nota,pendProd.isMax);
+    closeEx();
+  }
 }
 
 // RAWBT PRINTING - ESC/POS bytes
@@ -1666,34 +1831,70 @@ function buildEscPosBytes(o){
 }
 
 function buildEscPosText(o){
-  // Fallback testo per compatibilità
   const ora=o.time||new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   const data=o.date||new Date().toLocaleDateString('it-IT');
+  const ESC='\x1B',GS='\x1D';
+  const BIG=ESC+'\x21\x30';   // doppio width+height
+  const MED=ESC+'\x21\x10';   // doppio height
+  const WIDE=ESC+'\x21\x20';  // doppio width
+  const NRM=ESC+'\x21\x00';   // normale
+  const BOLD=ESC+'\x45\x01';
+  const BOFF=ESC+'\x45\x00';
+  const CTR=ESC+'\x61\x01';
+  const LFT=ESC+'\x61\x00';
+
   function getCat(name){for(const [cat,items] of Object.entries(MENU)){const found=items.find(i=>i.n===name);if(found)return found.cat||'altro';}return 'altro';}
   const pizze=o.items.filter(i=>getCat(i.name)==='pizza');
   const rosticceria=o.items.filter(i=>getCat(i.name)==='rosticceria');
   const bibite=o.items.filter(i=>['bibita','birra'].includes(getCat(i.name)));
   const altro=o.items.filter(i=>!['pizza','rosticceria','bibita','birra'].includes(getCat(i.name)));
-  let txt='================================\n        BUGS BUNNY\n================================\n';
-  txt+='  '+data+'   '+ora+'\n================================\n';
-  txt+=(o.type==='domicilio'?'  >>> DOMICILIO <<<\n  '+(o.indirizzo||'N/D')+'\n  Tel: '+(o.telefono||'-'):'   >>> ASPORTO <<<')+'\n================================\n';
+
+  let txt='';
+  txt+=CTR+BIG+'BUGS BUNNY\n'+NRM;
+  txt+=CTR+data+'  '+ora+'\n';
+  txt+='================================\n';
+  txt+=CTR+BIG+(o.type==='domicilio'?'DOMICILIO':'ASPORTO')+'\n'+NRM;
+  txt+=LFT;
+  if(o.type==='domicilio'){
+    txt+=MED+(o.indirizzo||'N/D')+'\n'+NRM;
+    txt+='Tel: '+(o.telefono||'-')+'\n';
+  }
+  txt+='================================\n';
+
   function addSection(title,items){
     if(!items.length)return;
-    txt+='\n  *** '+title+' ***\n--------------------------------\n';
+    txt+=CTR+BOLD+'\n'+title+'\n'+BOFF+LFT;
+    txt+='--------------------------------\n';
     items.forEach(i=>{
-      let n=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim().replace('Bolognese Burrata','Bol.Burrata').replace('Quattro Stagioni','4 Stagioni').replace('Quattro Formaggi','4 Formaggi').replace('Mezzo Metro','M.Metro');
-      txt+='  '+i.qty+'x  '+n+'\n';
+      let n=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim()
+        .replace('Bolognese Burrata','Bol.Burrata')
+        .replace('Quattro Stagioni','4 Stagioni')
+        .replace('Quattro Formaggi','4 Formaggi')
+        .replace('Mezzo Metro','M.Metro');
+      txt+=WIDE+i.qty+'x '+n+'\n'+NRM;
       let notaLibera='';
-      if(i.note&&i.note.includes("Meta'")){const parti=i.note.split(' · ');parti.forEach(p=>{if(p.includes("Meta':")){p.split(' / ').forEach(h=>txt+='     >> '+h.trim()+'\n');}else if(p.trim())notaLibera=p.trim();});}else if(i.note)notaLibera=i.note;
-      if(i.extras.length)i.extras.forEach(e=>txt+='     + '+e+'\n');
-      if(i.removes.length)i.removes.forEach(r=>txt+='     - '+r+'\n');
-      if(notaLibera)txt+='     ! '+notaLibera+'\n';
+      if(i.note&&i.note.includes("Meta'")){
+        const parti=i.note.split(' - ');
+        parti.forEach(p=>{
+          if(p.includes("Meta':")){p.split(' / ').forEach(h=>txt+='  >> '+h.trim()+'\n');}
+          else if(p.trim())notaLibera=p.trim();
+        });
+      } else if(i.note) notaLibera=i.note;
+      if(i.extras.length)i.extras.forEach(e=>txt+='  + '+e+'\n');
+      if(i.removes.length)i.removes.forEach(r=>txt+='  - '+r+'\n');
+      if(notaLibera)txt+='  ! '+notaLibera+'\n';
     });
   }
-  addSection('PIZZE',pizze);if(rosticceria.length)addSection('ROSTICCERIA',rosticceria);if(bibite.length||altro.length)addSection('BIBITE',[...bibite,...altro]);
-  txt+='================================\n  '+o.cognome.toUpperCase()+'\n  ORA: '+(o.orario||'-')+'\n================================\n';
-  if(o.total)txt+='  TOT = '+fmt(o.total)+'\n';
-  txt+='================================\n\n\n';
+
+  addSection('*** PIZZE ***',pizze);
+  if(rosticceria.length)addSection('*** ROSTICCERIA ***',rosticceria);
+  if(bibite.length||altro.length)addSection('*** BIBITE ***',[...bibite,...altro]);
+
+  txt+='================================\n';
+  txt+=CTR+BIG+o.cognome.toUpperCase()+'\n';
+  txt+=MED+'ORA: '+(o.orario||'-')+'\n'+NRM;
+  if(o.total)txt+=MED+'TOT: '+fmt(o.total)+'\n'+NRM;
+  txt+=LFT+'================================\n\n\n';
   return txt;
 }
 
