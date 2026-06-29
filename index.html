@@ -883,65 +883,44 @@ function editCartItem(idx){
     metaMetaGusti={prima:[],seconda:[]};
     metaMetaExtras={prima:[],seconda:[]};
 
-    // Ricostruisci da nota: "Meta': [gusto] + extra1, extra2 / Meta': [gusto] + extra1"
+    // Reset prima di ricostruire
+    metaMetaGusti={prima:[],seconda:[]};
+    metaMetaExtras={prima:[],seconda:[]};
+
+    // Ricostruisci da nota
     const nota=it.note||'';
     const dashIdx=nota.indexOf("Meta':");
     let notaLibera='';
     if(dashIdx>0)notaLibera=nota.substring(0,dashIdx).replace(/ - $/,'').trim();
     const metaPart=dashIdx>=0?nota.substring(dashIdx):'';
     const halves=metaPart.split(' / ');
-    
-    // Lista di tutti i nomi pizza (gusti validi)
     const gustiValidi=MENU['Pizze Tonde'].map(p=>p.n);
-    
     halves.forEach((h,hi)=>{
       const lato=hi===0?'prima':'seconda';
       const content=h.replace(/Meta':/,'').trim();
-      // Separa con ' + '
       const parts=content.split(' + ');
       const primaParte=parts[0].trim();
       const restoParte=parts.slice(1).join(' + ').trim();
-      
-      // Controlla se primaParte contiene gusti validi
+      // Prima parte può contenere "Gusto e Gusto2" oppure "Extra1, Extra2"
       const possibiliGusti=primaParte.split(' e ').map(g=>g.trim());
       const gustiTrovati=possibiliGusti.filter(g=>gustiValidi.includes(g));
       const nonGusti=possibiliGusti.filter(g=>!gustiValidi.includes(g));
-      
       metaMetaGusti[lato]=gustiTrovati;
-      
-      // Extra = nonGusti + restoParte
-      const tuttiExtra=[...nonGusti];
-      if(restoParte)tuttiExtra.push(...restoParte.split(', ').map(e=>e.trim()).filter(Boolean));
+      // Extra = nonGusti (già splittati per ' e ') + restoParte (splittato per ', ')
+      const tuttiExtra=[];
+      nonGusti.forEach(ng=>{
+        // Potrebbe contenere virgole: "Cotto, Funghi"
+        ng.split(', ').map(e=>e.trim()).filter(Boolean).forEach(e=>tuttiExtra.push(e));
+      });
+      if(restoParte){
+        restoParte.split(', ').map(e=>e.trim()).filter(Boolean).forEach(e=>tuttiExtra.push(e));
+      }
       metaMetaExtras[lato]=tuttiExtra.filter(Boolean);
     });
 
+    // Apri modal — skipReset=true, la pre-selezione avviene dentro openMetaMeta
     openMetaMeta(it.name,metaMetaPrice,metaMetaIsMax,true);
-
-    // Pre-seleziona subito senza setTimeout
-    ['prima','seconda'].forEach(lato=>{
-      metaMetaGusti[lato].forEach(g=>{
-        document.querySelectorAll(`#mmeta-grid-${lato} button`).forEach(b=>{
-          if(b.textContent.trim()===g){
-            b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
-          }
-        });
-      });
-      const sel=document.getElementById('mmeta-'+lato+'-sel');
-      if(metaMetaGusti[lato].length){
-        sel.textContent='✅ '+metaMetaGusti[lato].join(' + ');
-        sel.style.color='var(--g)';
-      }
-      metaMetaExtras[lato].forEach(e=>{
-        document.querySelectorAll(`#mmeta-extra-${lato} button`).forEach(b=>{
-          if((b.dataset.name||b.textContent.trim())===e){
-            b.style.background='var(--g)';b.style.borderColor='var(--g)';b.style.color='var(--vs)';
-          }
-        });
-      });
-      updateMetaCount(lato);
-    });
     document.getElementById('mmeta-note').value=notaLibera;
-    updateMetaTot();
     return;
   }
 
@@ -1178,6 +1157,7 @@ function deleteCompleted(idx){
 function resetCompleted(){
   if(!completedOrders.length){toast('Nessun ordine da azzerare','err');return;}
   const totNetto=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
+  if(!confirm(`Sei sicuro di voler azzerare la serata?\nIncasso netto: ${fmt(totNetto)}\nQuesta azione non si può annullare!`))return;
   completedOrders=[];
   localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
   updCount();
@@ -1623,21 +1603,39 @@ function openMetaMeta(name,price,isMax,skipReset=false){
   }
   document.getElementById('mmeta-title').textContent='⬡ '+name;
   document.getElementById('mmeta-note').value='';
-  ['prima','seconda'].forEach(lato=>{
-    document.getElementById('mmeta-'+lato+'-sel').textContent='Tocca per scegliere gusto...';
-    document.getElementById('mmeta-'+lato+'-sel').style.color='rgba(255,255,255,0.4)';
-    document.getElementById('mmeta-grid-'+lato+'-wrap').style.display='none';
-  });
+  if(!skipReset){
+    ['prima','seconda'].forEach(lato=>{
+      document.getElementById('mmeta-'+lato+'-sel').textContent='Tocca per scegliere gusto...';
+      document.getElementById('mmeta-'+lato+'-sel').style.color='rgba(255,255,255,0.4)';
+      document.getElementById('mmeta-grid-'+lato+'-wrap').style.display='none';
+    });
+  }
   const gusti=MENU['Pizze Tonde'].map(p=>p.n).sort((a,b)=>a.localeCompare(b,'it'));
   ['prima','seconda'].forEach(lato=>{
-    document.getElementById('mmeta-grid-'+lato).innerHTML=gusti.map(g=>`
-      <button onclick="togMetaGusto('${lato}','${g.replace(/'/g,"\'")}',this)"
-        style="padding:5px 3px;background:rgba(45,90,27,0.4);border:1px solid var(--vc);color:#fff;border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;text-align:center;">${g}</button>`).join('');
-    document.getElementById('mmeta-extra-'+lato).innerHTML=EXTRAS_MAX.map(e=>`
-      <button data-name="${e.n}" onclick="togMetaExtraLato('${lato}',this,'${e.n.replace(/'/g,"\'")}')"
-        style="padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(245,216,0,0.2);color:rgba(255,255,255,0.65);border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;white-space:nowrap;${e.special?'border-color:#3498db;color:#7fb3d3;':''}">
+    document.getElementById('mmeta-grid-'+lato).innerHTML=gusti.map(g=>{
+      const sel=skipReset&&metaMetaGusti[lato].includes(g);
+      return `<button onclick="togMetaGusto('${lato}','${g.replace(/'/g,"\'")}',this)"
+        style="padding:5px 3px;background:${sel?'var(--g)':'rgba(45,90,27,0.4)'};border:1px solid ${sel?'var(--g)':'var(--vc)'};color:${sel?'var(--vs)':'#fff'};border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;text-align:center;">${g}</button>`;
+    }).join('');
+
+    // Label gusto
+    const selEl=document.getElementById('mmeta-'+lato+'-sel');
+    if(skipReset&&metaMetaGusti[lato].length){
+      selEl.textContent='✅ '+metaMetaGusti[lato].join(' + ');
+      selEl.style.color='var(--g)';
+    } else if(!skipReset){
+      selEl.textContent='Tocca per scegliere gusto...';
+      selEl.style.color='rgba(255,255,255,0.4)';
+    }
+
+    document.getElementById('mmeta-extra-'+lato).innerHTML=EXTRAS_MAX.map(e=>{
+      const sel=skipReset&&metaMetaExtras[lato].includes(e.n);
+      return `<button data-name="${e.n}" onclick="togMetaExtraLato('${lato}',this,'${e.n.replace(/'/g,"\\'")}')"
+        style="padding:3px 6px;background:${sel?'var(--g)':'rgba(0,0,0,0.3)'};border:1px solid ${sel?'var(--g)':'rgba(245,216,0,0.2)'};color:${sel?'var(--vs)':'rgba(255,255,255,0.65)'};border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;white-space:nowrap;${e.special&&!sel?'border-color:#3498db;color:#7fb3d3;':''}">
         ${e.n}
-      </button>`).join('');
+      </button>`;
+    }).join('');
+
     updateMetaCount(lato);
   });
   updateMetaTot();
