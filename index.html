@@ -644,6 +644,7 @@ const MENU={
   ],
   "Rosticceria":[
     {n:"Arancino al Ragù",p:2.5,ing:"riso, mozzarella, sugo alla bolognese",cat:"rosticceria"},
+    {n:"Arancino Nduja",p:2.5,ing:"",cat:"rosticceria"},
     {n:"Arancino Salsiccia",p:2.5,ing:"riso, sugo con salsiccia",cat:"rosticceria"},
     {n:"Fagottino",p:2.5,ing:"",cat:"rosticceria"},
     {n:"Pizza Al Taglio",p:2,ing:"",cat:"rosticceria"},
@@ -1921,10 +1922,26 @@ function buildEscPosText(o){
     txt+='--------------------------------\n';
     items.forEach(i=>{
       let n=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim()
-        .replace('Bolognese Burrata','Bol.Burrata')
+        .replace('Bolognese Burrata','Bolognese Burr.')
         .replace('Quattro Stagioni','4 Stagioni')
         .replace('Quattro Formaggi','4 Formaggi')
-        .replace('Mezzo Metro','M.Metro');
+        .replace('Mezzo Metro','M.Metro')
+        .replace('Arancino al Ragù','Arancino Ragù')
+        .replace('Arancino Salsiccia','Aranc. Salsiccia')
+        .replace('Arancino Nduja','Aranc. Nduja')
+        .replace('Calzone Fritto Impanato','Calzone Fritto Imp.')
+        .replace('Mozzarella in Carrozza','Mozz. in Carrozza')
+        .replace('Tramezzino Pancetta','Tramezz. Pancetta')
+        .replace('Tramezzino Integrale','Tramezz. Integrale')
+        .replace('Tramezzino Tonno','Tramezz. Tonno')
+        .replace('Würstel in Camicia','Wurstel in Camicia')
+        .replace('Porzione Pat. Würstel e Pancetta','Pors. Pat. Wurs. Pan.')
+        .replace('Patatine e Würstel','Patatine e Wurstel')
+        .replace('Crostone Salame Piccante','Crostone Sal. Pic.')
+        .replace('Crostone Speck e Funghi','Crostone Speck Fung.')
+        .replace('Crostone con Pancetta','Crostone Pancetta')
+        .replace('Crostone con Spinaci','Crostone Spinaci')
+        .replace('Crostone al Cotto','Crostone Cotto');
       txt+=WIDE+i.qty+'x '+n+'\n'+NRM;
       let notaLibera='';
       if(i.note&&i.note.includes("Meta'")){
