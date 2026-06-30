@@ -2,126 +2,226 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Menu Pizzeria Bugs Bunny</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu — Pizzeria Bugs Bunny</title>
 <style>
-body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#f5f5f5;}
-h1{color:#2d5a1b;text-align:center;font-size:28px;}
-h2{color:#cc1a1a;font-size:18px;border-bottom:2px solid #cc1a1a;padding-bottom:4px;margin-top:24px;}
-table{width:100%;border-collapse:collapse;background:#fff;margin-bottom:16px;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
-th{background:#2d5a1b;color:#fff;padding:8px 12px;text-align:left;font-size:13px;}
-td{padding:7px 12px;font-size:13px;border-bottom:1px solid #eee;}
-tr:last-child td{border-bottom:none;}
-.price{font-weight:bold;color:#2d5a1b;white-space:nowrap;}
-.cat{color:#666;font-size:12px;}
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:#1a3a1a;color:#fff;padding-bottom:40px;}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#1a3a1a,#2d5a1b);border-bottom:4px solid #f5d800;text-align:center;padding:24px 16px 20px;}
+.logo{font-size:48px;margin-bottom:6px;}
+.title{font-family:'Fredoka One',cursive;font-size:32px;color:#f5d800;text-shadow:2px 2px 0 #8b0000;letter-spacing:2px;}
+.subtitle{font-size:13px;color:rgba(245,216,0,0.7);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+
+/* SEZIONI */
+.section{margin:16px 12px 0;}
+.section-title{font-family:'Fredoka One',cursive;font-size:18px;color:#fff;background:linear-gradient(135deg,#cc1a1a,#8b0000);padding:10px 16px;border-radius:12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+
+/* GRIGLIA PRODOTTI */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;}
+.card{background:rgba(0,0,0,0.3);border:1px solid rgba(74,124,47,0.4);border-radius:10px;padding:10px 12px;}
+.card-name{font-size:13px;font-weight:900;line-height:1.3;margin-bottom:3px;}
+.card-ing{font-size:10px;color:rgba(255,255,255,0.5);line-height:1.4;margin-bottom:5px;}
+.card-price{font-family:'Fredoka One',cursive;font-size:17px;color:#f5d800;}
+
+/* NOTA EXTRA */
+.extra-note{background:rgba(245,216,0,0.08);border:1px solid rgba(245,216,0,0.3);border-radius:10px;padding:12px 16px;margin:16px 12px 0;font-size:12px;line-height:1.7;color:rgba(255,255,255,0.75);}
+.extra-note strong{color:#f5d800;}
+
+/* FOOTER */
+.footer{text-align:center;margin-top:24px;font-size:11px;color:rgba(255,255,255,0.3);}
 </style>
 </head>
 <body>
-<h1>🐰 Pizzeria Bugs Bunny</h1>
-<p style="text-align:center;color:#666;">Via Casa Savoia 264, Gallico RC</p>
 
-<h2>🍕 Pizze Tonde</h2>
-<table>
-<tr><th>Prodotto</th><th>Prezzo</th><th>Ingredienti</th></tr>
-<tr><td>Margherita</td><td class="price">€5,00</td><td class="cat">pomodoro, mozzarella, basilico</td></tr>
-<tr><td>Biancaneve</td><td class="price">€4,50</td><td class="cat">mozzarella, origano</td></tr>
-<tr><td>Baby</td><td class="price">€7,00</td><td class="cat">pomodoro, mozzarella, würstel, patatine</td></tr>
-<tr><td>Bestemmia</td><td class="price">€8,00</td><td class="cat">pomodoro, mozzarella, salame, funghi</td></tr>
-<tr><td>Bolognese</td><td class="price">€8,00</td><td class="cat">mortadella, mozzarella, pesto e granella di pistacchio</td></tr>
-<tr><td>Bolognese Burrata</td><td class="price">€12,00</td><td class="cat">mortadella, mozzarella, burrata, pesto e granella di pistacchio</td></tr>
-<tr><td>Boscaiola</td><td class="price">€8,00</td><td class="cat">pomodoro, mozzarella, speck, funghi, scamorza</td></tr>
-<tr><td>Bugs Bunny</td><td class="price">€7,00</td><td class="cat">pomodorini, mozzarella, capperi, acciughe</td></tr>
-<tr><td>Calabrese</td><td class="price">€8,00</td><td class="cat">pomodoro, mozzarella, peperoni, melanzane, olive</td></tr>
-<tr><td>Caprese</td><td class="price">€7,00</td><td class="cat">mozzarella di bufala, pomodorini, basilico</td></tr>
-<tr><td>Capricciosa</td><td class="price">€8,00</td><td class="cat">pomodoro, mozzarella, würstel, carciofini, funghi</td></tr>
-<tr><td>Diavola</td><td class="price">€7,00</td><td class="cat">pomodoro, mozzarella, salame, olive</td></tr>
-<tr><td>Fantasy</td><td class="price">€8,00</td><td class="cat">pomodoro, mozzarella, salame, lattuga, olive</td></tr>
-<tr><td>Gustosa</td><td class="price">€8,00</td><td class="cat">pomodorini, mozzarella, crudo, rucola, scaglie grana</td></tr>
-<tr><td>Marinara</td><td class="price">€4,00</td><td class="cat">pomodoro, olio, aglio, origano</td></tr>
-<tr><td>Napoli</td><td class="price">€7,00</td><td class="cat">pomodoro, mozzarella, capperi, acciughe</td></tr>
-<tr><td>No Glutine</td><td class="price">€8,00</td><td class="cat">pomodoro, mozzarella</td></tr>
-<tr><td>Ortolana</td><td class="price">€8,00</td><td class="cat">pomodoro, mozzarella, peperoni arrosto, melanzane, zucchine</td></tr>
-<tr><td>Quattro Formaggi</td><td class="price">€8,00</td><td class="cat">mozzarella, scamorza, edamer, gorgonzola</td></tr>
-<tr><td>Quattro Stagioni</td><td class="price">€8,00</td><td class="cat">pomodoro, mozzarella, carciofini, funghi, olive, cotto</td></tr>
-<tr><td>Regina</td><td class="price">€5,00</td><td class="cat">pomodoro, pomodorini, mozzarella, basilico</td></tr>
-<tr><td>Suprema</td><td class="price">€9,00</td><td class="cat">pomodorini, mozzarella, bresaola, rucola, scaglie grana</td></tr>
-<tr><td>Tonnara</td><td class="price">€7,00</td><td class="cat">pomodoro, mozzarella, tonno</td></tr>
-<tr><td>Vegetariana</td><td class="price">€7,00</td><td class="cat">pomodoro, mozzarella, lattuga, radicchio, rucola</td></tr>
-</table>
+<div class="header">
+  <div class="logo">🐰</div>
+  <div class="title">BUGS BUNNY</div>
+  <div class="subtitle">Pizzeria · Rosticceria · Gallico RC</div>
+</div>
 
-<h2>🍕 Pizze Max</h2>
-<table>
-<tr><th>Prodotto</th><th>Prezzo</th></tr>
-<tr><td>Max Margherita (8pz)</td><td class="price">€12,00</td></tr>
-<tr><td>Max Farcita (8pz)</td><td class="price">€15,00</td></tr>
-<tr><td>Teglia Margherita (8pz)</td><td class="price">€16,00</td></tr>
-<tr><td>Teglia Farcita (8pz)</td><td class="price">€20,00</td></tr>
-<tr><td>Mezzo Metro Margherita</td><td class="price">€12,00</td></tr>
-<tr><td>Mezzo Metro Farcita</td><td class="price">€15,00</td></tr>
-</table>
+<!-- PIZZE TONDE -->
+<div class="section">
+  <div class="section-title">🍕 Pizze Tonde</div>
+  <div class="grid">
+    <div class="card"><div class="card-name">Margherita</div><div class="card-ing">pomodoro, mozzarella, basilico</div><div class="card-price">€ 5,00</div></div>
+    <div class="card"><div class="card-name">Biancaneve</div><div class="card-ing">mozzarella, origano</div><div class="card-price">€ 4,50</div></div>
+    <div class="card"><div class="card-name">Baby</div><div class="card-ing">pomodoro, mozzarella, würstel, patatine</div><div class="card-price">€ 7,00</div></div>
+    <div class="card"><div class="card-name">Bestemmia</div><div class="card-ing">pomodoro, mozzarella, salame, funghi</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Bolognese</div><div class="card-ing">mortadella, mozzarella, pesto e granella di pistacchio</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Bolognese Burrata</div><div class="card-ing">mortadella, mozzarella, burrata, pesto e granella di pistacchio</div><div class="card-price">€ 12,00</div></div>
+    <div class="card"><div class="card-name">Boscaiola</div><div class="card-ing">pomodoro, mozzarella, speck, funghi, scamorza</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Bugs Bunny</div><div class="card-ing">pomodorini pachino, mozzarella, capperi, acciughe</div><div class="card-price">€ 7,00</div></div>
+    <div class="card"><div class="card-name">Calabrese</div><div class="card-ing">pomodoro, mozzarella, peperoni, melanzane fritte, olive, peperoncino</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Caprese</div><div class="card-ing">mozzarella di bufala, pomodorini, basilico</div><div class="card-price">€ 7,00</div></div>
+    <div class="card"><div class="card-name">Capricciosa</div><div class="card-ing">pomodoro, mozzarella, würstel, carciofini, funghi</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Diavola</div><div class="card-ing">pomodoro, mozzarella, salame, olive</div><div class="card-price">€ 7,00</div></div>
+    <div class="card"><div class="card-name">Fantasy</div><div class="card-ing">pomodoro, mozzarella, salame, lattuga, olive</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Gustosa</div><div class="card-ing">pomodorini pachino, mozzarella, prosciutto crudo, rucola, scaglie di grana</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Marinara</div><div class="card-ing">pomodoro, olio, aglio, origano</div><div class="card-price">€ 4,00</div></div>
+    <div class="card"><div class="card-name">Napoli</div><div class="card-ing">pomodoro, mozzarella, capperi, acciughe</div><div class="card-price">€ 7,00</div></div>
+    <div class="card"><div class="card-name">No Glutine</div><div class="card-ing">pomodoro, mozzarella</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Ortolana</div><div class="card-ing">pomodoro, mozzarella, peperoni arrosto, melanzane fritte, zucchine fritte</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Quattro Formaggi</div><div class="card-ing">mozzarella, scamorza, edamer, gorgonzola</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Quattro Stagioni</div><div class="card-ing">pomodoro, mozzarella, carciofini, funghi, olive, prosciutto cotto</div><div class="card-price">€ 8,00</div></div>
+    <div class="card"><div class="card-name">Regina</div><div class="card-ing">pomodoro, pomodorini, mozzarella, basilico</div><div class="card-price">€ 5,00</div></div>
+    <div class="card"><div class="card-name">Suprema</div><div class="card-ing">pomodorini pachino, mozzarella, bresaola, rucola, scaglie di grana</div><div class="card-price">€ 9,00</div></div>
+    <div class="card"><div class="card-name">Tonnara</div><div class="card-ing">pomodoro, mozzarella, tonno</div><div class="card-price">€ 7,00</div></div>
+    <div class="card"><div class="card-name">Vegetariana</div><div class="card-ing">pomodoro, mozzarella, lattuga, radicchio, rucola</div><div class="card-price">€ 7,00</div></div>
+  </div>
+</div>
 
-<h2>🥩 Rosticceria</h2>
-<table>
-<tr><th>Prodotto</th><th>Prezzo</th></tr>
-<tr><td>Arancino al Ragù</td><td class="price">€2,50</td></tr>
-<tr><td>Arancino Salsiccia</td><td class="price">€2,50</td></tr>
-<tr><td>Calzone al Forno</td><td class="price">€2,00</td></tr>
-<tr><td>Calzone Baby</td><td class="price">€2,50</td></tr>
-<tr><td>Calzone Fritto</td><td class="price">€2,00</td></tr>
-<tr><td>Calzone Fritto Impanato</td><td class="price">€2,50</td></tr>
-<tr><td>Crocchetta di Patate</td><td class="price">€1,50</td></tr>
-<tr><td>Crostone al Cotto</td><td class="price">€3,00</td></tr>
-<tr><td>Crostone con Pancetta</td><td class="price">€3,00</td></tr>
-<tr><td>Crostone con Spinaci</td><td class="price">€3,00</td></tr>
-<tr><td>Crostone Salame Piccante</td><td class="price">€3,00</td></tr>
-<tr><td>Crostone Speck e Funghi</td><td class="price">€3,00</td></tr>
-<tr><td>Medaglione</td><td class="price">€1,50</td></tr>
-<tr><td>Mozzarella in Carrozza</td><td class="price">€2,00</td></tr>
-<tr><td>Tramezzino Pancetta</td><td class="price">€3,00</td></tr>
-<tr><td>Tramezzino Tonno</td><td class="price">€3,00</td></tr>
-<tr><td>Würstel in Camicia</td><td class="price">€2,00</td></tr>
-</table>
+<!-- PIZZE MAX -->
+<div class="section">
+  <div class="section-title">🍕 Pizze Max</div>
+  <div class="grid">
+    <div class="card"><div class="card-name">Max Margherita</div><div class="card-ing">pomodoro, mozzarella</div><div class="card-price">€ 12,00</div></div>
+    <div class="card"><div class="card-name">Max Biancaneve</div><div class="card-ing">mozzarella, origano</div><div class="card-price">€ 12,00</div></div>
+    <div class="card"><div class="card-name">Max Baby</div><div class="card-ing">pomodoro, mozzarella, würstel, patatine</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Bestemmia</div><div class="card-ing">pomodoro, mozzarella, salame, funghi</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Bolognese</div><div class="card-ing">mortadella, mozzarella, pesto e granella di pistacchio</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Bolognese Burrata</div><div class="card-ing">mortadella, mozzarella, burrata, pesto e granella di pistacchio</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Boscaiola</div><div class="card-ing">pomodoro, mozzarella, speck, funghi, scamorza</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Bugs Bunny</div><div class="card-ing">pomodorini, mozzarella, capperi, acciughe</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Calabrese</div><div class="card-ing">pomodoro, mozzarella, peperoni, melanzane fritte, olive</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Caprese</div><div class="card-ing">mozzarella di bufala, pomodorini, basilico</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Capricciosa</div><div class="card-ing">pomodoro, mozzarella, würstel, carciofini, funghi</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Diavola</div><div class="card-ing">pomodoro, mozzarella, salame, olive</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Fantasy</div><div class="card-ing">pomodoro, mozzarella, salame, lattuga, olive</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Gustosa</div><div class="card-ing">pomodorini, mozzarella, prosciutto crudo, rucola, scaglie di grana</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Marinara</div><div class="card-ing">pomodoro, olio, aglio, origano</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Napoli</div><div class="card-ing">pomodoro, mozzarella, capperi, acciughe</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Ortolana</div><div class="card-ing">pomodoro, mozzarella, peperoni arrosto, melanzane fritte, zucchine fritte</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Quattro Formaggi</div><div class="card-ing">mozzarella, scamorza, edamer, gorgonzola</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Quattro Stagioni</div><div class="card-ing">pomodoro, mozzarella, carciofini, funghi, olive, cotto</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Regina</div><div class="card-ing">pomodoro, pomodorini, mozzarella, basilico</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Suprema</div><div class="card-ing">pomodorini, mozzarella, bresaola, rucola, scaglie di grana</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Tonnara</div><div class="card-ing">pomodoro, mozzarella, tonno</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Vegetariana</div><div class="card-ing">pomodoro, mozzarella, lattuga, radicchio, rucola</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Max Farcita (metà/metà)</div><div class="card-ing">a scelta del cliente</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Teglia Margherita (8pz)</div><div class="card-ing">pomodoro, mozzarella</div><div class="card-price">€ 16,00</div></div>
+    <div class="card"><div class="card-name">Teglia Farcita (8pz)</div><div class="card-ing">ingredienti vari</div><div class="card-price">€ 20,00</div></div>
+  </div>
+</div>
 
-<h2>🍟 Stuzzicheria</h2>
-<table>
-<tr><th>Prodotto</th><th>Prezzo</th></tr>
-<tr><td>Misto Bugs Bunny</td><td class="price">€5,00</td></tr>
-<tr><td>Mozzarelline (8pz)</td><td class="price">€3,50</td></tr>
-<tr><td>Noisette</td><td class="price">€3,50</td></tr>
-<tr><td>Olive Ascolane (8pz)</td><td class="price">€3,50</td></tr>
-<tr><td>Patatine</td><td class="price">€2,50</td></tr>
-<tr><td>Patatine e Würstel</td><td class="price">€3,00</td></tr>
-</table>
+<!-- PIZZE MEZZO METRO -->
+<div class="section">
+  <div class="section-title">🍕 Pizze Mezzo Metro</div>
+  <div class="grid">
+    <div class="card"><div class="card-name">Mezzo Metro Margherita</div><div class="card-ing">pomodoro, mozzarella</div><div class="card-price">€ 12,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Biancaneve</div><div class="card-ing">mozzarella, origano</div><div class="card-price">€ 12,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Baby</div><div class="card-ing">pomodoro, mozzarella, würstel, patatine</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Bestemmia</div><div class="card-ing">pomodoro, mozzarella, salame, funghi</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Bolognese</div><div class="card-ing">mortadella, mozzarella, pesto e granella di pistacchio</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Bolognese Burrata</div><div class="card-ing">mortadella, mozzarella, burrata, pesto e granella di pistacchio</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Boscaiola</div><div class="card-ing">pomodoro, mozzarella, speck, funghi, scamorza</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Bugs Bunny</div><div class="card-ing">pomodorini, mozzarella, capperi, acciughe</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Calabrese</div><div class="card-ing">pomodoro, mozzarella, peperoni, melanzane fritte, olive</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Caprese</div><div class="card-ing">mozzarella di bufala, pomodorini, basilico</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Capricciosa</div><div class="card-ing">pomodoro, mozzarella, würstel, carciofini, funghi</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Diavola</div><div class="card-ing">pomodoro, mozzarella, salame, olive</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Fantasy</div><div class="card-ing">pomodoro, mozzarella, salame, lattuga, olive</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Gustosa</div><div class="card-ing">pomodorini, mozzarella, prosciutto crudo, rucola, scaglie di grana</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Marinara</div><div class="card-ing">pomodoro, olio, aglio, origano</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Napoli</div><div class="card-ing">pomodoro, mozzarella, capperi, acciughe</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Ortolana</div><div class="card-ing">pomodoro, mozzarella, peperoni arrosto, melanzane fritte, zucchine fritte</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Quattro Formaggi</div><div class="card-ing">mozzarella, scamorza, edamer, gorgonzola</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Quattro Stagioni</div><div class="card-ing">pomodoro, mozzarella, carciofini, funghi, olive, cotto</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Regina</div><div class="card-ing">pomodoro, pomodorini, mozzarella, basilico</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Suprema</div><div class="card-ing">pomodorini, mozzarella, bresaola, rucola, scaglie di grana</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Tonnara</div><div class="card-ing">pomodoro, mozzarella, tonno</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Vegetariana</div><div class="card-ing">pomodoro, mozzarella, lattuga, radicchio, rucola</div><div class="card-price">€ 15,00</div></div>
+    <div class="card"><div class="card-name">Mezzo Metro Farcita (metà/metà)</div><div class="card-ing">a scelta del cliente</div><div class="card-price">€ 15,00</div></div>
+  </div>
+</div>
 
-<h2>🥤 Bibite</h2>
-<table>
-<tr><th>Prodotto</th><th>Prezzo</th></tr>
-<tr><td>Acqua piccola</td><td class="price">€1,00</td></tr>
-<tr><td>Chinotto</td><td class="price">€2,50</td></tr>
-<tr><td>Coca Cola 1L</td><td class="price">€3,00</td></tr>
-<tr><td>Coca Cola lattina</td><td class="price">€2,00</td></tr>
-<tr><td>Coca Cola plastica</td><td class="price">€3,00</td></tr>
-<tr><td>Coca Cola vetro</td><td class="price">€3,00</td></tr>
-<tr><td>Fanta lattina</td><td class="price">€2,00</td></tr>
-<tr><td>Fanta plastica</td><td class="price">€3,00</td></tr>
-<tr><td>Fanta vetro</td><td class="price">€3,00</td></tr>
-<tr><td>Sprite lattina</td><td class="price">€2,00</td></tr>
-<tr><td>Sprite vetro</td><td class="price">€3,00</td></tr>
-<tr><td>Thè Pesca/Limone</td><td class="price">€1,50</td></tr>
-</table>
+<!-- ROSTICCERIA -->
+<div class="section">
+  <div class="section-title">🍟 Rosticceria</div>
+  <div class="grid">
+    <div class="card"><div class="card-name">Arancino al Ragù</div><div class="card-ing">riso, mozzarella, sugo alla bolognese</div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Arancino Nduja</div><div class="card-ing"></div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Arancino Salsiccia</div><div class="card-ing">riso, sugo con salsiccia</div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Fagottino</div><div class="card-ing"></div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Pizza Al Taglio</div><div class="card-ing"></div><div class="card-price">€ 2,00</div></div>
+    <div class="card"><div class="card-name">Pizza Farcita</div><div class="card-ing"></div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Calzone Baby</div><div class="card-ing">pomodoro, würstel, patatine</div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Calzone Fritto</div><div class="card-ing">pomodoro, mozzarella, prosciutto cotto</div><div class="card-price">€ 2,00</div></div>
+    <div class="card"><div class="card-name">Calzone Fritto Impanato</div><div class="card-ing">pomodoro, mozzarella, prosciutto cotto</div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Crocchetta di Patate</div><div class="card-ing"></div><div class="card-price">€ 1,50</div></div>
+    <div class="card"><div class="card-name">Crostone al Cotto</div><div class="card-ing">besciamella, mozzarella, prosciutto cotto</div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Crostone con Pancetta</div><div class="card-ing">mozzarella, besciamella, pancetta</div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Crostone con Spinaci</div><div class="card-ing">mozzarella, besciamella, spinaci</div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Crostone Salame Piccante</div><div class="card-ing">mozzarella, besciamella, salame piccante</div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Crostone Speck e Funghi</div><div class="card-ing">mozzarella, besciamella, speck, funghi</div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Medaglione</div><div class="card-ing">crocchette, scamorza, salame piccante</div><div class="card-price">€ 1,50</div></div>
+    <div class="card"><div class="card-name">Mozzarella in Carrozza</div><div class="card-ing">mozzarella, besciamella</div><div class="card-price">€ 2,00</div></div>
+    <div class="card"><div class="card-name">Tramezzino Integrale</div><div class="card-ing"></div><div class="card-price">€ 4,00</div></div>
+    <div class="card"><div class="card-name">Tramezzino Pancetta</div><div class="card-ing">pomodoro, pancetta, formaggio, lattuga, maionese</div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Tramezzino Tonno</div><div class="card-ing">pomodoro, maionese, prosciutto cotto, lattuga, tonno</div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Würstel in Camicia</div><div class="card-ing"></div><div class="card-price">€ 2,00</div></div>
+  </div>
+</div>
 
-<h2>🍺 Birre</h2>
-<table>
-<tr><th>Prodotto</th><th>Prezzo</th></tr>
-<tr><td>Björne</td><td class="price">€3,00</td></tr>
-<tr><td>Corona</td><td class="price">€4,00</td></tr>
-<tr><td>Nastro Azzurro 33cl</td><td class="price">€2,00</td></tr>
-<tr><td>Nastro Azzurro 66cl</td><td class="price">€4,00</td></tr>
-<tr><td>Peroni 33cl</td><td class="price">€1,50</td></tr>
-<tr><td>Peroni 66cl</td><td class="price">€3,00</td></tr>
-<tr><td>Raffo grande</td><td class="price">€3,00</td></tr>
-<tr><td>Raffo piccola</td><td class="price">€2,50</td></tr>
-<tr><td>Tennent's</td><td class="price">€3,00</td></tr>
-</table>
+<!-- STUZZICHERIA -->
+<div class="section">
+  <div class="section-title">🧆 Stuzzicheria</div>
+  <div class="grid">
+    <div class="card"><div class="card-name">Misto Bugs Bunny</div><div class="card-ing">patate, noisette, olive ascolane, mozzarelline, würstel</div><div class="card-price">€ 5,00</div></div>
+    <div class="card"><div class="card-name">Mozzarelline (8pz)</div><div class="card-ing"></div><div class="card-price">€ 3,50</div></div>
+    <div class="card"><div class="card-name">Noisette</div><div class="card-ing"></div><div class="card-price">€ 3,50</div></div>
+    <div class="card"><div class="card-name">Olive Ascolane (8pz)</div><div class="card-ing"></div><div class="card-price">€ 3,50</div></div>
+    <div class="card"><div class="card-name">Patatine</div><div class="card-ing"></div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Patatine e Würstel</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Porz. Patatine Würstel e Pancetta</div><div class="card-ing"></div><div class="card-price">€ 4,00</div></div>
+  </div>
+</div>
+
+<!-- BIBITE -->
+<div class="section">
+  <div class="section-title">🥤 Bibite</div>
+  <div class="grid">
+    <div class="card"><div class="card-name">Acqua piccola</div><div class="card-ing"></div><div class="card-price">€ 1,00</div></div>
+    <div class="card"><div class="card-name">Chinotto</div><div class="card-ing"></div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Coca Cola 1L</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Coca Cola lattina</div><div class="card-ing"></div><div class="card-price">€ 2,00</div></div>
+    <div class="card"><div class="card-name">Coca Cola plastica</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Coca Cola vetro</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Fanta lattina</div><div class="card-ing"></div><div class="card-price">€ 2,00</div></div>
+    <div class="card"><div class="card-name">Fanta plastica</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Fanta vetro</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Sprite lattina</div><div class="card-ing"></div><div class="card-price">€ 2,00</div></div>
+    <div class="card"><div class="card-name">Sprite vetro</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Thè Pesca/Limone</div><div class="card-ing"></div><div class="card-price">€ 1,50</div></div>
+  </div>
+</div>
+
+<!-- BIRRE -->
+<div class="section">
+  <div class="section-title">🍺 Birre</div>
+  <div class="grid">
+    <div class="card"><div class="card-name">Björne</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Corona</div><div class="card-ing"></div><div class="card-price">€ 4,00</div></div>
+    <div class="card"><div class="card-name">Nastro Azzurro 33cl</div><div class="card-ing"></div><div class="card-price">€ 2,00</div></div>
+    <div class="card"><div class="card-name">Nastro Azzurro 66cl</div><div class="card-ing"></div><div class="card-price">€ 4,00</div></div>
+    <div class="card"><div class="card-name">Peroni 33cl</div><div class="card-ing"></div><div class="card-price">€ 1,50</div></div>
+    <div class="card"><div class="card-name">Peroni 66cl</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+    <div class="card"><div class="card-name">Raffo</div><div class="card-ing"></div><div class="card-price">€ 2,50</div></div>
+    <div class="card"><div class="card-name">Tennent's</div><div class="card-ing"></div><div class="card-price">€ 3,00</div></div>
+  </div>
+</div>
+
+<!-- NOTA EXTRA -->
+<div class="extra-note">
+  <strong>Extra pizze tonde:</strong> +€ 1,00 per ingrediente · Bresaola e Bufala +€ 2,00<br>
+  <strong>Extra pizze Max / Mezzo Metro:</strong> +€ 2,00 per ingrediente · Bresaola e Bufala +€ 3,00
+</div>
+
+<div class="footer">
+  <p>🐰 Pizzeria Bugs Bunny · Gallico (RC)</p>
+</div>
 
 </body>
 </html>
