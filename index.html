@@ -580,6 +580,7 @@ const MENU={
     {n:"Quattro Formaggi",p:8,ing:"mozzarella, scamorza, edamer, gorgonzola",cat:"pizza",excl:[]},
     {n:"Quattro Stagioni",p:8,ing:"pomodoro, mozzarella, carciofini, funghi, olive, prosciutto cotto",cat:"pizza",excl:[]},
     {n:"Regina",p:5,ing:"pomodoro, pomodorini, mozzarella, basilico",cat:"pizza",excl:[]},
+    {n:"Rossa",p:4,ing:"pomodoro",cat:"pizza",excl:[]},
     {n:"Suprema",p:9,ing:"pomodorini pachino, mozzarella, bresaola, rucola, scaglie di grana",cat:"pizza",excl:[]},
     {n:"Tonnara",p:7,ing:"pomodoro, mozzarella, tonno",cat:"pizza",excl:[]},
     {n:"Vegetariana",p:7,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",cat:"pizza",excl:[]}
@@ -661,6 +662,7 @@ const MENU={
     {n:"Crostone Speck e Funghi",p:3,ing:"mozzarella, besciamella, speck, funghi",cat:"rosticceria"},
     {n:"Medaglione",p:1.5,ing:"crocchette, scamorza, salame piccante",cat:"rosticceria"},
     {n:"Mozzarella in Carrozza",p:2,ing:"mozzarella, besciamella",cat:"rosticceria"},
+    {n:"Scrocchiarella",p:4.5,ing:"",cat:"rosticceria"},
     {n:"Tramezzino Integrale",p:4,ing:"",cat:"rosticceria"},
     {n:"Tramezzino Pancetta",p:3,ing:"pomodoro, pancetta, formaggio, lattuga, maionese",cat:"rosticceria"},
     {n:"Tramezzino Tonno",p:3,ing:"pomodoro, maionese, prosciutto cotto, lattuga, tonno",cat:"rosticceria"},
@@ -712,7 +714,7 @@ const EXTRAS=[
   {n:"Panna",p:1},{n:"Patate al forno",p:1},{n:"Peperoncino",p:1},{n:"Peperoni",p:1},{n:"Peperoni arrosto",p:1},
   {n:"Pomodorini",p:1},{n:"Porchetta",p:2},{n:"Porcini",p:1},{n:"Rucola",p:1},
   {n:"Salame dolce",p:1},{n:"Salame piccante",p:1},{n:"Salsiccia",p:2},
-  {n:"Scaglie di grana",p:1},{n:"Scamorza",p:1},{n:"Speck",p:1},
+  {n:"Scaglie di grana",p:1},{n:"Scamorza",p:1},{n:"Scarola",p:1},{n:"Speck",p:1},
   {n:"Tonno",p:1},{n:"Uovo Sodo",p:2},{n:"Zucchine arrosto",p:1},{n:"Zucchine fritte",p:1},
   {n:"No Lattosio",p:0,special:true}
 ];
@@ -729,7 +731,7 @@ const EXTRAS_MAX=[
   {n:"Panna",p:2},{n:"Patate al forno",p:2},{n:"Peperoncino",p:2},{n:"Peperoni",p:2},{n:"Peperoni arrosto",p:2},
   {n:"Pomodorini",p:2},{n:"Porchetta",p:2},{n:"Porcini",p:2},{n:"Rucola",p:2},
   {n:"Salame dolce",p:2},{n:"Salame piccante",p:2},{n:"Salsiccia",p:2},
-  {n:"Scaglie di grana",p:2},{n:"Scamorza",p:2},{n:"Speck",p:2},
+  {n:"Scaglie di grana",p:2},{n:"Scamorza",p:2},{n:"Scarola",p:2},{n:"Speck",p:2},
   {n:"Tonno",p:2},{n:"Uovo Sodo",p:2},{n:"Zucchine arrosto",p:2},{n:"Zucchine fritte",p:2},
   {n:"No Lattosio",p:0,special:true}
 ];
@@ -1919,7 +1921,7 @@ function buildEscPosText(o){
   txt+=LFT;
   if(o.type==='domicilio'){
     txt+=MED+(o.indirizzo||'N/D')+'\n'+NRM;
-    txt+='Tel: '+(o.telefono||'-')+'\n';
+    txt+=BIG+'Tel: '+(o.telefono||'-')+'\n'+NRM;
   }
   txt+='================================\n';
 
