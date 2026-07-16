@@ -10,6 +10,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 *:focus{outline:none;}
+*{-webkit-tap-highlight-color:transparent;}
 button:focus{outline:none;}
 input:focus{outline:none;}
 :root{
@@ -812,9 +813,11 @@ function toast(msg,type='ok',ms=3200){
 }
 
 // MENU
+const CAT_LABELS={'Pizze Mezzo Metro':'Pizze M. M.'};
+function catLabel(c){return CAT_LABELS[c]||c;}
 function renderCats(){
   const cats=Object.keys(MENU);
-  document.getElementById('ctabs').innerHTML=cats.map((c,i)=>`<button class="ctab${i===0?' active':''}" onclick="selCat('${c}',this)">${c}</button>`).join('');
+  document.getElementById('ctabs').innerHTML=cats.map((c,i)=>`<button class="ctab${i===0?' active':''}" onclick="selCat('${c}',this)">${catLabel(c)}</button>`).join('');
   renderProds(cats[0]);
 }
 function selCat(cat,btn){
@@ -1393,7 +1396,7 @@ function renderEditCats(){
   const cats=Object.keys(MENU);
   document.getElementById('edit-cat-tabs').innerHTML=cats.map((c,i)=>`
     <button onclick="renderEditProds('${c}',this)"
-      style="padding:6px 12px;border-radius:16px;border:2px solid var(--vc);background:${i===0?'var(--r)':'rgba(0,0,0,0.4)'};color:${i===0?'var(--g)':'#ccc'};cursor:pointer;font-size:11px;font-weight:900;">${c}</button>`).join('');
+      style="padding:6px 12px;border-radius:16px;border:2px solid var(--vc);background:${i===0?'var(--r)':'rgba(0,0,0,0.4)'};color:${i===0?'var(--g)':'#ccc'};cursor:pointer;font-size:11px;font-weight:900;">${catLabel(c)}</button>`).join('');
   renderEditProds(cats[0],document.getElementById('edit-cat-tabs').firstChild);
 }
 
