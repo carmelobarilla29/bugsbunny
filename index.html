@@ -405,8 +405,9 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
     <h3 id="medit-title">✏️ Modifica Ordine</h3>
     <!-- TAB modifica/aggiungi -->
     <div style="display:flex;gap:6px;margin-bottom:10px;">
-      <button onclick="selEditTab('items',this)" id="etab-items" style="flex:1;padding:8px;background:var(--g);color:var(--vs);border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">📋 Prodotti ordine</button>
-      <button onclick="selEditTab('add',this)" id="etab-add" style="flex:1;padding:8px;background:rgba(0,0,0,0.3);color:rgba(255,255,255,0.6);border:2px solid rgba(255,255,255,0.2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">➕ Aggiungi prodotto</button>
+      <button onclick="selEditTab('items',this)" id="etab-items" style="flex:1;padding:8px;background:var(--g);color:var(--vs);border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">📋 Prodotti</button>
+      <button onclick="selEditTab('add',this)" id="etab-add" style="flex:1;padding:8px;background:rgba(0,0,0,0.3);color:rgba(255,255,255,0.6);border:2px solid rgba(255,255,255,0.2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">➕ Aggiungi</button>
+      <button onclick="selEditTab('dati',this)" id="etab-dati" style="flex:1;padding:8px;background:rgba(0,0,0,0.3);color:rgba(255,255,255,0.6);border:2px solid rgba(255,255,255,0.2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:900;">📇 Dati</button>
     </div>
 
     <!-- TAB PRODOTTI ORDINE -->
@@ -418,6 +419,21 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
     <div id="etab-add-panel" style="display:none;flex:1;overflow-y:auto;margin-bottom:10px;">
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;" id="edit-cat-tabs"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;" id="edit-prod-grid"></div>
+    </div>
+
+    <!-- TAB DATI CLIENTE -->
+    <div id="etab-dati-panel" style="display:none;flex:1;overflow-y:auto;margin-bottom:10px;">
+      <label style="display:block;font-size:11px;font-weight:900;color:rgba(255,255,255,0.5);margin-bottom:3px;">COGNOME</label>
+      <input type="text" id="edit-dati-cognome" style="width:100%;padding:10px;background:rgba(0,0,0,0.35);border:2px solid var(--vc);border-radius:8px;color:#fff;font-size:14px;font-weight:700;margin-bottom:10px;">
+      <label style="display:block;font-size:11px;font-weight:900;color:rgba(255,255,255,0.5);margin-bottom:3px;">ORARIO (es. 20:30 oppure Appena possibile)</label>
+      <input type="text" id="edit-dati-orario" style="width:100%;padding:10px;background:rgba(0,0,0,0.35);border:2px solid var(--vc);border-radius:8px;color:#fff;font-size:14px;font-weight:700;margin-bottom:10px;">
+      <div id="edit-dati-dom">
+        <label style="display:block;font-size:11px;font-weight:900;color:rgba(255,255,255,0.5);margin-bottom:3px;">TELEFONO</label>
+        <input type="tel" id="edit-dati-tel" style="width:100%;padding:10px;background:rgba(0,0,0,0.35);border:2px solid var(--vc);border-radius:8px;color:#fff;font-size:14px;font-weight:700;margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:900;color:rgba(255,255,255,0.5);margin-bottom:3px;">INDIRIZZO</label>
+        <input type="text" id="edit-dati-ind" style="width:100%;padding:10px;background:rgba(0,0,0,0.35);border:2px solid var(--vc);border-radius:8px;color:#fff;font-size:14px;font-weight:700;margin-bottom:10px;">
+      </div>
+      <button onclick="saveEditDati()" style="width:100%;padding:12px;background:linear-gradient(135deg,#b8860b,#f39c12);border:2px solid var(--g);color:#000;border-radius:10px;cursor:pointer;font-size:14px;font-weight:900;">💾 Salva dati</button>
     </div>
 
     <div style="background:rgba(245,216,0,0.1);border:2px solid var(--g);border-radius:8px;padding:8px 14px;display:flex;justify-content:space-between;margin-bottom:8px;">
@@ -472,7 +488,7 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
     </div>
     <div id="mmeta-totrow" style="text-align:center;font-size:14px;font-weight:900;color:var(--g);margin-bottom:8px;"></div>
     <div class="mbtns">
-      <button class="bcan" onclick="document.getElementById('mmeta').classList.remove('show');window._editMode=false;window._editCartIdx=undefined;">✕ Annulla</button>
+      <button class="bcan" onclick="document.getElementById('mmeta').classList.remove('show');window._editMode=false;window._editCartIdx=undefined;window._editOpen=null;">✕ Annulla</button>
       <button onclick="confirmMetaMeta()" style="flex:1;padding:12px;background:linear-gradient(135deg,#b8860b,#f39c12);border:2px solid var(--g);color:#000;border-radius:10px;cursor:pointer;font-size:14px;font-weight:900;">✅ Aggiungi</button>
     </div>
   </div>
@@ -611,9 +627,7 @@ const MENU={
     {n:"Max Regina",p:15,ing:"pomodoro, pomodorini, mozzarella, basilico",extraMax:true,cat:"pizza",excl:[]},
     {n:"Max Suprema",p:15,ing:"pomodorini, mozzarella, bresaola, rucola, scaglie di grana",extraMax:true,cat:"pizza",excl:[]},
     {n:"Max Tonnara",p:15,ing:"pomodoro, mozzarella, tonno",extraMax:true,cat:"pizza",excl:[]},
-    {n:"Max Vegetariana",p:15,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",extraMax:true,cat:"pizza",excl:[]},
-    {n:"Teglia Margherita (8pz)",p:16,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
-    {n:"Teglia Farcita (8pz)",p:20,ing:"ingredienti vari",extraMax:true,cat:"pizza",excl:[]}
+    {n:"Max Vegetariana",p:15,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",extraMax:true,cat:"pizza",excl:[]}
   ],
   "Pizze Mezzo Metro":[
     {n:"Mezzo Metro Margherita",p:12,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
@@ -642,6 +656,34 @@ const MENU={
     {n:"Mezzo Metro Suprema",p:15,ing:"pomodorini, mozzarella, bresaola, rucola, scaglie di grana",extraMax:true,cat:"pizza",excl:[]},
     {n:"Mezzo Metro Tonnara",p:15,ing:"pomodoro, mozzarella, tonno",extraMax:true,cat:"pizza",excl:[]},
     {n:"Mezzo Metro Vegetariana",p:15,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",extraMax:true,cat:"pizza",excl:[]}
+  ],
+  "Teglie":[
+    {n:"Teglia Margherita",p:16,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Baby",p:20,ing:"pomodoro, mozzarella, würstel, patatine",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Bestemmia",p:20,ing:"pomodoro, mozzarella, salame, funghi",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Biancaneve",p:20,ing:"mozzarella, origano",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Bolognese",p:20,ing:"mortadella, mozzarella, pesto e granella di pistacchio",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Bolognese Burrata",p:20,ing:"mortadella, mozzarella, burrata, pesto e granella di pistacchio",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Boscaiola",p:20,ing:"pomodoro, mozzarella, speck, funghi, scamorza",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Bugs Bunny",p:20,ing:"pomodorini, mozzarella, capperi, acciughe",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Calabrese",p:20,ing:"pomodoro, mozzarella, peperoni, melanzane fritte, olive",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Caprese",p:20,ing:"mozzarella di bufala, pomodorini, basilico",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Capricciosa",p:20,ing:"pomodoro, mozzarella, würstel, carciofini, funghi",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Diavola",p:20,ing:"pomodoro, mozzarella, salame, olive",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Farcita (metà/metà)",p:20,ing:"",extraMax:true,cat:"pizza",excl:[],metaMeta:true},
+    {n:"Teglia Farcita (+)",p:20,ing:"",extraMax:true,cat:"pizza",excl:[],farcitaPlus:true},
+    {n:"Teglia Fantasy",p:20,ing:"pomodoro, mozzarella, salame, lattuga, olive",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Gustosa",p:20,ing:"pomodorini, mozzarella, prosciutto crudo, rucola, scaglie di grana",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Marinara",p:20,ing:"pomodoro, olio, aglio, origano",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Napoli",p:20,ing:"pomodoro, mozzarella, capperi, acciughe",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia No Glutine",p:20,ing:"pomodoro, mozzarella",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Ortolana",p:20,ing:"pomodoro, mozzarella, peperoni arrosto, melanzane fritte, zucchine fritte",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Quattro Formaggi",p:20,ing:"mozzarella, scamorza, edamer, gorgonzola",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Quattro Stagioni",p:20,ing:"pomodoro, mozzarella, carciofini, funghi, olive, cotto",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Regina",p:20,ing:"pomodoro, pomodorini, mozzarella, basilico",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Suprema",p:20,ing:"pomodorini, mozzarella, bresaola, rucola, scaglie di grana",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Tonnara",p:20,ing:"pomodoro, mozzarella, tonno",extraMax:true,cat:"pizza",excl:[]},
+    {n:"Teglia Vegetariana",p:20,ing:"pomodoro, mozzarella, lattuga, radicchio, rucola",extraMax:true,cat:"pizza",excl:[]}
   ],
   "Rosticceria":[
     {n:"Arancino al Ragù",p:2.5,ing:"riso, mozzarella, sugo alla bolognese",cat:"rosticceria"},
@@ -805,7 +847,7 @@ function renderProds(cat){
 }
 
 function addProd(cat,name,price){
-  const isPizza=cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro';
+  const isPizza=cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro'||cat==='Teglie';
   if(isPizza){
     const prod=MENU[cat].find(p=>p.n===name);
     const isMax=prod&&prod.extraMax;
@@ -875,13 +917,14 @@ function editCartItem(idx){
   for(const c of Object.keys(MENU)){
     if(MENU[c].find(p=>p.n===it.name)){cat=c;break;}
   }
-  const isPizza=cat&&(cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro');
+  const isPizza=cat&&(cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro'||cat==='Teglie');
   const isMetaMeta=it.note&&it.note.includes("Meta':");
 
   if(isMetaMeta){
     const prod=cat?MENU[cat].find(p=>p.n===it.name):null;
     window._editCartIdx=idx;
     window._editMode=true;
+    window._editOpen=null;
     metaMetaName=it.name;
     metaMetaPrice=prod?prod.p:it.price;
     metaMetaIsMax=prod?prod.extraMax:true;
@@ -934,6 +977,7 @@ function editCartItem(idx){
     const isMax=prod&&prod.extraMax;
     window._editCartIdx=idx;
     window._editMode=true;
+    window._editOpen=null;
     pendProd={name:it.name,price:prod?prod.p:it.price,ing:prod?prod.ing:'',isMax,excl:[],farcitaPlus:prod?prod.farcitaPlus:false};
     selEx=[...it.extras];
     selRm=[...it.removes];
@@ -1050,6 +1094,7 @@ function confirmOrder(){
   order.orario=orVal;
   order.indirizzo=order.type==='domicilio'?document.getElementById('indirizzo').value.trim():'';
   order.total=getTotal();
+  order.deliveryCost=order.type==='domicilio'?currentDeliveryCost:0;
   order.time=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   order.date=new Date().toLocaleDateString('it-IT');
   saveCli();
@@ -1210,7 +1255,7 @@ function renderStats(){
 
   // Conteggio pizze
   const pizzeCount=completedOrders.reduce((s,o)=>s+o.items.filter(i=>{
-    for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro']){
+    for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro','Teglie']){
       if(MENU[cat]&&MENU[cat].find(p=>p.n===i.name))return true;
     }
     return false;
@@ -1301,13 +1346,47 @@ function renderOpen(){
 }
 
 function selEditTab(tab,btn){
-  document.getElementById('etab-items-panel').style.display=tab==='items'?'block':'none';
-  document.getElementById('etab-add-panel').style.display=tab==='add'?'block':'none';
-  document.getElementById('etab-items').style.background=tab==='items'?'var(--g)':'rgba(0,0,0,0.3)';
-  document.getElementById('etab-items').style.color=tab==='items'?'var(--vs)':'rgba(255,255,255,0.6)';
-  document.getElementById('etab-add').style.background=tab==='add'?'var(--g)':'rgba(0,0,0,0.3)';
-  document.getElementById('etab-add').style.color=tab==='add'?'var(--vs)':'rgba(255,255,255,0.6)';
+  ['items','add','dati'].forEach(t=>{
+    document.getElementById('etab-'+t+'-panel').style.display=tab===t?'block':'none';
+    const b=document.getElementById('etab-'+t);
+    b.style.background=tab===t?'var(--g)':'rgba(0,0,0,0.3)';
+    b.style.color=tab===t?'var(--vs)':'rgba(255,255,255,0.6)';
+  });
   if(tab==='add')renderEditCats();
+  if(tab==='dati')fillEditDati();
+}
+
+function fillEditDati(){
+  const o=openOrders.find(x=>x.id===window._editId);
+  if(!o)return;
+  document.getElementById('edit-dati-cognome').value=o.cognome||'';
+  document.getElementById('edit-dati-orario').value=o.orario||'';
+  document.getElementById('edit-dati-tel').value=o.telefono||'';
+  document.getElementById('edit-dati-ind').value=o.indirizzo||'';
+  document.getElementById('edit-dati-dom').style.display=o.type==='domicilio'?'block':'none';
+}
+
+function saveEditDati(){
+  const o=openOrders.find(x=>x.id===window._editId);
+  if(!o)return;
+  const cog=document.getElementById('edit-dati-cognome').value.trim();
+  if(!cog){toast('Il cognome non può essere vuoto!','err');return;}
+  const orario=document.getElementById('edit-dati-orario').value.trim();
+  if(!orario){toast('L\'orario non può essere vuoto!','err');return;}
+  o.cognome=cog;
+  o.orario=orario;
+  if(o.type==='domicilio'){
+    const tel=document.getElementById('edit-dati-tel').value.trim();
+    const ind=document.getElementById('edit-dati-ind').value.trim();
+    if(!tel){toast('Il telefono non può essere vuoto!','err');return;}
+    if(!ind){toast('L\'indirizzo non può essere vuoto!','err');return;}
+    o.telefono=tel;
+    o.indirizzo=ind;
+  }
+  saveOrders();
+  renderOpen();
+  document.getElementById('medit-title').textContent='✏️ Modifica — '+o.cognome;
+  toast('Dati aggiornati! ✅','ok',2500);
 }
 
 function renderEditCats(){
@@ -1335,9 +1414,7 @@ function editAddProduct(name,price){
   const ex=o.items.find(i=>i.name===name&&!i.extras.length&&!i.removes.length&&!i.note);
   if(ex){ex.qty++;}
   else{o.items.push({name,price,extras:[],removes:[],note:'',qty:1});}
-  o.total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
-  if(o.type==='domicilio')o.total+=DELIVERY_COST;
-  o.total=+o.total.toFixed(2);
+  recalcOpenOrder(o);
   saveOrders();
   renderEditItems(o);
   toast(name+' aggiunto!','ok',2000);
@@ -1347,10 +1424,11 @@ function renderEditItems(o){
   document.getElementById('medit-items').innerHTML=o.items.map((it,i)=>`
     <div style="display:flex;align-items:center;background:rgba(45,90,27,0.25);border:1px solid rgba(74,124,47,0.35);border-radius:8px;padding:7px 10px;margin-bottom:5px;gap:8px;">
       <div style="flex:1;font-size:13px;font-weight:700;">${it.name}
-        ${it.extras.length?`<div style="font-size:11px;color:var(--g);">+ ${it.extras.join(', ')}</div>`:''}
-        ${it.removes.length?`<div style="font-size:11px;color:#ff7070;">- ${it.removes.join(', ')}</div>`:''}
+        ${(it.extras||[]).length?`<div style="font-size:11px;color:var(--g);">+ ${it.extras.join(', ')}</div>`:''}
+        ${(it.removes||[]).length?`<div style="font-size:11px;color:#ff7070;">- ${it.removes.join(', ')}</div>`:''}
         ${it.note?`<div style="font-size:11px;color:rgba(255,255,255,0.45);">📝 ${it.note}</div>`:''}
       </div>
+      <button onclick="editOpenItem(${o.id},${i})" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px;">✏️</button>
       <div style="display:flex;align-items:center;gap:5px;">
         <button onclick="editChgQty(${o.id},${i},-1)" style="background:var(--r);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:bold;">−</button>
         <span style="font-weight:900;min-width:20px;text-align:center;">${it.qty}</span>
@@ -1360,6 +1438,90 @@ function renderEditItems(o){
       <button onclick="editDelItem(${o.id},${i})" style="background:none;border:none;color:rgba(255,100,100,0.6);cursor:pointer;font-size:16px;">✕</button>
     </div>`).join('');
   document.getElementById('medit-total').textContent=fmt(o.total);
+}
+
+// Modifica un prodotto dentro un ordine aperto (pizze con extras, metà/metà, note)
+function editOpenItem(orderId,itemIdx){
+  const o=openOrders.find(x=>x.id===orderId);
+  if(!o)return;
+  const it=o.items[itemIdx];
+  if(!it)return;
+
+  let cat=null;
+  for(const c of Object.keys(MENU)){
+    if(MENU[c].find(p=>p.n===it.name)){cat=c;break;}
+  }
+  const isPizza=cat&&(cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro'||cat==='Teglie');
+  const isMetaMeta=it.note&&it.note.includes("Meta':");
+
+  if(isMetaMeta){
+    const prod=cat?MENU[cat].find(p=>p.n===it.name):null;
+    window._editOpen={oid:orderId,idx:itemIdx};
+    window._editMode=false;window._editCartIdx=undefined;
+    metaMetaName=it.name;
+    metaMetaPrice=prod?prod.p:it.price;
+    metaMetaIsMax=prod?prod.extraMax:true;
+    metaMetaGusti={prima:[],seconda:[]};
+    metaMetaExtras={prima:[],seconda:[]};
+
+    const nota=it.note||'';
+    const dashIdx=nota.indexOf("Meta':");
+    let notaLibera='';
+    if(dashIdx>0)notaLibera=nota.substring(0,dashIdx).replace(/ - $/,'').trim();
+    const metaPart=dashIdx>=0?nota.substring(dashIdx):'';
+    const halves=metaPart.split(' / ');
+    const gustiValidi=MENU['Pizze Tonde'].map(p=>p.n);
+    halves.forEach((h,hi)=>{
+      const lato=hi===0?'prima':'seconda';
+      const content=h.replace(/Meta':/,'').trim();
+      const parts=content.split(' + ');
+      const primaParte=parts[0].trim();
+      const restoParte=parts.slice(1).join(' + ').trim();
+      const possibiliGusti=primaParte.split(' e ').map(g=>g.trim());
+      const gustiTrovati=possibiliGusti.filter(g=>gustiValidi.includes(g));
+      const nonGusti=possibiliGusti.filter(g=>!gustiValidi.includes(g));
+      metaMetaGusti[lato]=gustiTrovati;
+      const tuttiExtra=[];
+      nonGusti.forEach(ng=>{
+        ng.split(', ').map(e=>e.trim()).filter(Boolean).forEach(e=>tuttiExtra.push(e));
+      });
+      if(restoParte){
+        restoParte.split(', ').map(e=>e.trim()).filter(Boolean).forEach(e=>tuttiExtra.push(e));
+      }
+      metaMetaExtras[lato]=tuttiExtra.filter(Boolean);
+    });
+
+    openMetaMeta(it.name,metaMetaPrice,metaMetaIsMax,true);
+    document.getElementById('mmeta-note').value=notaLibera;
+    return;
+  }
+
+  if(isPizza){
+    const prod=MENU[cat].find(p=>p.n===it.name);
+    const isMax=prod&&prod.extraMax;
+    window._editOpen={oid:orderId,idx:itemIdx};
+    window._editMode=false;window._editCartIdx=undefined;
+    pendProd={name:it.name,price:prod?prod.p:it.price,ing:prod?prod.ing:'',isMax,excl:[],farcitaPlus:prod?prod.farcitaPlus:false};
+    selEx=[...(it.extras||[])];
+    selRm=[...(it.removes||[])];
+    openEx(it.name,prod?prod.ing:'',isMax,[],true,pendProd.farcitaPlus||false);
+    document.getElementById('mex-note').value=it.note||'';
+  } else {
+    const nota=prompt('Modifica nota per '+it.name+':',it.note||'');
+    if(nota!==null){
+      it.note=nota;
+      saveOrders();
+      renderEditItems(o);
+      toast('Nota aggiornata! ✅','ok',2000);
+    }
+  }
+}
+
+// Ricalcola il totale di un ordine aperto (items + consegna)
+function recalcOpenOrder(o){
+  o.total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
+  if(o.type==='domicilio')o.total+=(o.deliveryCost!==undefined?o.deliveryCost:DELIVERY_COST);
+  o.total=+o.total.toFixed(2);
 }
 
 function editOrder(id){
@@ -1377,9 +1539,7 @@ function editChgQty(orderId,itemIdx,d){
   if(!o)return;
   o.items[itemIdx].qty+=d;
   if(o.items[itemIdx].qty<=0)o.items.splice(itemIdx,1);
-  o.total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
-  if(o.type==='domicilio')o.total+=DELIVERY_COST;
-  o.total=+o.total.toFixed(2);
+  recalcOpenOrder(o);
   saveOrders();
   if(!o.items.length){
     document.getElementById('medit').classList.remove('show');
@@ -1394,7 +1554,7 @@ function editDelItem(orderId,itemIdx){
   editChgQty(orderId,itemIdx,-99);
 }
 
-function closeEditModal(){document.getElementById('medit').classList.remove('show');renderOpen();}
+function closeEditModal(){document.getElementById('medit').classList.remove('show');window._editOpen=null;renderOpen();}
 function editPrintComanda(){
   const o=openOrders.find(x=>x.id===window._editId);
   if(o)printComanda(o);
@@ -1532,6 +1692,7 @@ function openEx(name,ing,isMax=false,excl=[],keepSel=false,farcitaPlus=false){
     selEx=[];selRm=[];
     window._editMode=false;
     window._editCartIdx=undefined;
+    window._editOpen=null;
   }
   const baseList=farcitaPlus?EXTRAS_FARCITA:(isMax?EXTRAS_MAX:EXTRAS);
   const extrasList=baseList.filter(e=>!excl.includes(e.n));
@@ -1610,6 +1771,7 @@ function openMetaMeta(name,price,isMax,skipReset=false){
     metaMetaExtras={prima:[],seconda:[]};
     window._editMode=false;
     window._editCartIdx=undefined;
+    window._editOpen=null;
   }
   document.getElementById('mmeta-title').textContent='⬡ '+name;
   document.getElementById('mmeta-note').value='';
@@ -1704,6 +1866,25 @@ function confirmMetaMeta(){
   const nota=(document.getElementById('mmeta-note').value.trim()?document.getElementById('mmeta-note').value.trim()+' - ':'')+'Meta\': '+descMeta('prima')+' / Meta\': '+descMeta('seconda');
   const fp=calcMetaPrice();
 
+  if(window._editOpen){
+    // Modifica metà/metà di un ordine aperto
+    const o=openOrders.find(x=>x.id===window._editOpen.oid);
+    if(o&&o.items[window._editOpen.idx]){
+      const it=o.items[window._editOpen.idx];
+      it.note=nota;
+      it.price=fp;
+      it.extras=[];
+      recalcOpenOrder(o);
+      saveOrders();
+      renderEditItems(o);
+      renderOpen();
+    }
+    window._editOpen=null;
+    document.getElementById('mmeta').classList.remove('show');
+    toast('Metà/Metà modificata! ✅','ok',2000);
+    return;
+  }
+
   if(window._editMode&&window._editCartIdx!==undefined){
     // Modalità modifica
     const idx=window._editCartIdx;
@@ -1739,6 +1920,7 @@ function closeEx(){
   pendProd=null;
   window._editMode=false;
   window._editCartIdx=undefined;
+  window._editOpen=null;
 }
 function confirmEx(){
   if(!pendProd)return;
@@ -1756,6 +1938,26 @@ function confirmEx(){
   }
 
   const fp=+(pendProd.price+extraPrice).toFixed(2);
+
+  if(window._editOpen){
+    // Modifica prodotto di un ordine aperto
+    const o=openOrders.find(x=>x.id===window._editOpen.oid);
+    if(o&&o.items[window._editOpen.idx]){
+      const it=o.items[window._editOpen.idx];
+      it.extras=[...selEx];
+      it.removes=[...selRm];
+      it.note=nota;
+      it.price=fp;
+      recalcOpenOrder(o);
+      saveOrders();
+      renderEditItems(o);
+      renderOpen();
+    }
+    window._editOpen=null;
+    closeEx();
+    toast('Prodotto modificato! ✅','ok',2000);
+    return;
+  }
 
   if(window._editMode&&window._editCartIdx!==undefined){
     const idx=window._editCartIdx;
@@ -2001,7 +2203,7 @@ function printRiepilogo(){
   completedOrders.forEach(o=>o.items.forEach(i=>{prodCount[i.name]=(prodCount[i.name]||0)+i.qty;}));
   const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]);
   const pizzeCount=completedOrders.reduce((s,o)=>s+o.items.filter(i=>{
-    for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro']){if(MENU[cat]&&MENU[cat].find(p=>p.n===i.name))return true;}return false;
+    for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro','Teglie']){if(MENU[cat]&&MENU[cat].find(p=>p.n===i.name))return true;}return false;
   }).reduce((ss,i)=>ss+i.qty,0),0);
   const byHour={};
   completedOrders.forEach(o=>{
