@@ -774,7 +774,7 @@ const MENU={
 
 const EXTRAS=[
   {n:"Würstel",p:1},{n:"Patate",p:1},
-  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:2},{n:"Bufala",p:2},
+  {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:2},{n:"Bufala",p:2},{n:"Burrata",p:2},
   {n:"Capperi",p:1},{n:"Carciofi",p:1},{n:"Cipolla",p:1},{n:"Cotto",p:1},{n:"Crudo",p:1},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:1},{n:"Fiori di zucca",p:1},{n:"Friarelli",p:1},
   {n:"Funghi",p:1},{n:"Gorgonzola",p:1},{n:"Granella di pistacchio",p:2},
@@ -791,7 +791,7 @@ const EXTRAS=[
 
 const EXTRAS_MAX=[
   {n:"Würstel",p:2},{n:"Patate",p:2},
-  {n:"Acciughe",p:2},{n:"Basilico",p:0},{n:"Bresaola",p:3},{n:"Bufala",p:3},
+  {n:"Acciughe",p:2},{n:"Basilico",p:0},{n:"Bresaola",p:3},{n:"Bufala",p:3},{n:"Burrata",p:4},
   {n:"Capperi",p:2},{n:"Carciofi",p:2},{n:"Cipolla",p:2},{n:"Cotto",p:2},{n:"Crudo",p:2},
   {n:"Crema di pistacchio",p:2},{n:"Edamer",p:2},{n:"Fiori di zucca",p:2},{n:"Friarelli",p:2},
   {n:"Funghi",p:2},{n:"Gorgonzola",p:2},{n:"Granella di pistacchio",p:2},
@@ -806,9 +806,12 @@ const EXTRAS_MAX=[
   {n:"No Lattosio",p:0,special:true}
 ];
 
-// Lista per Farcita(+): tutto gratis tranne Bresaola e Bufala a €3
+// Ingredienti "prestige": nel metà/metà e nella Farcita(+) si paga solo il più caro presente, una volta sola
+const PRESTIGE_INGREDIENTS=['Bresaola','Bufala','Burrata'];
+
+// Lista per Farcita(+): tutto gratis tranne Bresaola/Bufala/Burrata al loro prezzo Max
 const EXTRAS_FARCITA=EXTRAS_MAX.map(e=>{
-  if(e.n==='Bresaola'||e.n==='Bufala')return {...e,p:3};
+  if(PRESTIGE_INGREDIENTS.includes(e.n))return {...e};
   return {...e,p:0};
 });
 let order={type:'asporto',items:[]};
@@ -1487,7 +1490,6 @@ function editAddProduct(name,price,cat){
   const isPizza=cat&&(cat==='Pizze Tonde'||cat==='Pizze Max'||cat==='Pizze Mezzo Metro'||cat==='Teglie');
 
   if(isPizza&&prod){
-    window._editAddTarget=o.id;
     if(prod.metaMeta){
       metaMetaGusti={prima:[],seconda:[]};
       metaMetaExtras={prima:[],seconda:[]};
@@ -1497,6 +1499,7 @@ function editAddProduct(name,price,cat){
       selEx=[];selRm=[];
       openEx(prod.n,prod.ing,prod.extraMax,prod.excl||[],false,prod.farcitaPlus||false);
     }
+    window._editAddTarget=o.id;
     return;
   }
 
@@ -1546,7 +1549,7 @@ function editOpenItem(orderId,itemIdx){
   if(isMetaMeta){
     const prod=cat?MENU[cat].find(p=>p.n===it.name):null;
     window._editOpen={oid:orderId,idx:itemIdx};
-    window._editMode=false;window._editCartIdx=undefined;
+    window._editMode=false;window._editCartIdx=undefined;window._editAddTarget=null;
     metaMetaName=it.name;
     metaMetaPrice=prod?prod.p:it.price;
     metaMetaIsMax=prod?prod.extraMax:true;
@@ -1589,7 +1592,7 @@ function editOpenItem(orderId,itemIdx){
     const prod=MENU[cat].find(p=>p.n===it.name);
     const isMax=prod&&prod.extraMax;
     window._editOpen={oid:orderId,idx:itemIdx};
-    window._editMode=false;window._editCartIdx=undefined;
+    window._editMode=false;window._editCartIdx=undefined;window._editAddTarget=null;
     pendProd={name:it.name,price:prod?prod.p:it.price,ing:prod?prod.ing:'',isMax,excl:[],farcitaPlus:prod?prod.farcitaPlus:false};
     selEx=[...(it.extras||[])];
     selRm=[...(it.removes||[])];
@@ -1818,7 +1821,7 @@ let metaMetaExtras={prima:[],seconda:[]};
 
 function calcMetaPrice(){
   let extra=0;
-  let hasPrestige=false; // Bresaola o Bufala presenti in qualsiasi metà
+  let prestigeMax=0; // prezzo più alto tra gli ingredienti prestige presenti (si paga una sola volta il più caro)
 
   ['prima','seconda'].forEach(lato=>{
     const exs=metaMetaExtras[lato];
@@ -1826,8 +1829,8 @@ function calcMetaPrice(){
     exs.forEach(n=>{
       const ex=EXTRAS_MAX.find(e=>e.n===n);
       if(!ex)return;
-      if(n==='Bresaola'||n==='Bufala'){
-        hasPrestige=true; // segna presenza ma non aggiunge ancora
+      if(PRESTIGE_INGREDIENTS.includes(n)){
+        if(ex.p>prestigeMax)prestigeMax=ex.p; // tiene il prezzo più alto tra quelli presenti
       } else if(ex.p===0){
         // gratis
       } else {
@@ -1837,7 +1840,7 @@ function calcMetaPrice(){
     });
   });
 
-  if(hasPrestige)extra+=3; // Bresaola/Bufala: sempre +€3 a prescindere da quante metà
+  extra+=prestigeMax; // ingredienti prestige: si paga solo il più caro, una volta sola
 
   return +(metaMetaPrice+extra).toFixed(2);
 }
@@ -2037,9 +2040,15 @@ function confirmEx(){
 
   let extraPrice=0;
   if(pendProd.farcitaPlus){
-    // Farcita+: tutti gratis tranne Bresaola/Bufala sempre €3
-    const hasPrestige=selEx.includes('Bresaola')||selEx.includes('Bufala');
-    if(hasPrestige)extraPrice=3;
+    // Farcita+: tutti gratis tranne Bresaola/Bufala/Burrata (si paga solo il più caro presente)
+    let prestigeMax=0;
+    PRESTIGE_INGREDIENTS.forEach(n=>{
+      if(selEx.includes(n)){
+        const ex=EXTRAS_MAX.find(x=>x.n===n);
+        if(ex&&ex.p>prestigeMax)prestigeMax=ex.p;
+      }
+    });
+    extraPrice=prestigeMax;
   } else {
     // Pizze normali: usa prezzi da lista
     const list=pendProd.isMax?EXTRAS_MAX:EXTRAS;
