@@ -1536,12 +1536,19 @@ function renderEditCats(){
 function renderEditProds(cat,btn){
   document.querySelectorAll('#edit-cat-tabs button').forEach(b=>{b.style.background='rgba(0,0,0,0.4)';b.style.color='#ccc';b.style.borderColor='var(--vc)';});
   if(btn){btn.style.background='var(--r)';btn.style.color='var(--g)';btn.style.borderColor='var(--g)';}
-  document.getElementById('edit-prod-grid').innerHTML=MENU[cat].map(p=>`
+  document.getElementById('edit-prod-grid').innerHTML=MENU[cat].map(p=>{
+    // Il separatore delle birre non e' un prodotto: qui era cliccabile e
+    // finiva nell'ordine come riga da zero euro.
+    if(p.separatore){
+      return `<div style="grid-column:1/-1;background:rgba(245,216,0,0.1);border:1px solid rgba(245,216,0,0.3);border-radius:8px;padding:6px;text-align:center;font-size:12px;font-weight:900;color:var(--g);pointer-events:none;">${p.n}</div>`;
+    }
+    return `
     <button onclick="editAddProduct('${p.n.replace(/'/g,"\\'")}',${p.p},'${cat}')"
       style="background:${p.zero?'linear-gradient(145deg,#2b2b2b,#000)':'linear-gradient(145deg,rgba(45,90,27,0.8),rgba(26,58,26,0.9))'};border:2px solid ${p.zero?'#9a9a9a':'var(--vc)'};color:#fff;padding:10px 8px;border-radius:10px;cursor:pointer;text-align:center;">
       <div style="font-size:12px;font-weight:900;">${p.n}</div>
       <div style="font-size:14px;color:var(--g);font-weight:900;margin-top:4px;">${fmt(p.p)}</div>
-    </button>`).join('');
+    </button>`;
+  }).join('');
 }
 
 function editAddProduct(name,price,cat){
