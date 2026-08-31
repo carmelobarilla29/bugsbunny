@@ -1894,7 +1894,9 @@ function updateMetaTot(){
 function updateMetaCount(lato){
   const exs=metaMetaExtras[lato];
   let c=0;
-  exs.forEach(n=>{const ex=EXTRAS_MAX.find(e=>e.n===n);if(ex&&ex.p!==0&&ex.p!==4)c++;});
+  // Stessa regola di calcMetaPrice: non contano i gratis ne' i prestige
+  // (Bresaola/Bufala/Burrata si pagano a parte, solo il piu' caro una volta sola)
+  exs.forEach(n=>{const ex=EXTRAS_MAX.find(e=>e.n===n);if(ex&&ex.p!==0&&!PRESTIGE_INGREDIENTS.includes(n))c++;});
   const r=Math.max(0,4-c);
   document.getElementById('mmeta-count-'+lato).textContent=c<=4?`(${r} gratis rim.)`:`(${c-4} a €2)`;
 }
