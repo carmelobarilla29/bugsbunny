@@ -385,7 +385,8 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
       <div id="atab-prezzi">
         <div class="mnote" style="margin-bottom:10px;">Modifica prezzi del menu — clicca su un prezzo per cambiarlo</div>
         <div id="admin-menu-list"></div>
-        <div class="mbtns" style="margin-top:16px;">
+        <button class="bclr" style="margin-top:16px;" onclick="ripristinaPrezziOriginali()">↩️ Ripristina prezzi originali</button>
+        <div class="mbtns" style="margin-top:8px;">
           <button class="bcan" onclick="closeAdmin()">✕ Chiudi</button>
           <button class="bok" onclick="saveAdminPrezzi()">💾 Salva tutto</button>
         </div>
@@ -781,6 +782,14 @@ const MENU={
     {n:"Tennent's",p:3,ing:"",cat:"birra"}
   ]
 };
+
+// Prezzi come stanno scritti qui nel programma, presi prima di applicare
+// quelli salvati: servono al tasto "Ripristina prezzi originali" dell'Admin.
+const PREZZI_ORIGINALI={};
+Object.entries(MENU).forEach(([cat,items])=>{
+  PREZZI_ORIGINALI[cat]={};
+  items.forEach(item=>{PREZZI_ORIGINALI[cat][item.n]=item.p;});
+});
 
 // Riapplica i prezzi modificati dal pannello Admin (salvati in bb_menu).
 // Solo i PREZZI e solo cercando per NOME: cosi' i prodotti aggiunti o tolti
@@ -2552,6 +2561,20 @@ function saveAdminPrezzi(){
   toast('Prezzi aggiornati!','ok');
   renderCats();
   closeAdmin();
+}
+
+function ripristinaPrezziOriginali(){
+  if(!confirm('Rimettere tutti i prezzi come sono nel programma?\nI prezzi cambiati da questo pannello andranno persi.'))return;
+  Object.entries(MENU).forEach(([cat,items])=>{
+    items.forEach(item=>{
+      const p=PREZZI_ORIGINALI[cat]?PREZZI_ORIGINALI[cat][item.n]:undefined;
+      if(typeof p==='number')item.p=p;
+    });
+  });
+  localStorage.removeItem('bb_menu');
+  renderAdminMenu();
+  renderCats();
+  toast('Prezzi originali ripristinati!','ok');
 }
 
 function saveDelivery(){
