@@ -782,6 +782,27 @@ const MENU={
   ]
 };
 
+// Riapplica i prezzi modificati dal pannello Admin (salvati in bb_menu).
+// Solo i PREZZI e solo cercando per NOME: cosi' i prodotti aggiunti o tolti
+// nel codice restano quelli veri, e un menu vecchio salvato sul tablet non
+// congela il resto (ingredienti, meta/meta, Farcita, separatori).
+// Il try/catch e' voluto: se bb_menu fosse corrotto, senza di esso l'errore
+// fermerebbe TUTTO lo script e il gestionale non partirebbe.
+(function caricaPrezziSalvati(){
+  let salvato=null;
+  try{ salvato=JSON.parse(localStorage.getItem('bb_menu')||'null'); }
+  catch(e){ return; }
+  if(!salvato||typeof salvato!=='object')return;
+  Object.entries(MENU).forEach(([cat,items])=>{
+    const salvatiCat=salvato[cat];
+    if(!Array.isArray(salvatiCat))return;
+    items.forEach(item=>{
+      const s=salvatiCat.find(x=>x&&x.n===item.n);
+      if(s&&typeof s.p==='number'&&!isNaN(s.p)&&s.p>=0)item.p=s.p;
+    });
+  });
+})();
+
 const EXTRAS=[
   {n:"Würstel",p:1},{n:"Patate",p:1},
   {n:"Acciughe",p:1},{n:"Basilico",p:0},{n:"Bresaola",p:2},{n:"Bufala",p:2},{n:"Burrata",p:2},
