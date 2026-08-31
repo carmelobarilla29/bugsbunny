@@ -276,7 +276,8 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
         <button class="orbtn" id="orbtn-ap" onclick="setOr('ap')">⚡ Appena possibile</button>
         <button class="orbtn" id="orbtn-ora" onclick="setOr('ora')">🕐 Inserisci orario</button>
       </div>
-      <input class="finput" type="text" id="orario-input" placeholder="Es: 20:30" style="display:none;margin-bottom:5px;">
+      <input class="finput" type="text" id="orario-input" placeholder="Es: 20:30" style="display:none;margin-bottom:5px;" oninput="updCarico()">
+      <div id="carico-info" style="display:none;font-size:12px;font-weight:800;padding:6px 10px;border-radius:8px;margin-bottom:5px;"></div>
 
       <!-- DOMICILIO FIELDS -->
       <div id="domfields" style="display:none;">
@@ -393,9 +394,18 @@ body{font-family:'Nunito',Arial,sans-serif;background:var(--vs);color:#fff;heigh
       <!-- TAB CONSEGNA -->
       <div id="atab-consegna" style="display:none;">
         <div class="mnote" style="margin-bottom:10px;">Costo fisso consegna a domicilio</div>
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
           <span style="font-size:16px;font-weight:700;">€</span>
           <input class="minput" type="number" id="admin-delivery" step="0.50" min="0" style="font-size:22px;font-weight:900;width:120px;">
+        </div>
+        <div class="mnote" style="margin-bottom:10px;">Stima carico forno</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:700;flex:1;">Pizze per 15 min</span>
+          <input class="minput" type="number" id="admin-capacita" step="1" min="1" style="font-size:18px;font-weight:900;width:80px;">
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <span style="font-size:13px;font-weight:700;flex:1;">Minuti di consegna</span>
+          <input class="minput" type="number" id="admin-viaggio" step="1" min="0" style="font-size:18px;font-weight:900;width:80px;">
         </div>
         <div class="mbtns">
           <button class="bcan" onclick="closeAdmin()">✕ Chiudi</button>
@@ -1031,6 +1041,7 @@ function updTotal(){
   if(order.type==='domicilio'){
     document.getElementById('delrow').innerHTML=`<span>🛵 Consegna</span><span style="color:var(--g)">${fmt(currentDeliveryCost)}</span>`;
   }
+  updCarico();
 }
 
 function addCoperto(){
@@ -1052,6 +1063,7 @@ function setType(t){
     setDelivery(DELIVERY_COST,true);
   }
   updTotal();
+  updCarico();
 }
 
 // ORARIO
@@ -1067,14 +1079,21 @@ function setOr(mode){
     ora.classList.add('active');ap.classList.remove('active');
     inp.style.display='block';inp.focus();
   }
+  updCarico();
 }
 function getOrVal(){
   if(orMode==='ap')return 'Appena possibile';
-  if(orMode==='ora')return document.getElementById('orario-input').value.trim();
+  if(orMode==='ora'){
+    const raw=document.getElementById('orario-input').value.trim();
+    const m=orarioInMinuti(raw);
+    return m!==null?minutiInOrario(m):raw; // normalizza "19" -> "19:00"
+  }
   return '';
 }
 function resetOr(){
   orMode=null;
+  const ci=document.getElementById('carico-info');
+  if(ci)ci.style.display='none';
   document.getElementById('orbtn-ap').classList.remove('active');
   document.getElementById('orbtn-ora').classList.remove('active');
   document.getElementById('orario-input').style.display='none';
@@ -1327,7 +1346,8 @@ function renderStats(){
 
 function renderOpen(){
   const tot=openOrders.reduce((s,o)=>s+(o.total||0),0);
-  document.getElementById('oinfo').textContent=`${openOrders.length} ordini · Totale: ${fmt(tot)}`;
+  const pizzeCoda=attesaAttuale();
+  document.getElementById('oinfo').textContent=`${openOrders.length} ordini · Totale: ${fmt(tot)}`+(pizzeCoda>0?` · 🍕 ${pizzeCoda} in coda`:'');
 
   const sorted=[...openOrders].sort((a,b)=>{
     const getMin=o=>{
@@ -1441,7 +1461,8 @@ function saveEditDati(){
   const orario=document.getElementById('edit-dati-orario').value.trim();
   if(!orario){toast('L\'orario non può essere vuoto!','err');return;}
   o.cognome=cog;
-  o.orario=orario;
+  const om=orarioInMinuti(orario);
+  o.orario=(orario.toLowerCase().includes('appena')||om===null)?orario:minutiInOrario(om);
   const newType=window._editType||o.type;
   if(newType==='domicilio'){
     const tel=document.getElementById('edit-dati-tel').value.trim();
@@ -2286,6 +2307,158 @@ function setDelivery(cost,force=false){
 }
 let ADMIN_PWD=localStorage.getItem('bb_adminpwd')||'1234';
 
+// ===== STIMA CARICO FORNO =====
+// Parametri modificabili da Admin
+let CAPACITA_FASCIA=parseInt(localStorage.getItem('bb_capacita')||'9');   // pizze max per fascia da 15 min
+let MINUTI_VIAGGIO=parseInt(localStorage.getItem('bb_viaggio')||'15');    // minuti di consegna a domicilio
+
+// Peso di ogni prodotto sul forno a legna
+function pesoForno(nomeProdotto){
+  for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro']){
+    if(MENU[cat]&&MENU[cat].find(p=>p.n===nomeProdotto)){
+      return cat==='Pizze Tonde'?1:2; // Max e Mezzo Metro pesano il doppio
+    }
+  }
+  return 0; // Teglie (forno diverso), rosticceria, bibite: non pesano
+}
+
+// Quante "pizze equivalenti" pesa un ordine
+function pesoOrdine(o){
+  if(!o||!o.items)return 0;
+  return o.items.reduce((s,i)=>s+pesoForno(i.name)*(i.qty||1),0);
+}
+
+// Converte "20:30" o "20.30" in minuti dalla mezzanotte. null se non è un orario.
+function orarioInMinuti(str){
+  if(!str)return null;
+  let s=String(str).trim().replace(/[.,\-\s]/g,':');
+  let h,min;
+  let m=s.match(/^(\d{1,2}):(\d{1,2})$/);
+  if(m){
+    h=parseInt(m[1]);min=parseInt(m[2]);
+  } else if(/^\d{1,2}$/.test(s)){
+    h=parseInt(s);min=0;                    // "19" -> 19:00
+  } else if(/^\d{3}$/.test(s)){
+    h=parseInt(s.substring(0,1));min=parseInt(s.substring(1)); // "930" -> 9:30
+  } else if(/^\d{4}$/.test(s)){
+    h=parseInt(s.substring(0,2));min=parseInt(s.substring(2)); // "1930" -> 19:30
+  } else return null;
+  if(isNaN(h)||isNaN(min)||h>23||min>59)return null;
+  return h*60+min;
+}
+
+// Formatta minuti dalla mezzanotte in "HH:MM"
+function minutiInOrario(m){
+  const h=Math.floor(m/60)%24,mi=Math.round(m%60);
+  return String(h).padStart(2,'0')+':'+String(mi).padStart(2,'0');
+}
+
+// Minuto in cui le pizze di un ordine devono essere PRONTE nel forno
+function minutoForno(o){
+  const t=orarioInMinuti(o.orario);
+  if(t===null)return null; // "Appena possibile" gestito a parte
+  return o.type==='domicilio'?t-MINUTI_VIAGGIO:t;
+}
+
+// Peso già impegnato in una fascia di 15 minuti attorno a un dato minuto
+function caricoFascia(minutoTarget,escludiId){
+  let peso=0;
+  openOrders.forEach(o=>{
+    if(escludiId!==undefined&&o.id===escludiId)return;
+    const m=minutoForno(o);
+    if(m===null)return;
+    if(Math.abs(m-minutoTarget)<=7)peso+=pesoOrdine(o); // fascia di ~15 min
+  });
+  return peso;
+}
+
+// Primo orario libero a partire da un minuto dato (a passi di 15 min)
+function primoOrarioLibero(minutoPartenza,pesoDaAggiungere,escludiId){
+  for(let step=0;step<16;step++){
+    const m=minutoPartenza+step*15;
+    if(caricoFascia(m,escludiId)+pesoDaAggiungere<=CAPACITA_FASCIA){
+      const h=Math.floor(m/60)%24,min=m%60;
+      return String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');
+    }
+  }
+  return null;
+}
+
+// Quante pizze ci sono in coda adesso (in lavorazione o imminenti)
+function attesaAttuale(){
+  const ora=new Date();
+  const adesso=ora.getHours()*60+ora.getMinutes();
+  let peso=0;
+  openOrders.forEach(o=>{
+    const m=minutoForno(o);
+    if(m===null){peso+=pesoOrdine(o);return;}      // Appena possibile: pesa subito
+    if(m>=adesso-10&&m<=adesso+25)peso+=pesoOrdine(o); // in lavorazione o imminente
+  });
+  return peso;
+}
+
+// Aggiorna l'avviso sotto il campo orario
+function updCarico(){
+  const el=document.getElementById('carico-info');
+  if(!el)return;
+
+  const pesoNuovo=order.items.reduce((s,i)=>s+pesoForno(i.name)*(i.qty||1),0);
+  if(pesoNuovo===0||!orMode){el.style.display='none';return;} // nessuna pizza o nessun orario scelto
+
+  const verde=()=>{el.style.background='rgba(45,90,27,0.35)';el.style.border='1px solid var(--vc)';el.style.color='#8fd18f';};
+  const arancio=()=>{el.style.background='rgba(200,120,0,0.25)';el.style.border='1px solid #f39c12';el.style.color='#f5c26b';};
+  el.style.display='block';
+
+  // ===== APPENA POSSIBILE: mostra solo quante pizze ci sono in coda =====
+  if(orMode==='ap'){
+    const ora=new Date();
+    const adesso=ora.getHours()*60+ora.getMinutes();
+    let pesoCoda=0;
+    openOrders.forEach(o=>{
+      if(editId!==null&&o.id===editId)return;
+      const m=minutoForno(o);
+      if(m===null){pesoCoda+=pesoOrdine(o);return;}          // altri "appena possibile"
+      if(m>=adesso-10&&m<=adesso+25)pesoCoda+=pesoOrdine(o); // prenotati imminenti
+    });
+    if(pesoCoda===0){
+      verde();
+      el.textContent='📋 Nessuna pizza in coda';
+    } else if(pesoCoda<=CAPACITA_FASCIA){
+      verde();
+      el.textContent=`📋 ${pesoCoda} pizze in coda`;
+    } else {
+      arancio();
+      el.textContent=`📋 ${pesoCoda} pizze in coda — c'è da aspettare`;
+    }
+    return;
+  }
+
+  // ===== ORARIO FISSO =====
+  const val=document.getElementById('orario-input').value.trim();
+  const minutoRichiesto=orarioInMinuti(val);
+  if(minutoRichiesto===null){el.style.display='none';return;}
+
+  const orarioPulito=minutiInOrario(minutoRichiesto);
+  const minutoTarget=order.type==='domicilio'?minutoRichiesto-MINUTI_VIAGGIO:minutoRichiesto;
+  const giaImpegnato=caricoFascia(minutoTarget,editId!==null?editId:undefined);
+  const totale=giaImpegnato+pesoNuovo;
+
+  if(totale<=CAPACITA_FASCIA){
+    verde();
+    el.textContent=`✅ ${orarioPulito} libero (${totale}/${CAPACITA_FASCIA} pizze)`;
+  } else {
+    const libero=primoOrarioLibero(minutoTarget,pesoNuovo,editId!==null?editId:undefined);
+    let suggerito=null;
+    if(libero!==null){
+      const mm=orarioInMinuti(libero)+(order.type==='domicilio'?MINUTI_VIAGGIO:0);
+      suggerito=minutiInOrario(mm);
+    }
+    arancio();
+    el.textContent=`⚠️ ${orarioPulito} carico (${totale}/${CAPACITA_FASCIA} pizze)`+(suggerito?` — libero dalle ${suggerito}`:'');
+  }
+}
+
+
 function getTotal(){
   let t=order.items.reduce((s,i)=>s+i.price*i.qty,0);
   if(order.type==='domicilio')t+=currentDeliveryCost;
@@ -2307,6 +2480,8 @@ function checkAdminPwd(){
     document.getElementById('admin-panel').style.display='block';
     renderAdminMenu();
     document.getElementById('admin-delivery').value=DELIVERY_COST;
+    document.getElementById('admin-capacita').value=CAPACITA_FASCIA;
+    document.getElementById('admin-viaggio').value=MINUTI_VIAGGIO;
   } else {
     toast('Password errata!','err');
     document.getElementById('admin-pwd').value='';
@@ -2358,12 +2533,21 @@ function saveAdminPrezzi(){
 
 function saveDelivery(){
   const v=parseFloat(document.getElementById('admin-delivery').value);
-  if(isNaN(v)||v<0){toast('Valore non valido!','err');return;}
+  if(isNaN(v)||v<0){toast('Costo consegna non valido!','err');return;}
+  const cap=parseInt(document.getElementById('admin-capacita').value);
+  if(isNaN(cap)||cap<1){toast('Pizze per 15 min non valido!','err');return;}
+  const via=parseInt(document.getElementById('admin-viaggio').value);
+  if(isNaN(via)||via<0){toast('Minuti di consegna non validi!','err');return;}
   DELIVERY_COST=v;
   localStorage.setItem('bb_delivery',v.toString());
-  toast('Costo consegna aggiornato a '+fmt(v)+'!','ok');
+  CAPACITA_FASCIA=cap;
+  localStorage.setItem('bb_capacita',cap.toString());
+  MINUTI_VIAGGIO=via;
+  localStorage.setItem('bb_viaggio',via.toString());
+  toast('Impostazioni salvate!','ok');
   closeAdmin();
   updTotal();
+  renderOpen();
 }
 
 function saveAdminPwd(){
