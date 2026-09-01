@@ -1176,7 +1176,11 @@ function saveCli(){
 }
 
 // CONFIRM ORDER
+// Guardia contro il doppio tocco sul tasto: sul tablet capita di sfiorarlo due
+// volte e finora partivano due ordini identici e due comande.
+let confermaInCorso=false;
 function confirmOrder(){
+  if(confermaInCorso)return;
   const cog=document.getElementById('cognome').value.trim();
   if(!cog){toast('Inserisci il cognome del cliente!','err');return;}
   if(!order.items.length){toast('Aggiungi almeno un prodotto!','err');return;}
@@ -1196,20 +1200,27 @@ function confirmOrder(){
   order.time=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   order.date=new Date().toLocaleDateString('it-IT');
   saveCli();
+  confermaInCorso=true;
+  setTimeout(()=>{confermaInCorso=false;},1000);   // sblocco di sicurezza
+  // Copia profonda: {...order} copiava gli items per riferimento, quindi per i
+  // 400ms prima di clearOrder il carrello e l'ordine appena salvato erano lo
+  // stesso array e toccare il "+" modificava una comanda gia' stampata.
+  const salvato={...order,items:order.items.map(i=>({...i,
+    extras:[...(i.extras||[])],removes:[...(i.removes||[])]}))};
   if(editId!==null){
     const idx=openOrders.findIndex(o=>o.id===editId);
-    if(idx!==-1){order.id=editId;order.num=openOrders[idx].num;openOrders[idx]={...order};}
+    if(idx!==-1){salvato.id=editId;salvato.num=openOrders[idx].num;openOrders[idx]=salvato;}
     editId=null;
   } else {
-    order.id=Date.now();
+    salvato.id=Date.now();
     ORDER_NUM++;
     localStorage.setItem('bb_ordnum',ORDER_NUM.toString());
-    order.num=ORDER_NUM;
-    openOrders.push({...order});
+    salvato.num=ORDER_NUM;
+    openOrders.push(salvato);
   }
   saveOrders();
   updCount();
-  printComanda({...order});
+  printComanda(salvato);
   setTimeout(()=>{
     clearOrder();
     toast('Ordine confermato! Comanda inviata al pizzaiolo.','ok',4000);
