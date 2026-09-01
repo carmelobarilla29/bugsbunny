@@ -872,6 +872,10 @@ let orMode=null;
 
 const fmt=n=>'€ '+n.toFixed(2).replace('.',',');
 
+// Prepara un testo per finire dentro una stringa JS in un attributo onclick:
+// backslash e apici vanno protetti per il JS, le virgolette doppie per l'HTML.
+const escAttr=s=>String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+
 // CLOCK
 setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),1000);
 document.getElementById('clock').textContent=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
@@ -1144,11 +1148,11 @@ function resetOr(){
 function onCog(v){
   const sb=document.getElementById('sugbox');
   if(v.length<2){sb.style.display='none';return;}
-  const m=clienti.filter(c=>c.cognome.toLowerCase().includes(v.toLowerCase()));
+  const m=clienti.filter(c=>c&&c.cognome&&c.cognome.toLowerCase().includes(v.toLowerCase()));
   if(!m.length){sb.style.display='none';return;}
   sb.style.display='block';
   sb.innerHTML=m.slice(0,5).map(c=>`
-    <div class="sugitem" onclick="selCli('${c.cognome.replace(/'/g,"\\'")}','${(c.telefono||'').replace(/'/g,"\\'")}','${(c.indirizzo||'').replace(/'/g,"\\'")}')">
+    <div class="sugitem" onclick="selCli('${escAttr(c.cognome)}','${escAttr(c.telefono)}','${escAttr(c.indirizzo)}')">
       <strong>${c.cognome}</strong>${c.telefono?' · '+c.telefono:''}${c.indirizzo?' · '+c.indirizzo:''}
     </div>`).join('');
 }
@@ -1421,7 +1425,7 @@ function renderOpen(){
       <div class="ocacts" style="margin-top:6px;">
         <button class="ocico edit" onclick="editOrder(${o.id})" title="Modifica">✏️</button>
         <button class="ocico print" onclick="printComanda(openOrders.find(x=>x.id===${o.id}))" title="Stampa">🖨️</button>
-        <button class="ocico cancel" onclick="if(confirm('Annullare ordine di ${o.cognome}?'))deleteOrder(${o.id})" title="Annulla ordine">🗑️</button>
+        <button class="ocico cancel" onclick="deleteOrder(${o.id})" title="Annulla ordine">🗑️</button>
       </div>
     </div>`;
 
@@ -1724,6 +1728,12 @@ function editPrintComanda(){
 }
 
 function deleteOrder(id){
+  // La conferma sta qui e non nell'onclick: nell'attributo il cognome finiva
+  // dentro una stringa JS e i cognomi con apostrofo (D'Amico, Dell'Aquila)
+  // rompevano il codice, lasciando il tasto senza alcun effetto.
+  const ord=openOrders.find(o=>o.id===id);
+  if(!ord)return;
+  if(!confirm('Annullare ordine di '+ord.cognome+'?'))return;
   openOrders=openOrders.filter(o=>o.id!==id);
   saveOrders();updCount();renderOpen();
   toast('Ordine annullato','ok',3000);
