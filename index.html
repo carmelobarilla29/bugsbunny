@@ -859,9 +859,20 @@ const EXTRAS_FARCITA=EXTRAS_MAX.map(e=>{
   return {...e,p:0};
 });
 let order={type:'asporto',items:[]};
-let openOrders=JSON.parse(localStorage.getItem('bb_ord')||'[]');
-let completedOrders=JSON.parse(localStorage.getItem('bb_comp')||'[]');
-let clienti=JSON.parse(localStorage.getItem('bb_cli')||'[]');
+// Lettura difensiva: se una di queste chiavi si rovina (scrittura interrotta,
+// memoria piena) il JSON.parse fermava tutto lo script e il gestionale non
+// partiva piu' - schermo vuoto a pizzeria aperta. Meglio ripartire da zero.
+function leggiSalvato(chiave){
+  try{
+    const v=JSON.parse(localStorage.getItem(chiave)||'[]');
+    return Array.isArray(v)?v:[];
+  }catch(e){
+    return [];   // dati rovinati: si riparte da zero invece di non partire
+  }
+}
+let openOrders=leggiSalvato('bb_ord');
+let completedOrders=leggiSalvato('bb_comp');
+let clienti=leggiSalvato('bb_cli');
 let view='new';
 let pendProd=null;
 let selEx=[],selRm=[];
@@ -870,7 +881,7 @@ let editId=null;
 let ORDER_NUM=parseInt(localStorage.getItem('bb_ordnum')||'0');
 let orMode=null;
 
-const fmt=n=>'€ '+n.toFixed(2).replace('.',',');
+const fmt=n=>'€ '+(Number(n)||0).toFixed(2).replace('.',',');
 
 // Prepara un testo per finire dentro una stringa JS in un attributo onclick:
 // backslash e apici vanno protetti per il JS, le virgolette doppie per l'HTML.
@@ -1286,7 +1297,7 @@ function renderCompleted(){
         <span class="octype ${o.type}">${o.type==='domicilio'?'🛵 Dom':'🥡 Asp'}</span>
       </div>
       ${o.orario?`<div style="font-size:12px;color:var(--g);margin-bottom:3px;">⏰ ${o.orario}</div>`:''}
-      <div class="ocitems">${o.items.map(i=>{
+      <div class="ocitems">${(o.items||[]).map(i=>{
         let s=`${i.qty}x ${i.name}`;
         if(i.extras&&i.extras.length)s+=` <span style="color:rgba(100,200,100,0.8);font-size:10px;">+${i.extras.join(', ')}</span>`;
         if(i.note)s+=` <span style="color:rgba(255,200,100,0.8);font-size:10px;">📝${i.note}</span>`;
@@ -1364,14 +1375,14 @@ function renderStats(){
   const peakHour=Object.entries(byHour).sort((a,b)=>b[1]-a[1])[0];
 
   // Conteggio pizze
-  const pizzeCount=completedOrders.reduce((s,o)=>s+o.items.filter(i=>{
+  const pizzeCount=completedOrders.reduce((s,o)=>s+(o.items||[]).filter(i=>{
     for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro','Teglie']){
       if(MENU[cat]&&MENU[cat].find(p=>p.n===i.name))return true;
     }
     return false;
-  }).reduce((ss,i)=>ss+i.qty,0),0);
+  }).reduce((ss,i)=>ss+(i.qty||0),0),0);
   const prodCount={};
-  completedOrders.forEach(o=>o.items.forEach(i=>{prodCount[i.name]=(prodCount[i.name]||0)+i.qty;}));
+  completedOrders.forEach(o=>(o.items||[]).forEach(i=>{prodCount[i.name]=(prodCount[i.name]||0)+(i.qty||0);}));
   const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const sc=(v,label,sub,color='var(--g)')=>`
     <div style="background:linear-gradient(145deg,rgba(45,90,27,0.6),rgba(26,58,26,0.8));border:2px solid ${color};border-radius:14px;padding:16px;">
@@ -1427,7 +1438,7 @@ function renderOpen(){
         ${o.orario?`<div style="font-size:16px;font-weight:900;color:var(--g);">⏰ ${o.orario}</div>`:''}
       </div>
       ${o.indirizzo?`<div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.85);margin-bottom:4px;">📍 ${o.indirizzo}</div>`:''}
-      <div class="ocitems">${o.items.map(i=>`${i.qty}x ${i.name}${(i.extras||[]).length?' [+'+i.extras.join(',')+']':''}${(i.removes||[]).length?' [-'+i.removes.join(',')+']':''}`).join('<br>')}</div>
+      <div class="ocitems">${(o.items||[]).map(i=>`${i.qty}x ${i.name}${(i.extras||[]).length?' [+'+i.extras.join(',')+']':''}${(i.removes||[]).length?' [-'+i.removes.join(',')+']':''}`).join('<br>')}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 8px;">
         <span class="octot">${fmt(o.total)}</span>
         <span class="octime">Preso: ${o.time}</span>
@@ -1697,7 +1708,7 @@ function editOpenItem(orderId,itemIdx){
 
 // Ricalcola il totale di un ordine aperto (items + consegna)
 function recalcOpenOrder(o){
-  o.total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
+  o.total=(o.items||[]).reduce((s,i)=>s+(i.price||0)*(i.qty||0),0);
   if(o.type==='domicilio')o.total+=(o.deliveryCost!==undefined?o.deliveryCost:DELIVERY_COST);
   o.total=+o.total.toFixed(2);
 }
@@ -2311,11 +2322,11 @@ function printRiepilogo(){
   const asporto=completedOrders.filter(o=>o.type==='asporto');
   const domicilio=completedOrders.filter(o=>o.type==='domicilio');
   const prodCount={};
-  completedOrders.forEach(o=>o.items.forEach(i=>{prodCount[i.name]=(prodCount[i.name]||0)+i.qty;}));
+  completedOrders.forEach(o=>(o.items||[]).forEach(i=>{prodCount[i.name]=(prodCount[i.name]||0)+(i.qty||0);}));
   const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]);
-  const pizzeCount=completedOrders.reduce((s,o)=>s+o.items.filter(i=>{
+  const pizzeCount=completedOrders.reduce((s,o)=>s+(o.items||[]).filter(i=>{
     for(const cat of ['Pizze Tonde','Pizze Max','Pizze Mezzo Metro','Teglie']){if(MENU[cat]&&MENU[cat].find(p=>p.n===i.name))return true;}return false;
-  }).reduce((ss,i)=>ss+i.qty,0),0);
+  }).reduce((ss,i)=>ss+(i.qty||0),0),0);
   const byHour={};
   completedOrders.forEach(o=>{
     let t=null;
