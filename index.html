@@ -2238,19 +2238,19 @@ function buildEscPosText(o){
   let txt='';
   txt+=CTR+BIG+'BUGS BUNNY\n'+NRM;
   txt+=CTR+data+'  '+ora+'\n';
-  txt+='================================\n';
+  txt+=LFT+'================\n';   // a sinistra come tutte le altre separazioni
   txt+=CTR+BIG+(o.type==='domicilio'?'DOMICILIO':'ASPORTO')+(o.num?' #'+o.num:'')+'\n'+NRM;
   txt+=LFT;
   if(o.type==='domicilio'){
     txt+=MED+(o.indirizzo||'N/D')+'\n'+NRM;
     txt+=BIG+'Tel: '+(o.telefono||'-')+'\n'+NRM;
   }
-  txt+='================================\n';
+  txt+='================\n';
 
   function addSection(title,items){
     if(!items.length)return;
     txt+=CTR+BOLD+'\n'+title+'\n'+BOFF+LFT;
-    txt+='--------------------------------\n';
+    txt+='----------------\n';
     items.forEach(i=>{
       let n=i.name.replace(/\s*\(met[aà]\/met[aà]\)/gi,'').trim()
         .replace('Quattro Stagioni','4 Stagioni')
@@ -2274,11 +2274,11 @@ function buildEscPosText(o){
   if(rosticceria.length)addSection('*** ROSTICCERIA ***',rosticceria);
   if(bibite.length||altro.length)addSection('*** BIBITE ***',[...bibite,...altro]);
 
-  txt+='================================\n';
+  txt+='================\n';
   txt+=CTR+BIG+(o.cognome||'CLIENTE').toUpperCase()+'\n';
   txt+=MED+'ORA: '+(o.orario||'-')+'\n'+NRM;
   if(o.total)txt+=MED+'TOT: '+fmt(o.total)+'\n'+NRM;
-  txt+=LFT+'================================\n\n\n\n\n';
+  txt+=LFT+'================\n\n\n\n\n';
   txt+=GS+'V'+'\x00';
   return txt;
 }
@@ -2342,24 +2342,24 @@ function printRiepilogo(){
   txt+=CENTER+FONT_GRANDE+'BUGS BUNNY\n'+FONT_NORMALE;
   txt+=CENTER+'RIEPILOGO SERATA\n';
   txt+=CENTER+data+'  '+ora+'\n';
-  txt+='================================\n';
+  txt+='================\n';
   txt+=LEFT;
   txt+=FONT_MEDIO+'Ordini: '+completedOrders.length+'\n'+FONT_NORMALE;
   txt+=FONT_MEDIO+'Asporto: '+asporto.length+'  Domicilio: '+domicilio.length+'\n'+FONT_NORMALE;
-  txt+='================================\n';
+  txt+='================\n';
   txt+=FONT_MEDIO+'Incasso lordo:  '+fmt(tot)+'\n'+FONT_NORMALE;
   if(totSconti>0)txt+='Sconti:         -'+fmt(totSconti)+'\n';
   txt+=FONT_MEDIO+'Incasso netto:  '+fmt(incassoReale)+'\n'+FONT_NORMALE;
-  txt+='--------------------------------\n';
+  txt+='----------------\n';
   txt+='Contanti: '+fmt(cash.reduce((s,o)=>s+(o.totalePagato||o.total||0),0))+' ('+cash.length+' ord)\n';
   txt+='Carta:    '+fmt(card.reduce((s,o)=>s+(o.totalePagato||o.total||0),0))+' ('+card.length+' ord)\n';
-  txt+='================================\n';
+  txt+='================\n';
   txt+=FONT_MEDIO+'Pizze sfornate: '+pizzeCount+'\n'+FONT_NORMALE;
   if(peakHour)txt+='Ora piu affollata: '+peakHour[0]+':00 ('+peakHour[1]+' ord)\n';
-  txt+='================================\n';
+  txt+='================\n';
   txt+=BOLD+'PRODOTTI:\n'+BOLD_OFF;
   topProds.forEach(p=>txt+=p[1]+'x  '+p[0]+'\n');
-  txt+='================================\n\n\n\n\n';
+  txt+='================\n\n\n\n\n';
   txt+='\x1D'+'V'+'\x00';
 
   setTimeout(()=>{
