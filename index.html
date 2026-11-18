@@ -1431,8 +1431,8 @@ function onCog(v){
 function selCli(cog,tel,ind){
   document.getElementById('cognome').value=cog;
   if(order.type==='domicilio'){
-    if(tel)document.getElementById('telefono').value=tel;
-    if(ind)document.getElementById('indirizzo').value=ind;
+    document.getElementById('telefono').value=tel||'';
+    document.getElementById('indirizzo').value=ind||'';
   }
   document.getElementById('sugbox').style.display='none';
 }
@@ -1536,7 +1536,7 @@ function updCount(){
 // COMPLETED ORDERS
 function renderCompleted(){
   const grid=document.getElementById('cgrid');
-  const totNetto=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
+  const totNetto=completedOrders.reduce((s,o)=>s+(o.totalePagato??o.total??0),0);
   document.getElementById('cinfo').textContent=`${completedOrders.length} ordini · Incasso netto: ${fmt(totNetto)}`;
   if(!completedOrders.length){
     grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="big">✅</div><p>Nessun ordine completato stasera</p></div>';
@@ -1591,7 +1591,7 @@ function deleteCompleted(idx){
 
 function resetCompleted(){
   if(!completedOrders.length){toast('Nessun ordine da azzerare','err');return;}
-  const totNetto=completedOrders.reduce((s,o)=>s+(o.totalePagato||o.total||0),0);
+  const totNetto=completedOrders.reduce((s,o)=>s+(o.totalePagato??o.total??0),0);
   if(!confirm(`Sei sicuro di voler azzerare la serata?\nIncasso netto: ${fmt(totNetto)}\nQuesta azione non si può annullare!`))return;
   completedOrders=[];
   localStorage.setItem('bb_comp',JSON.stringify(completedOrders));
@@ -1614,8 +1614,8 @@ function renderStats(){
   const card=completedOrders.filter(o=>o.payMethod==='card');
   const asporto=completedOrders.filter(o=>o.type==='asporto');
   const domicilio=completedOrders.filter(o=>o.type==='domicilio');
-  const totCash=cash.reduce((s,o)=>s+(o.totalePagato||o.total||0),0); // reale contanti
-  const totCard=card.reduce((s,o)=>s+(o.totalePagato||o.total||0),0); // reale carta
+  const totCash=cash.reduce((s,o)=>s+(o.totalePagato??o.total??0),0); // reale contanti
+  const totCard=card.reduce((s,o)=>s+(o.totalePagato??o.total??0),0); // reale carta
   const totSconti=completedOrders.reduce((s,o)=>s+(o.sconto||0),0);
   const nSconti=completedOrders.filter(o=>o.sconto>0).length;
   const incassoReale=totCash+totCard; // reale = contanti reali + carta reali
@@ -2000,7 +2000,8 @@ function editChgQty(orderId,itemIdx,d){
 }
 
 function editDelItem(orderId,itemIdx){
-  editChgQty(orderId,itemIdx,-99);
+  const item=openOrders.find(o=>o.id===orderId)?.items[itemIdx];
+  if(item)editChgQty(orderId,itemIdx,-item.qty);
 }
 
 function closeEditModal(){document.getElementById('medit').classList.remove('show');window._editOpen=null;window._editAddTarget=null;renderOpen();}
@@ -2060,9 +2061,13 @@ function showPayModal(tot,name){
   document.getElementById('mpay').classList.add('show');
 }
 
+function scontoPagamento(id,totale){
+  const richiesto=parseFloat(document.getElementById(id).value)||0;
+  return Math.min(totale,Math.max(0,richiesto));
+}
 function updateCardTotal(){
   const tot=payId?openOrders.find(o=>o.id===payId)?.total:getTotal();
-  const sconto=parseFloat(document.getElementById('pay-sconto-card').value)||0;
+  const sconto=scontoPagamento('pay-sconto-card',tot);
   const finale=Math.max(0,tot-sconto);
   document.getElementById('card-amount').textContent=fmt(finale);
 }
@@ -2089,7 +2094,7 @@ function setPayMethod(m){
 
 function calcResto(){
   const tot=payId?openOrders.find(o=>o.id===payId)?.total:getTotal();
-  const sconto=parseFloat(document.getElementById('pay-sconto').value)||0;
+  const sconto=scontoPagamento('pay-sconto',tot);
   const totale_finale=Math.max(0,tot-sconto);
   const dato=parseFloat(document.getElementById('pay-in').value)||0;
   const resto=Math.max(0,dato-totale_finale);
@@ -2102,9 +2107,7 @@ function closePay(){document.getElementById('mpay').classList.remove('show');pay
 function completePay(){
   if(!payMethod){toast('Seleziona contanti o carta!','err');return;}
   const tot=payId?openOrders.find(o=>o.id===payId)?.total:getTotal();
-  const sconto=payMethod==='cash'
-    ?(parseFloat(document.getElementById('pay-sconto').value)||0)
-    :(parseFloat(document.getElementById('pay-sconto-card').value)||0);
+  const sconto=scontoPagamento(payMethod==='cash'?'pay-sconto':'pay-sconto-card',tot);
   const totalefinale=Math.max(0,tot-sconto);
   if(payMethod==='cash'){
     const dato=parseFloat(document.getElementById('pay-in').value)||0;
@@ -2119,7 +2122,11 @@ function completePay(){
     order.total=getTotal();
     order.time=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
     order.date=new Date().toLocaleDateString('it-IT');
-    paidOrder={...order};
+    const domicilio=order.type==='domicilio';
+    paidOrder={...order,orario:getOrVal(),
+      telefono:domicilio?document.getElementById('telefono').value.trim():'',
+      indirizzo:domicilio?document.getElementById('indirizzo').value.trim():'',
+      deliveryCost:domicilio?currentDeliveryCost:0};
     saveCli();clearOrder();
   }
   if(paidOrder){
