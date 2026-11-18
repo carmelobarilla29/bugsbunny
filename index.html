@@ -364,6 +364,103 @@ button:focus-visible,input:focus-visible{outline:3px solid #d19521;outline-offse
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;}}
 
+/* Tema sabbia: stessa gerarchia nel banco, nelle liste e nelle finestre. */
+:root{--paper:#e6e0d0;--panel:#f0ebdd;--tile:#f6f1e5;--ink:#263c30;--border:#c2c5b2;}
+.app{grid-template-columns:minmax(0,1fr) 410px;}
+.menu-panel{grid-column:1;background:var(--paper);}
+.opanel{grid-column:2;background:var(--panel);border-right:0;border-left:2px solid #b4bda8;box-shadow:-4px 0 15px #213d3010;}
+.ohdr,.ofooter{background:var(--panel);}.cinfo .finput,.catalog-search{background:var(--tile);}
+.pbtn{background:var(--tile);}.ctab{background:#eee9dc;}.ctab.active{background:#235a3e;}
+.tbtn,.orbtn{transition:none;transform:none!important;}.typrow{gap:8px;}.tbtn{min-height:44px;}
+.oitem{grid-template-columns:minmax(0,1fr) auto auto;gap:6px;padding:8px 0;margin-bottom:2px;}
+.oitem>div:first-child{grid-column:1/3;grid-row:1;}.oitem .iprice{grid-column:3;grid-row:1;font-size:16px;}
+.oitem .qrow{grid-column:1;grid-row:2;}.oitem>button:not(.idel){grid-column:2;grid-row:2;}.oitem .idel{grid-column:3;grid-row:2;justify-self:end;}
+.qbtn,.idel,.oitem>button:not(.idel){min-width:40px;width:40px;min-height:40px;height:40px;}
+.iname{font-size:14px;}.qnum{min-width:24px;}.oitems{padding:6px 14px;}
+.opanel .inote-p,.opanel .inote-m,.opanel .inote-t{font-size:11px;line-height:1.25;}
+/* Liste ordini e statistiche: card distinte, testo scuro, azioni touch. */
+.oview,#cview,#sview{background:var(--paper);color:var(--ink);padding:20px!important;}
+:is(#oview,#cview,#sview) [style*="color:"]{color:var(--ink)!important;}
+.ogrid{grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;}
+.ocard,.ocard.domicilio{background:var(--tile);border:1px solid #bcc5b0;border-top:5px solid #42714b;border-radius:14px;opacity:1!important;padding:16px;box-shadow:0 3px 0 #bdc6b54a;}
+.ocard.domicilio{border-top-color:#b94b37;}
+.ocname{color:var(--ink);font-family:'Nunito',sans-serif;font-size:20px;}.ocitems{color:#43533d;font-size:14px;line-height:1.6;}
+.octot{color:#203e30;font-family:'Nunito',sans-serif;font-weight:900;}.octime{color:#62705b;font-size:12px;}
+.osection-title{font-family:'Nunito',sans-serif;font-weight:900;}.osection-title.asporto{color:#2c5435;background:#dce6ce;border-color:#8fa980;}.osection-title.domicilio{color:#863d2e;background:#f0d6c5;border-color:#c58e75;}
+.ocacts{gap:10px;}.ocico{width:46px;height:46px;min-width:46px;border-radius:10px;}.ocico.edit{background:#dce7ea;}.ocico.print{background:#e7dced;}.ocico.cancel{background:#f0d6cb;}
+.ocbtn-pay{background:#edc75b;border:1px solid #c4a347;color:#352e16;min-height:46px;}
+#cgrid .ocard>div:first-child{position:static!important;justify-content:flex-end;margin-bottom:8px;gap:10px!important;}
+#cgrid .ocard>div:first-child button{width:44px!important;height:44px!important;border-radius:9px!important;}
+#cgrid .ocard>div:nth-child(2){padding-right:0!important;}
+#cview button,#oview button,#sview button{min-height:44px;}
+#stats-content>div{background:var(--tile)!important;border-color:#aeba9c!important;}
+/* Fondi, campi e testi di tutti i modal. I valori selezionati sono gialli. */
+.modal{background:var(--panel);color:var(--ink);border:2px solid #9cac8b;padding:20px;}
+.modal :is(div,span,label,h3,p)[style*="color:"]{color:var(--ink)!important;}
+.modal h3{color:var(--ink);margin-bottom:12px;}
+.modal input{background:var(--tile)!important;color:var(--ink)!important;border:1px solid #aebc9d!important;border-radius:9px;min-height:42px;}
+.modal input::placeholder{color:#6b775e!important;}
+.modal button{min-height:44px;color:var(--ink)!important;background:#e1e5d6!important;border:1px solid #a8b998!important;border-radius:9px;transition:none!important;}
+.modal button[style*="background:var(--g)"],.modal button[style*="background: var(--g)"],.modal button[aria-pressed="true"],.modal .active{background:#f4d36c!important;border-color:#9b7922!important;color:#322f19!important;box-shadow:inset 0 -3px #ae8c35!important;}
+.modal button[style*="background: rgb(41, 128, 185)"]{background:#f4d36c!important;}
+.modal button.bok,.modal button[onclick="confirmMetaMeta()"],#pay-confirm-btn{background:#275b3a!important;color:#fff!important;border-color:#275b3a!important;}
+.modal button.bcan{background:#d7dacd!important;}
+.modal .mnote{color:#526448;font-size:12px;}.modal .paytot{color:#25432f;}.modal .restobox{background:#d6e4c5;}.modal .rv,.modal .rl{color:#23412e;}
+.modal .admin-cat{color:#315838;}.modal .admin-item{border-bottom-color:#c5cdb8;}
+#medit{z-index:100;}#mex,#mmeta,#mpay{z-index:110;}
+#medit .modal{width:720px!important;}.modal .mbtns{flex-shrink:0;gap:12px;}
+#medit-items>div{background:#e4e7d9!important;flex-wrap:wrap;}
+#medit-items button{min-width:42px;min-height:42px;}
+#edit-cat-tabs{gap:8px!important;}#edit-prod-grid{gap:10px!important;}
+/* Pizza normale: ricerca, ingredienti grandi e riepilogo rimovibile. */
+#mex .modal{width:820px;max-height:94dvh;display:flex;flex-direction:column;}
+#mex .elist{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:none;min-height:100px;height:230px;overflow-y:auto;flex:1 1 auto;padding:3px;}
+#mex .ebtn{font-size:13px;min-height:48px;}.modal .ebtn span{color:#526448!important;}
+#mex .rlist{gap:8px;flex-shrink:0;margin-bottom:10px;}.modal .rbtn[aria-pressed="true"]{background:#e8b5a3!important;border-color:#9e4a36!important;}
+.composer-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-shrink:0;}
+.composer-toolbar input{flex:1;min-width:0;width:100%;padding:10px 12px;font-size:15px;}
+.composer-toolbar .search-clear{width:44px;flex-shrink:0;font-size:22px;}
+.selection-strip{display:flex;flex-wrap:wrap;gap:6px;max-height:90px;overflow-y:auto;flex-shrink:0;padding:5px 0 9px;font-size:12px;color:#627153;}
+.selection-strip button{font-size:12px;padding:7px 10px;background:#f4d36c!important;}
+/* Metà/metà: una metà e un elenco per volta; conferma sempre separata. */
+#mmeta .modal{width:920px!important;height:min(740px,94dvh);max-height:94dvh!important;overflow:hidden;}
+.composer-help{font-size:12px;color:#5c6b50;line-height:1.4;margin-bottom:10px;flex-shrink:0;}
+.half-tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;flex-shrink:0;}
+.half-tabs button{text-align:left;padding:10px 12px;min-height:70px;}.half-tabs strong{font-size:16px;display:block;}.half-tabs span{font-size:12px;display:block;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px;}
+.composer-tabs{display:flex;gap:8px;}.composer-tabs button{min-width:85px;padding:9px 16px;font-size:14px;font-weight:900;}
+.composer-choices{flex:1;min-height:110px;overflow-y:auto;padding:3px;margin-bottom:8px;}
+.half-flavours{display:none!important;}
+.half-panel [id$="-wrap"]{max-height:none!important;overflow:visible!important;}
+#mmeta .choice-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px!important;max-height:none;overflow:visible;}
+#mmeta .choice-grid[hidden]{display:none!important;}
+#mmeta .choice-grid button{min-height:48px;font-size:14px!important;padding:10px!important;white-space:normal!important;font-weight:700;}
+.half-extra-label{color:#526448;font-size:12px;margin-bottom:8px;}
+#mmeta-note{min-height:38px;padding:7px 10px;}.meta-composer>div:has(#mmeta-note){flex-shrink:0;}
+#mmeta-totrow{flex-shrink:0;font-size:20px!important;color:#294b30!important;margin:4px 0 8px!important;}
+#mmeta .selection-strip{max-height:100px;}
+@media(max-width:1100px){.app{grid-template-columns:minmax(0,1fr) 370px;}.pgrid{grid-template-columns:repeat(3,minmax(0,1fr));}.pn{font-size:13px;}.catalog-heading p{max-width:none;}.catalog-tools{flex-wrap:wrap;}.catalog-search{max-width:none;}.catalog-badge{display:none;}}
+@media(max-width:850px){.app{grid-template-columns:minmax(0,1fr) 340px;}.pgrid{grid-template-columns:repeat(2,minmax(0,1fr));}.cat-tabs{grid-template-columns:repeat(4,minmax(0,1fr));}.catalog-section h2{font-size:14px;}.modal{padding:14px;}#mex .elist,#mmeta .choice-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.half-tabs span{max-width:280px;}}
+@media(max-width:600px){.app{grid-template-columns:minmax(0,1fr);}.menu-panel{grid-column:1;grid-row:2;}.opanel{grid-column:1;grid-row:3;border-left:0;}#mex .elist,#mmeta .choice-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.half-tabs span{max-width:150px;}.composer-toolbar{flex-wrap:wrap;}.composer-tabs{width:100%;}.composer-tabs button{flex:1;}.ogrid{grid-template-columns:1fr;}}
+@media(max-height:740px){#mex .modal{overflow-y:auto;}#mex .elist{flex:none;height:180px;}#mmeta .modal{height:96dvh;max-height:96dvh!important;padding:12px;}#mmeta .composer-help{font-size:11px;margin-bottom:6px;}.half-tabs{margin-bottom:7px;}.half-tabs button{min-height:60px;padding:7px 10px;}#mmeta h3{margin-bottom:7px;}#mmeta .selection-strip{max-height:52px;}.tbtn{min-height:42px;}}
+
+
+/* Rifiniture touch: azioni distanziate e finestre utilizzabili con tastiera aperta. */
+.nbtn,.orbtn,.typrow>button:last-child,.ofooter .bclr{min-height:44px;}
+.qbtn,.idel,.oitem>button:not(.idel){width:44px;min-width:44px;height:44px;min-height:44px;}
+.catalog-search button{width:44px;min-height:44px;}
+.modal button[data-name="Basilico"]:not([aria-pressed="true"]),
+.modal button[data-name="Origano"]:not([aria-pressed="true"]),
+.modal button[data-name="No Lattosio"]:not([aria-pressed="true"]){background:#dceaf0!important;color:#245974!important;border-color:#7ca3b7!important;}
+#edit-cat-tabs button[style*="background: var(--r)"],#edit-cat-tabs button[style*="background:var(--r)"]{background:#f4d36c!important;border-color:#9b7922!important;}
+@media(max-width:1100px) and (min-width:601px){.app{grid-template-rows:108px minmax(0,1fr);}}
+@media(max-height:600px){#mmeta .modal{overflow-y:auto;}#mmeta .composer-choices{flex:none;height:180px;}#mmeta .half-tabs,#mmeta .composer-toolbar{flex-shrink:0;}}
+
+.cinfo .finput{min-height:42px;}
+#domfields>div{display:grid!important;grid-template-columns:minmax(0,1fr) 76px;gap:6px!important;}
+#telefono{grid-column:1;grid-row:1;}#indirizzo{grid-column:1;grid-row:2;}
+#domfields>div>div{grid-column:2;grid-row:1/3;gap:6px!important;}
+#domfields input{width:100%;min-height:44px;margin-bottom:0!important;}
+#del-3,#del-5{min-height:44px;}
 </style>
 </head>
 <body>
@@ -397,6 +494,27 @@ button:focus-visible,input:focus-visible{outline:3px solid #d19521;outline-offse
       style="background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:900;white-space:nowrap;">
       🖨️ Non connessa
     </button>
+  </div>
+
+  <!-- MENU PANEL -->
+  <div class="menu-panel" id="mpanel">
+    <div class="catalog-heading">
+      <div><h1>Cosa prepariamo?</h1><p>Scegli una categoria e tocca un prodotto.</p></div>
+      <span class="catalog-badge">Il menu di Bugs Bunny</span>
+    </div>
+    <div class="cat-tabs" id="ctabs" aria-label="Categorie del menu"></div>
+    <div class="catalog-tools">
+      <div class="catalog-section"><h2 id="catalog-title">Pizze Tonde</h2><span class="catalog-count" id="catalog-count"></span></div>
+      <div class="catalog-search">
+        <span aria-hidden="true">⌕</span>
+        <input type="search" id="catalog-search" placeholder="Cerca nella categoria…" aria-label="Cerca nella categoria" autocomplete="off">
+        <button type="button" id="catalog-clear" aria-label="Cancella ricerca" hidden>×</button>
+      </div>
+    </div>
+    <div class="catalog-scroll">
+      <div class="pgrid" id="pgrid"></div>
+      <p class="catalog-no-results" id="catalog-empty" role="status" hidden>Nessun prodotto trovato. Prova un altro nome.</p>
+    </div>
   </div>
 
   <!-- ORDER PANEL -->
@@ -451,27 +569,6 @@ button:focus-visible,input:focus-visible{outline:3px solid #d19521;outline-offse
         <button class="bpay" onclick="openPay(null)">💰 Paga</button>
       </div>
       <button class="bclr" onclick="clearOrder()">🗑️ Azzera ordine corrente</button>
-    </div>
-  </div>
-
-  <!-- MENU PANEL -->
-  <div class="menu-panel" id="mpanel">
-    <div class="catalog-heading">
-      <div><h1>Cosa prepariamo?</h1><p>Scegli una categoria e tocca un prodotto.</p></div>
-      <span class="catalog-badge">Il menu di Bugs Bunny</span>
-    </div>
-    <div class="cat-tabs" id="ctabs" aria-label="Categorie del menu"></div>
-    <div class="catalog-tools">
-      <div class="catalog-section"><h2 id="catalog-title">Pizze Tonde</h2><span class="catalog-count" id="catalog-count"></span></div>
-      <div class="catalog-search">
-        <span aria-hidden="true">⌕</span>
-        <input type="search" id="catalog-search" placeholder="Cerca nella categoria…" aria-label="Cerca nella categoria" autocomplete="off">
-        <button type="button" id="catalog-clear" aria-label="Cancella ricerca" hidden>×</button>
-      </div>
-    </div>
-    <div class="catalog-scroll">
-      <div class="pgrid" id="pgrid"></div>
-      <p class="catalog-no-results" id="catalog-empty" role="status" hidden>Nessun prodotto trovato. Prova un altro nome.</p>
     </div>
   </div>
 
@@ -653,39 +750,33 @@ button:focus-visible,input:focus-visible{outline:3px solid #d19521;outline-offse
 
 <!-- MODAL METÀ/METÀ -->
 <div class="moverlay" id="mmeta">
-  <div class="modal" style="width:680px;max-height:95vh;display:flex;flex-direction:column;">
+  <div class="modal meta-composer" style="width:920px;max-height:95vh;display:flex;flex-direction:column;">
     <h3 id="mmeta-title" style="color:#f39c12;">⬡ Metà / Metà</h3>
-    <div style="font-size:10px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:6px;">Gusto opzionale · Primi 4 extra per metà gratis · Bresaola/Bufala sempre +€3</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;overflow-y:auto;margin-bottom:8px;">
-      <!-- PRIMA METÀ -->
-      <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:8px;">
-        <div style="font-size:12px;font-weight:900;color:#f39c12;text-align:center;margin-bottom:5px;">🍕 1a METÀ</div>
-        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">GUSTO (opzionale)</div>
-        <div id="mmeta-prima-sel" onclick="toggleGustiGrid('prima')"
-          style="background:rgba(0,0,0,0.3);border:1.5px solid rgba(245,216,0,0.3);border-radius:7px;padding:6px;text-align:center;font-size:11px;font-weight:900;color:rgba(255,255,255,0.4);cursor:pointer;margin-bottom:4px;">
-          Tocca per scegliere gusto...
-        </div>
-        <div id="mmeta-grid-prima-wrap" style="display:none;max-height:120px;overflow-y:auto;margin-bottom:5px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;" id="mmeta-grid-prima"></div>
-        </div>
-        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">EXTRA <span id="mmeta-count-prima" style="color:#f39c12;font-size:10px;"></span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:3px;" id="mmeta-extra-prima"></div>
-      </div>
-      <!-- SECONDA METÀ -->
-      <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:8px;">
-        <div style="font-size:12px;font-weight:900;color:#f39c12;text-align:center;margin-bottom:5px;">🍕 2a METÀ</div>
-        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">GUSTO (opzionale)</div>
-        <div id="mmeta-seconda-sel" onclick="toggleGustiGrid('seconda')"
-          style="background:rgba(0,0,0,0.3);border:1.5px solid rgba(245,216,0,0.3);border-radius:7px;padding:6px;text-align:center;font-size:11px;font-weight:900;color:rgba(255,255,255,0.4);cursor:pointer;margin-bottom:4px;">
-          Tocca per scegliere gusto...
-        </div>
-        <div id="mmeta-grid-seconda-wrap" style="display:none;max-height:120px;overflow-y:auto;margin-bottom:5px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;" id="mmeta-grid-seconda"></div>
-        </div>
-        <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">EXTRA <span id="mmeta-count-seconda" style="color:#f39c12;font-size:10px;"></span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:3px;" id="mmeta-extra-seconda"></div>
-      </div>
+    <p class="composer-help">Puoi scegliere più gusti. Primi 4 extra standard gratis per metà; poi €2 ciascuno. Tra Bresaola, Bufala e Burrata si paga solo il più caro, una volta.</p>
+    <div class="half-tabs">
+      <button type="button" id="ui-half-tab-prima" onclick="uiSelectHalf('prima')"><strong>½ Prima metà</strong><span id="ui-summary-prima">Da comporre</span></button>
+      <button type="button" id="ui-half-tab-seconda" onclick="uiSelectHalf('seconda')"><strong>½ Seconda metà</strong><span id="ui-summary-seconda">Da comporre</span></button>
     </div>
+    <div class="composer-toolbar">
+      <div class="composer-tabs"><button type="button" id="ui-mode-gusti" onclick="uiSelectMode('gusti')">Gusti</button><button type="button" id="ui-mode-extra" onclick="uiSelectMode('extra')">Extra</button></div>
+      <input type="search" id="ui-meta-search" aria-label="Cerca gusti o extra" placeholder="Cerca un gusto…" oninput="uiRefreshMeta()" autocomplete="off">
+      <button type="button" class="search-clear" onclick="uiClearSearch('ui-meta-search',uiRefreshMeta)" aria-label="Cancella ricerca metà">×</button>
+    </div>
+    <div id="ui-meta-choices" class="composer-choices">
+<section class="half-panel" id="ui-half-prima">
+   <div id="mmeta-prima-sel" class="half-flavours"></div>
+   <div id="mmeta-grid-prima-wrap"><div id="mmeta-grid-prima" class="choice-grid"></div></div>
+   <div class="half-extra-label">Extra <span id="mmeta-count-prima"></span></div>
+   <div id="mmeta-extra-prima" class="choice-grid"></div>
+ </section><section class="half-panel" id="ui-half-seconda">
+   <div id="mmeta-seconda-sel" class="half-flavours"></div>
+   <div id="mmeta-grid-seconda-wrap"><div id="mmeta-grid-seconda" class="choice-grid"></div></div>
+   <div class="half-extra-label">Extra <span id="mmeta-count-seconda"></span></div>
+   <div id="mmeta-extra-seconda" class="choice-grid"></div>
+ </section>
+      <p id="ui-meta-empty" hidden>Nessun risultato. Prova un altro nome.</p>
+    </div>
+    <div id="ui-meta-selected" class="selection-strip" aria-label="Scelte della metà attiva"></div>
     <div style="margin-bottom:6px;">
       <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:2px;">📝 NOTE</div>
       <input class="finput" type="text" id="mmeta-note" placeholder="Es: ben cotta..." style="margin-bottom:0;">
@@ -700,10 +791,16 @@ button:focus-visible,input:focus-visible{outline:3px solid #d19521;outline-offse
 
 <!-- MODAL EXTRA -->
 <div class="moverlay" id="mex">
-  <div class="modal">
+  <div class="modal extra-composer">
     <h3 id="mex-title">🍕 Personalizza</h3>
     <div class="mnote" id="mex-note-label">➕ Ingredienti extra (+€1,00 cad.)</div>
+    <div class="composer-toolbar">
+      <input type="search" id="ui-ex-search" aria-label="Cerca ingrediente" placeholder="Cerca ingrediente…" oninput="uiRefreshExtras()" autocomplete="off">
+      <button type="button" class="search-clear" onclick="uiClearSearch('ui-ex-search',uiRefreshExtras)" aria-label="Cancella ricerca ingrediente">×</button>
+    </div>
     <div class="elist" id="mex-extras"></div>
+    <p id="ui-ex-empty" hidden>Nessun ingrediente trovato.</p>
+    <div id="ui-ex-selected" class="selection-strip" aria-label="Ingredienti selezionati"></div>
     <div class="mnote">➖ Ingredienti da togliere</div>
     <div class="rlist" id="mex-removes"></div>
     <div class="mnote">📝 Note aggiuntive</div>
@@ -1274,16 +1371,15 @@ function addCoperto(){
 
 // TYPE
 function setType(t){
+  const changed=order.type!==t;
   order.type=t;
   document.getElementById('ta').classList.toggle('active',t==='asporto');
   document.getElementById('td').classList.toggle('active',t==='domicilio');
+  document.getElementById('ta').setAttribute('aria-pressed',String(t==='asporto'));
+  document.getElementById('td').setAttribute('aria-pressed',String(t==='domicilio'));
   document.getElementById('domfields').style.display=t==='domicilio'?'block':'none';
-  if(t==='domicilio'){
-    currentDeliveryCost=0; // reset prima così force funziona
-    setDelivery(DELIVERY_COST,true);
-  }
-  updTotal();
-  updCarico();
+  if(changed&&t==='domicilio')setDelivery(DELIVERY_COST,true);
+  else updTotal();
 }
 
 // ORARIO
@@ -2059,7 +2155,7 @@ function openEx(name,ing,isMax=false,excl=[],keepSel=false,farcitaPlus=false){
   const extrasList=baseList.filter(e=>!excl.includes(e.n));
   document.getElementById('mex-title').textContent='🍕 '+name;
   if(!keepSel)document.getElementById('mex-note').value='';
-  document.getElementById('mex-note-label').textContent='📝 Note aggiuntive';
+  document.getElementById('mex-note-label').textContent='Ingredienti extra';
   document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" data-name="${e.n.replace(/"/g,'&quot;')}" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')" ${e.special?'style="border-color:#3498db;color:#3498db;"':''}>${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
   const ings=ing.split(',').map(s=>s.trim()).filter(Boolean);
   document.getElementById('mex-removes').innerHTML=ings.length?ings.map(e=>`<button class="rbtn" onclick="togRm(this,'${e.replace(/'/g,"\\'")}')">${e}</button>`).join(''):'<span style="color:rgba(255,255,255,0.3);font-size:12px;">Nessun ingrediente base</span>';
@@ -2077,6 +2173,7 @@ function openEx(name,ing,isMax=false,excl=[],keepSel=false,farcitaPlus=false){
       }
     });
   }
+  uiResetExtras();
   document.getElementById('mex').classList.add('show');
 }
 
@@ -2175,6 +2272,7 @@ function openMetaMeta(name,price,isMax,skipReset=false){
     updateMetaCount(lato);
   });
   updateMetaTot();
+  uiResetMeta();
   document.getElementById('mmeta').classList.add('show');
 }
 
@@ -2861,6 +2959,66 @@ updCount();
   new MutationObserver(()=>{search.value='';update();grid.parentElement.scrollTop=0;}).observe(grid,{childList:true});
   update();
 })();
+</script>
+<script>
+// Stato solo visivo: le selezioni e i prezzi restano nelle funzioni originali.
+let uiHalf='prima',uiMetaMode='gusti';
+function uiNormalize(s){return s.toLocaleLowerCase('it').normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function uiClearSearch(id,refresh){document.getElementById(id).value='';refresh();}
+function uiChips(id,values,remove){
+  const el=document.getElementById(id);el.replaceChildren();
+  if(!values.length){el.textContent='Nessuna selezione';return;}
+  values.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v.label+' ×';b.setAttribute('aria-label','Rimuovi '+v.label);b.onclick=()=>remove(v);el.appendChild(b);});
+}
+function uiResetExtras(){document.getElementById('ui-ex-search').value='';document.getElementById('mex-extras').scrollTop=0;uiRefreshExtras();}
+function uiRefreshExtras(){
+ const query=uiNormalize(document.getElementById('ui-ex-search').value.trim());let count=0;
+ document.querySelectorAll('#mex-extras .ebtn').forEach(b=>{
+  b.hidden=!uiNormalize(b.dataset.name).includes(query);if(!b.hidden)count++;
+  b.setAttribute('aria-pressed',String(selEx.includes(b.dataset.name)));
+ });
+ document.querySelectorAll('#mex-removes .rbtn').forEach(b=>b.setAttribute('aria-pressed',String(selRm.includes(b.textContent.trim()))));
+ document.getElementById('ui-ex-empty').hidden=count>0;
+ uiChips('ui-ex-selected',selEx.map(n=>({label:n})),v=>{
+  const b=Array.from(document.querySelectorAll('#mex-extras .ebtn')).find(b=>b.dataset.name===v.label);
+  if(b){togEx(b,v.label);uiRefreshExtras();}
+ });
+}
+function uiResetMeta(){uiHalf='prima';uiMetaMode='gusti';document.getElementById('ui-meta-search').value='';uiRefreshMeta();document.getElementById('ui-meta-choices').scrollTop=0;}
+function uiSelectHalf(half){uiHalf=half;document.getElementById('ui-meta-search').value='';uiRefreshMeta();document.getElementById('ui-meta-choices').scrollTop=0;}
+function uiSelectMode(mode){uiMetaMode=mode;document.getElementById('ui-meta-search').value='';uiRefreshMeta();document.getElementById('ui-meta-choices').scrollTop=0;}
+function uiRefreshMeta(){
+ const search=document.getElementById('ui-meta-search');const query=uiNormalize(search.value.trim());let count=0;
+ search.placeholder=uiMetaMode==='gusti'?'Cerca un gusto…':'Cerca un ingrediente…';
+ ['prima','seconda'].forEach(half=>{
+  document.getElementById('ui-half-'+half).hidden=half!==uiHalf;
+  document.getElementById('ui-half-tab-'+half).setAttribute('aria-pressed',String(half===uiHalf));
+  document.getElementById('ui-summary-'+half).textContent=[...metaMetaGusti[half],...metaMetaExtras[half]].join(', ')||'Da comporre';
+  document.getElementById('mmeta-grid-'+half+'-wrap').style.display=uiMetaMode==='gusti'?'block':'none';
+  document.getElementById('mmeta-extra-'+half).hidden=uiMetaMode!=='extra';
+  document.querySelector('#ui-half-'+half+' .half-extra-label').hidden=uiMetaMode!=='extra';
+  document.querySelectorAll('#mmeta-grid-'+half+' button').forEach(b=>{
+   const n=b.textContent.trim();b.hidden=!uiNormalize(n).includes(query);
+   b.setAttribute('aria-pressed',String(metaMetaGusti[half].includes(n)));
+   if(half===uiHalf&&uiMetaMode==='gusti'&&!b.hidden)count++;
+  });
+  document.querySelectorAll('#mmeta-extra-'+half+' button').forEach(b=>{
+   b.hidden=!uiNormalize(b.dataset.name).includes(query);b.setAttribute('aria-pressed',String(metaMetaExtras[half].includes(b.dataset.name)));
+   if(half===uiHalf&&uiMetaMode==='extra'&&!b.hidden)count++;
+  });
+ });
+ ['gusti','extra'].forEach(mode=>document.getElementById('ui-mode-'+mode).setAttribute('aria-pressed',String(mode===uiMetaMode)));
+ document.getElementById('ui-meta-empty').hidden=count>0;
+ uiChips('ui-meta-selected',[...metaMetaGusti[uiHalf].map(n=>({label:n,kind:'gusto'})),...metaMetaExtras[uiHalf].map(n=>({label:n,kind:'extra'}))],v=>{
+  const selector=v.kind==='gusto'?'#mmeta-grid-'+uiHalf+' button':'#mmeta-extra-'+uiHalf+' button';
+  const b=Array.from(document.querySelectorAll(selector)).find(b=>(b.dataset.name||b.textContent.trim())===v.label);
+  if(b){if(v.kind==='gusto')togMetaGusto(uiHalf,v.label,b);else togMetaExtraLato(uiHalf,b,v.label);uiRefreshMeta();}
+ });
+}
+document.getElementById('mex-extras').addEventListener('click',uiRefreshExtras);
+document.getElementById('mex-removes').addEventListener('click',uiRefreshExtras);
+document.getElementById('ui-meta-choices').addEventListener('click',uiRefreshMeta);
+
 </script>
 </body>
 </html>
