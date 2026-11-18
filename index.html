@@ -1112,7 +1112,7 @@ const EXTRAS_MAX=[
   {n:"No Lattosio",p:0,special:true}
 ];
 
-// Ingredienti "prestige": nel metà/metà e nella Farcita(+) si paga solo il più caro presente, una volta sola
+// Ingredienti "prestige": nella Farcita (+) si sommano; nel metà/metà si paga solo il più caro.
 const PRESTIGE_INGREDIENTS=['Bresaola','Bufala','Burrata'];
 
 // Lista per Farcita(+): tutto gratis tranne Bresaola/Bufala/Burrata al loro prezzo Max
@@ -1216,7 +1216,7 @@ function addProd(cat,name,price){
       openMetaMeta(name,price,isMax);
       return;
     }
-    // Farcita+ : apre modal con lista Max, prezzi smart (4 gratis, dal 5° €2, bresaola/bufala €3)
+    // Farcita (+): ingredienti standard inclusi; Bresaola, Bufala e Burrata si sommano.
     if(prod&&prod.farcitaPlus){
       pendProd={name,price,ing:'',isMax:true,farcitaPlus:true,excl:[]};
       openEx(name,'',true,[],false,true);
@@ -1747,7 +1747,7 @@ function fillEditDati(){
   document.getElementById('edit-dati-tel').value=o.telefono||'';
   document.getElementById('edit-dati-ind').value=o.indirizzo||'';
   window._editType=o.type;
-  window._editDeliveryCost=o.deliveryCost!==undefined&&o.deliveryCost>0?o.deliveryCost:DELIVERY_COST;
+  window._editDeliveryCost=o.type==='domicilio'?(o.deliveryCost??DELIVERY_COST):DELIVERY_COST;
   updEditTypeUI();
 }
 
@@ -1761,7 +1761,7 @@ function updEditTypeUI(){
   bD.style.color=isDom?'var(--vs)':'rgba(255,255,255,0.6)';
   if(isDom){
     const b3=document.getElementById('edit-deliv-3'),b5=document.getElementById('edit-deliv-5');
-    const cost=window._editDeliveryCost||DELIVERY_COST;
+    const cost=window._editDeliveryCost??DELIVERY_COST;
     b3.style.background=cost===3?'var(--g)':'rgba(0,0,0,0.3)';
     b3.style.color=cost===3?'var(--vs)':'rgba(255,255,255,0.6)';
     b5.style.background=cost===5?'var(--g)':'rgba(0,0,0,0.3)';
@@ -1771,7 +1771,6 @@ function updEditTypeUI(){
 
 function switchEditType(type){
   window._editType=type;
-  if(type==='domicilio'&&!window._editDeliveryCost)window._editDeliveryCost=DELIVERY_COST;
   updEditTypeUI();
 }
 
@@ -1787,9 +1786,6 @@ function saveEditDati(){
   if(!cog){toast('Il cognome non può essere vuoto!','err');return;}
   const orario=document.getElementById('edit-dati-orario').value.trim();
   if(!orario){toast('L\'orario non può essere vuoto!','err');return;}
-  o.cognome=cog;
-  const om=orarioInMinuti(orario);
-  o.orario=(orario.toLowerCase().includes('appena')||om===null)?orario:minutiInOrario(om);
   const newType=window._editType||o.type;
   if(newType==='domicilio'){
     const tel=document.getElementById('edit-dati-tel').value.trim();
@@ -1799,11 +1795,14 @@ function saveEditDati(){
     o.telefono=tel;
     o.indirizzo=ind;
     o.type='domicilio';
-    o.deliveryCost=window._editDeliveryCost||DELIVERY_COST;
+    o.deliveryCost=window._editDeliveryCost??DELIVERY_COST;
   } else {
     o.type='asporto';
     o.deliveryCost=0;
   }
+  o.cognome=cog;
+  const om=orarioInMinuti(orario);
+  o.orario=(orario.toLowerCase().includes('appena')||om===null)?orario:minutiInOrario(om);
   recalcOpenOrder(o);
   saveOrders();
   renderOpen();
@@ -2155,7 +2154,7 @@ function openEx(name,ing,isMax=false,excl=[],keepSel=false,farcitaPlus=false){
   const extrasList=baseList.filter(e=>!excl.includes(e.n));
   document.getElementById('mex-title').textContent='🍕 '+name;
   if(!keepSel)document.getElementById('mex-note').value='';
-  document.getElementById('mex-note-label').textContent='Ingredienti extra';
+  document.getElementById('mex-note-label').textContent=farcitaPlus?'Ingredienti inclusi · Bresaola, Bufala e Burrata si sommano':'Ingredienti extra';
   document.getElementById('mex-extras').innerHTML=extrasList.map(e=>`<button class="ebtn" data-name="${e.n.replace(/"/g,'&quot;')}" onclick="togEx(this,'${e.n.replace(/'/g,"\\'")}')" ${e.special?'style="border-color:#3498db;color:#3498db;"':''}>${e.n} <span style="color:var(--g);font-size:11px;">${e.p===0?'gratis':'+€'+e.p}</span></button>`).join('');
   const ings=ing.split(',').map(s=>s.trim()).filter(Boolean);
   document.getElementById('mex-removes').innerHTML=ings.length?ings.map(e=>`<button class="rbtn" onclick="togRm(this,'${e.replace(/'/g,"\\'")}')">${e}</button>`).join(''):'<span style="color:rgba(255,255,255,0.3);font-size:12px;">Nessun ingrediente base</span>';
@@ -2406,22 +2405,13 @@ function confirmEx(){
   if(!pendProd)return;
   const nota=document.getElementById('mex-note').value.trim();
 
-  let extraPrice=0;
-  if(pendProd.farcitaPlus){
-    // Farcita+: tutti gratis tranne Bresaola/Bufala/Burrata (si paga solo il più caro presente)
-    let prestigeMax=0;
-    PRESTIGE_INGREDIENTS.forEach(n=>{
-      if(selEx.includes(n)){
-        const ex=EXTRAS_MAX.find(x=>x.n===n);
-        if(ex&&ex.p>prestigeMax)prestigeMax=ex.p;
-      }
-    });
-    extraPrice=prestigeMax;
-  } else {
-    // Pizze normali: usa prezzi da lista
-    const list=pendProd.isMax?EXTRAS_MAX:EXTRAS;
-    extraPrice=selEx.reduce((s,n)=>{const ex=list.find(x=>x.n===n);return s+(ex?ex.p:0);},0);
-  }
+  // La Farcita (+) usa il listino mostrato nel modal: standard inclusi,
+  // Bresaola/Bufala/Burrata ciascuna al proprio prezzo, sommati tra loro.
+  const list=pendProd.farcitaPlus?EXTRAS_FARCITA:(pendProd.isMax?EXTRAS_MAX:EXTRAS);
+  const extraPrice=selEx.reduce((sum,n)=>{
+    const ex=list.find(x=>x.n===n);
+    return sum+(ex?ex.p:0);
+  },0);
 
   const fp=+(pendProd.price+extraPrice).toFixed(2);
 
