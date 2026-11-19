@@ -351,10 +351,11 @@ button:focus-visible,input:focus-visible{outline:3px solid #d19521;outline-offse
  .pbtn{min-height:88px;padding:13px;}.catalog-scroll{padding-top:12px;}
 }
 @media(max-height:740px) and (min-width:601px){
- .opanel{overflow-y:auto;}.oitems{flex:1 0 125px;}
+ /* Con poco spazio scorre tutta la colonna: il totale segue l’ultima pizza. */
+ .opanel{overflow-y:auto;}.oitems{flex:1 0 auto;overflow:visible;}
 }
 @media(max-height:650px) and (min-width:601px){
- .opanel{overflow-y:auto;}.oitems{flex:1 0 110px;overflow-y:visible;}.ohdr,.cinfo,.ofooter{padding-top:7px;padding-bottom:7px;}
+ .ohdr,.cinfo,.ofooter{padding-top:7px;padding-bottom:7px;}
  .catalog-heading{margin-bottom:10px;}.cat-tabs{margin-bottom:10px;}.ctab{min-height:60px;}
 }
 @media(hover:hover){
